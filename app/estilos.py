@@ -154,11 +154,23 @@ div[class*="st-key-card_"] {
 SCRIPT_NOINDEX = """
 <script>
 (function() {
-    if (!document.querySelector('meta[name="robots"]')) {
-        const meta = document.createElement('meta');
-        meta.name = 'robots';
-        meta.content = 'noindex, nofollow';
-        document.head.appendChild(meta);
+    // Streamlit Cloud renderiza la app dentro de un iframe (.../~/+/) -- el <head> que
+    // importa para robots.txt/crawlers es el del documento EXTERIOR, no el de este iframe.
+    function marcarNoindex(doc) {
+        if (doc && !doc.querySelector('meta[name="robots"]')) {
+            const meta = doc.createElement('meta');
+            meta.name = 'robots';
+            meta.content = 'noindex, nofollow';
+            doc.head.appendChild(meta);
+        }
+    }
+    marcarNoindex(document);
+    try {
+        if (window.top && window.top !== window) {
+            marcarNoindex(window.top.document);
+        }
+    } catch (e) {
+        // Cross-origin (no debería pasar en Streamlit Cloud, mismo origen) -- no hacer nada.
     }
 })();
 </script>
