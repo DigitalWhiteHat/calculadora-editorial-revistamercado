@@ -1,0 +1,10 @@
+streamlit
+plotly
+pandas
+numpy
+pillow
+fpdf2
+watchdog
+kaleido
+beautifulsoup4
+requests

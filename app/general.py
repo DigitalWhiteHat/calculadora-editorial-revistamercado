@@ -1,0 +1,424 @@
+"""Vista general — desempeño editorial de todo el equipo."""
+
+import numpy as np
+import pandas as pd
+import plotly.graph_objects as go
+import streamlit as st
+
+import calculos as calc
+import datos_reales as dr
+from avatares import avatar_data_uri
+from estilos import BG_ESTADO, TXT_ESTADO, delta_html, kpi_card
+from google_updates import UPDATES_2026
+
+COLOR_ESTADO = {"green": "#16A34A", "blue": "#3457D5", "red": "#DC2626"}
+ESTADO_STYLE = {
+    label: f"background-color:{BG_ESTADO[key]};color:{TXT_ESTADO[key]};font-weight:600;border-radius:6px"
+    for label, key in [("SOBRE MEDIANA", "green"), ("EN RANGO", "blue"), ("EN ALERTA", "red")]
+}
+
+
+def _kpis(tabla):
+    notas_total = tabla["notas"].sum()
+    trafico_total = tabla["clics"].sum()
+    eficiencia_prom = tabla["eficiencia_normalizada"].mean()
+    en_alerta = int(tabla["en_alerta"].sum())
+
+    tarjetas = [
+        kpi_card("👥", "Periodistas activos", f"{len(tabla)}"),
+        kpi_card("⚠️", "En alerta", f"{en_alerta}", help_text="Periodistas con al menos una alerta CRÍTICA de "
+                  "estado actual (SEO, canibalización, CTR o eficiencia). Ver pestaña Alertas para el detalle."),
+        kpi_card("📈", "Eficiencia promedio", f"{eficiencia_prom:.0f}",
+                  help_text="Índice comparativo, no un porcentaje ni un conteo: 100 = mediana del equipo. "
+                  "Tráfico ajustado por dificultad de sección, relativo al resto del equipo."),
+        kpi_card("📝", "Notas totales", f"{notas_total:.0f}"),
+        kpi_card("🔎", "Tráfico total", calc.formatear_numero(trafico_total)),
+        kpi_card("🚩", "Flags de revisión IA", "—", help_text="Aún no se ha corrido la auditoría de originalidad sobre este periodo"),
+    ]
+    st.markdown(f'<div class="cp-kpi-row">{"".join(tarjetas)}</div>', unsafe_allow_html=True)
+
+
+def _tendencia_portal():
+    st.subheader("Tendencia del portal — 7 periodos (jul-2026 censo + histórico ene-jun)")
+    st.caption(
+        "Tráfico TOTAL real reportado por GA4 cada periodo (todo el portal, sin filtrar por clasificación de "
+        "artículo) — no cambia con el selector de periodo de arriba. Los puntos rojos son periodos con un "
+        "update de Google conocido — pasa el mouse por encima para ver cuál, y compáralo con la forma de la "
+        "línea antes/después."
+    )
+    por_periodo = dr.trafico_total_por_periodo()
+
+    updates_por_periodo: dict[str, list[dict]] = {}
+    for u in UPDATES_2026:
+        if u["inicio"].year == 2026 and 1 <= u["inicio"].month <= 7:
+            mes_str = f"2026-{u['inicio'].month:02d}"
+            updates_por_periodo.setdefault(mes_str, []).append(u)
+
+    fig = go.Figure(go.Scatter(
+        x=por_periodo["mes_label"], y=por_periodo["trafico"], mode="lines+markers+text",
+        line=dict(color="#3457D5", width=3), marker=dict(size=9, color="#3457D5"),
+        text=[calc.formatear_numero(v) for v in por_periodo["trafico"]], textposition="top center",
+        hovertemplate="%{x}<br>Tráfico: %{y:,.0f}<extra></extra>",
+    ))
+
+    con_update = por_periodo[por_periodo["periodo"].isin(updates_por_periodo)]
+    if not con_update.empty:
+        hover_txt = [" · ".join(u["nombre"] for u in updates_por_periodo[p]) for p in con_update["periodo"]]
+        fig.add_trace(go.Scatter(
+            x=con_update["mes_label"], y=con_update["trafico"], mode="markers",
+            marker=dict(size=15, color="#DC2626", symbol="diamond", line=dict(width=2, color="white")),
+            hovertext=hover_txt, hovertemplate="%{x}<br>%{hovertext}<extra></extra>", showlegend=False,
+        ))
+        for p, r in zip(con_update["periodo"], con_update.itertuples()):
+            tipos = " + ".join(sorted({u["tipo"] for u in updates_por_periodo[p]}))
+            fig.add_annotation(
+                x=r.mes_label, y=r.trafico, text=tipos, showarrow=True, arrowhead=0, arrowcolor="#DC2626",
+                ax=0, ay=-38, font=dict(size=10, color="#DC2626"),
+                bgcolor="rgba(255,255,255,0.92)", bordercolor="#DC2626", borderwidth=1, borderpad=3,
+            )
+
+    fig.update_layout(
+        height=380, margin=dict(l=0, r=10, t=50, b=10),
+        yaxis_title=None, showlegend=False,
+        plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
+        yaxis=dict(showgrid=True, gridcolor="#E2E6ED", rangemode="tozero"),
+        xaxis=dict(showgrid=False),
+    )
+    st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
+
+
+def _aporte_trafico(tabla):
+    st.subheader("Aporte de tráfico por periodista")
+    ordenado = tabla.sort_values("clics", ascending=True)
+    colores = [COLOR_ESTADO[calc.estado_label(r.eficiencia_normalizada, r.en_alerta)[1]] for r in ordenado.itertuples()]
+    textos = [f"{calc.formatear_numero(v)} · {p:.1f}%" for v, p in zip(ordenado["clics"], ordenado["pct_trafico_total"])]
+
+    fig = go.Figure(go.Bar(
+        x=ordenado["clics"], y=ordenado["periodista"], orientation="h",
+        marker_color=colores, text=textos, textposition="outside",
+        hovertemplate="%{y}<br>Tráfico: %{x:,.0f}<extra></extra>",
+    ))
+    fig.update_layout(
+        height=max(280, 34 * len(ordenado)), margin=dict(l=0, r=60, t=10, b=10),
+        xaxis_title=None, yaxis_title=None, showlegend=False,
+        plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
+        xaxis=dict(showgrid=True, gridcolor="#E2E6ED"),
+    )
+    st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
+    st.caption(f"Tráfico total del periodo: **{calc.formatear_numero(tabla['clics'].sum())}**")
+
+
+def _notas_por_periodista(tabla):
+    st.subheader("Notas publicadas por periodista")
+    st.caption("Cuántas notas hizo cada quien en el periodo — dato bruto, sin ajustar.")
+    ordenado = tabla.sort_values("notas", ascending=True)
+    colores = [COLOR_ESTADO[calc.estado_label(r.eficiencia_normalizada, r.en_alerta)[1]] for r in ordenado.itertuples()]
+
+    fig = go.Figure(go.Bar(
+        x=ordenado["notas"], y=ordenado["periodista"], orientation="h",
+        marker_color=colores, text=ordenado["notas"].astype(int).astype(str), textposition="outside",
+        hovertemplate="%{y}<br>Notas: %{x}<extra></extra>",
+    ))
+    fig.update_layout(
+        height=max(280, 34 * len(ordenado)), margin=dict(l=0, r=40, t=10, b=10),
+        xaxis_title=None, yaxis_title=None, showlegend=False,
+        plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
+        xaxis=dict(showgrid=True, gridcolor="#E2E6ED"),
+    )
+    st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
+    st.caption(f"Notas totales del periodo: **{int(tabla['notas'].sum())}**")
+
+
+def _cuadrante(tabla):
+    st.subheader("Volumen de notas vs. eficiencia normalizada")
+    st.caption("Cada punto representa a un periodista. Haz clic en un punto para ver su perfil.")
+
+    x = tabla["notas"].to_numpy(dtype=float)
+    y = tabla["eficiencia_normalizada"].to_numpy(dtype=float)
+    x_mid = float(np.median(x))
+    y_mid = 100.0
+
+    # Equipos reales muy desiguales (2-3 de alto volumen/eficiencia vs. muchos
+    # colaboradores ocasionales de 1-5 notas) hacen que el máximo bruto dispare
+    # el rango del eje y aplaste a todo el resto del equipo contra el borde —
+    # visualmente roto, no solo "apretado". En vez de usar el máximo real,
+    # el techo del eje se calcula sobre el percentil 75 (la mayoría del
+    # equipo) y los pocos puntos que superen ese techo se PINTAN ahí mismo
+    # (ancla visual, no se pierden ni se inventan): su cifra real sigue en el
+    # hover y en la tabla de abajo, nunca se oculta el dato.
+    x_p75 = float(np.percentile(x, 75)) if len(x) else 0.0
+    y_p75 = float(np.percentile(y, 75)) if len(y) else 0.0
+    x_cap = max(x_p75 * 5, x_mid * 2, 20.0)
+    y_cap = max(y_p75 * 5, 300.0)
+    x_plot = np.clip(x, None, x_cap)
+    y_plot = np.clip(y, None, y_cap)
+    hay_recortados = bool((x > x_cap).any() or (y > y_cap).any())
+
+    x_range = (0, x_cap * 1.1)
+    y_range = (0, y_cap * 1.1)
+
+    fig = go.Figure()
+    zonas = [
+        (x_range[0], x_mid, y_mid, y_range[1], "#FEF3C7"),
+        (x_mid, x_range[1], y_mid, y_range[1], "#DCFCE7"),
+        (x_range[0], x_mid, y_range[0], y_mid, "#F1F5F9"),
+        (x_mid, x_range[1], y_range[0], y_mid, "#FEE2E2"),
+    ]
+    for x0, x1, y0, y1, color in zonas:
+        fig.add_shape(type="rect", x0=x0, x1=x1, y0=y0, y1=y1, fillcolor=color, opacity=0.5, line_width=0, layer="below")
+
+    # Las etiquetas de zona van ancladas a las ESQUINAS del gráfico (coordenadas
+    # de dominio 0-1), no a los valores de datos: con un equipo real tan
+    # desigual (unos pocos periodistas de alto volumen vs. muchos de 1-5 notas),
+    # x_mid/y_mid quedan muy cerca de los bordes y el texto centrado en el
+    # valor de datos se sale del gráfico o choca con los ejes. Anclado a la
+    # esquina, el rótulo siempre queda legible sin importar qué tan parejo o
+    # desigual esté el equipo ese mes.
+    # Textos cortos a propósito (no "ALTA EFICIENCIA · BAJO VOLUMEN Y ...largo"):
+    # con la columna angosta del layout de 2 columnas, etiquetas largas en la
+    # misma fila (arriba-izq. y arriba-der.) chocan entre sí mucho antes de
+    # llegar a los bordes del gráfico. El eje X/Y y el texto explicativo de
+    # arriba ya dicen qué es volumen y qué es eficiencia — la etiqueta de
+    # esquina solo necesita ubicar el cuadrante, no repetirlo todo.
+    etiquetas_esquina = [
+        (0.02, 0.97, "left", "top", "Alta eficiencia"),
+        (0.98, 0.97, "right", "top", "Zona ideal"),
+        (0.02, 0.03, "left", "bottom", "Bajo rendimiento"),
+        (0.98, 0.03, "right", "bottom", "Alto volumen, bajo impacto"),
+    ]
+    for xe, ye, xanchor, yanchor, label in etiquetas_esquina:
+        fig.add_annotation(x=xe, y=ye, xref="x domain", yref="y domain", text=label, showarrow=False,
+                            font=dict(size=9, color="#64748B"), xanchor=xanchor, yanchor=yanchor)
+
+    fig.add_shape(type="line", x0=x_mid, x1=x_mid, y0=y_range[0], y1=y_range[1], line=dict(color="#94A3B8", dash="dash", width=1))
+    fig.add_shape(type="line", x0=x_range[0], x1=x_range[1], y0=y_mid, y1=y_mid, line=dict(color="#94A3B8", dash="dash", width=1))
+
+    colores = [COLOR_ESTADO[calc.estado_label(r.eficiencia_normalizada, r.en_alerta)[1]] for r in tabla.itertuples()]
+    # Lista de listas (no np.stack): mezcla slug (str) con notas/eficiencia
+    # (float) — un ndarray homogéneo forzaría todo a texto y rompería el
+    # formato ":.0f" del hovertemplate.
+    customdata = [[slug, xi, yi] for slug, xi, yi in zip(tabla["slug"], x, y)]
+    fig.add_trace(go.Scatter(
+        x=x_plot, y=y_plot, mode="markers", marker=dict(size=34, color=colores, line=dict(width=2, color="white")),
+        customdata=customdata, text=tabla["periodista"],
+        hovertemplate="%{text}<br>Notas: %{customdata[1]}<br>Eficiencia: %{customdata[2]:.0f}<extra></extra>",
+    ))
+
+    sizex = (x_range[1] - x_range[0]) * 0.055
+    sizey = (y_range[1] - y_range[0]) * 0.11
+    for r, xp, yp in zip(tabla.itertuples(), x_plot, y_plot):
+        fig.add_layout_image(dict(
+            source=avatar_data_uri(r.periodista, "#334155", 96), xref="x", yref="y",
+            x=xp, y=yp, sizex=sizex, sizey=sizey,
+            xanchor="center", yanchor="middle", layer="above",
+        ))
+
+    fig.update_layout(
+        height=440, margin=dict(l=10, r=10, t=30, b=10),
+        xaxis=dict(title="Volumen de notas publicadas (periodo)", range=x_range, showgrid=True, gridcolor="#E2E6ED"),
+        yaxis=dict(title="Eficiencia normalizada (índice)", range=y_range, showgrid=True, gridcolor="#E2E6ED"),
+        plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)", showlegend=False,
+    )
+
+    # Key con firma del contenido (no un string fijo): Streamlit/Plotly puede
+    # persistir el zoom/rango del cliente entre reruns bajo la misma key —
+    # con datos tan distintos entre periodos (un mes puede necesitar recorte
+    # y julio no), un zoom viejo pegado al cambiar de periodo vuelve a romper
+    # visualmente el gráfico aunque el rango recién calculado sea correcto.
+    firma = f"{len(tabla)}_{int(x_cap)}_{int(y_cap)}"
+    event = st.plotly_chart(fig, width="stretch", on_select="rerun", selection_mode="points",
+                             key=f"cuadrante_scatter_{firma}", config={"displayModeBar": False})
+    if hay_recortados:
+        st.caption("📌 Uno o más periodistas con volumen o eficiencia muy por encima del resto del equipo se "
+                   "muestran anclados al borde del gráfico (si no, aplastarían al resto contra el eje) — su "
+                   "cifra real está en el hover y en la tabla de abajo, nunca se oculta ni se inventa.")
+    puntos = event.get("selection", {}).get("points", []) if event else []
+    if puntos:
+        idx = puntos[0].get("point_index")
+        if idx is not None and 0 <= idx < len(tabla):
+            return tabla.iloc[idx]["slug"]
+    return None
+
+
+def _selector_perfil(tabla):
+    orden = tabla.sort_values("clics", ascending=False)
+    col_txt, col_sel, col_btn = st.columns([2, 2, 1])
+    col_txt.subheader("Detalle por periodista")
+    nombre = col_sel.selectbox("Ver perfil de periodista", orden["periodista"], label_visibility="collapsed")
+    if col_btn.button("Ver perfil →", width="stretch"):
+        return orden.loc[orden["periodista"] == nombre, "slug"].iloc[0]
+    return None
+
+
+def _tabla_principal(tabla):
+    st.caption("O haz clic en una fila de la tabla / un punto del cuadrante para ver su perfil.")
+    st.caption(
+        "**Semáforo SEO** = % promedio de cumplimiento del checklist de 15 ítems automatizados "
+        "(título, meta descripción, estructura, enlaces internos, imagen, etc.) sobre las notas evaluadas "
+        "de cada periodista: 🟢 80% o más · 🟡 entre 60% y 79% · 🔴 menos de 60%. "
+        "Haz clic en un periodista y baja a \"¿En qué está fallando el SEO?\" para ver el desglose ítem por ítem."
+    )
+    vista = tabla.copy().sort_values("clics", ascending=False).reset_index(drop=True)
+    vista["foto"] = [avatar_data_uri(n, "#334155", 64) for n in vista["periodista"]]
+    vista["seccion_beat"] = vista["seccion"] + " · " + vista["beat"]
+    vista["eficiencia_delta"] = vista.apply(
+        lambda r: calc.formatear_delta_pct(r["eficiencia_normalizada"], r["eficiencia_normalizada_anterior"]) or "—",
+        axis=1)
+    vista["notas_dificultad"] = vista.apply(
+        lambda r: f"{int(r.notas_facil)}F · {int(r.notas_media)}M · {int(r.notas_dificil)}D", axis=1)
+    vista["engagement"] = vista["tiempo_pagina_seg"].apply(calc.formatear_tiempo)
+    vista["semaforo"] = vista["pct_cumplimiento_prom"].apply(
+        lambda v: "⚪ s/e" if pd.isna(v) else f"{'🟢' if v >= 80 else '🟡' if v >= 60 else '🔴'} {v:.0f}%")
+    vista["estado_txt"] = vista.apply(lambda r: calc.estado_label(r["eficiencia_normalizada"], r["en_alerta"])[0], axis=1)
+    vista["trafico_txt"] = vista["clics"].apply(calc.formatear_numero)
+    vista["pct_trafico_txt"] = vista["pct_trafico_total"].apply(lambda v: f"{v:.1f}%")
+
+    columnas = ["foto", "periodista", "seccion_beat", "notas", "eficiencia_normalizada", "eficiencia_delta",
+                "trafico_txt", "pct_trafico_txt", "canal_dominante", "notas_dificultad", "engagement",
+                "semaforo", "flags_ia", "estado_txt"]
+    styled = vista[columnas].style.map(lambda v: ESTADO_STYLE.get(v, ""), subset=["estado_txt"])
+    event = st.dataframe(
+        styled, hide_index=True, width="stretch", on_select="rerun",
+        selection_mode="single-row", key="tabla_periodistas",
+        column_config={
+            "foto": st.column_config.ImageColumn("", width="small"),
+            "periodista": st.column_config.TextColumn("Periodista", width="medium"),
+            "seccion_beat": st.column_config.TextColumn("Sección / Beat", width="medium"),
+            "notas": st.column_config.NumberColumn("Notas", width="small",
+                                                     help="Número de notas publicadas en el periodo (dato bruto)"),
+            "eficiencia_normalizada": st.column_config.NumberColumn(
+                "Eficiencia", format="%.0f", width="small",
+                help="Índice comparativo (100 = mediana del equipo), no un conteo de notas ni un porcentaje"),
+            "eficiencia_delta": st.column_config.TextColumn("Δ vs. periodo ant.", width="small"),
+            "trafico_txt": st.column_config.TextColumn("Tráfico", width="small"),
+            "pct_trafico_txt": st.column_config.TextColumn("% del medio", width="small"),
+            "canal_dominante": st.column_config.TextColumn("Canal", width="small"),
+            "notas_dificultad": st.column_config.TextColumn("Notas por dificultad", width="small",
+                                                              help="Fácil / Media / Difícil, según el tráfico mensual de la sección"),
+            "engagement": st.column_config.TextColumn("Engagement", width="small"),
+            "semaforo": st.column_config.TextColumn("Semáforo SEO", width="small"),
+            "flags_ia": st.column_config.NumberColumn("Flags IA", width="small"),
+            "estado_txt": st.column_config.TextColumn("Estado", width="medium"),
+        },
+    )
+    filas = event.get("selection", {}).get("rows", []) if event else []
+    if filas:
+        return vista.iloc[filas[0]]["slug"]
+    return None
+
+
+def _explicacion_eficiencia(tabla):
+    mediana = tabla["trafico_ajustado"].median()
+    ref = tabla.iloc[(tabla["trafico_ajustado"] - mediana).abs().argsort()[:1]].iloc[0]
+    top = tabla.sort_values("eficiencia_normalizada", ascending=False).iloc[0]
+    with st.expander("ℹ️ ¿Qué significa \"eficiencia normalizada\"? (no es el número de notas)", expanded=True):
+        st.markdown(
+            "Es un **índice comparativo**, no un porcentaje ni un conteo de notas. Compara el tráfico "
+            "de cada periodista (ajustado por qué tan competida es su sección) contra la **mediana del "
+            "equipo del mes**.\n\n"
+            "- **100** = tráfico igual a la mediana del equipo\n"
+            "- **200** = el doble de la mediana\n"
+            "- **50** = la mitad de la mediana\n\n"
+            f"**Ejemplo con los datos reales de este mes:** la mediana de tráfico ajustado del equipo fue "
+            f"**{calc.formatear_numero(mediana)}**. {ref['periodista']} tuvo prácticamente esa misma cifra, "
+            f"por eso su índice es {ref['eficiencia_normalizada']:.0f} (≈100). {top['periodista']} generó "
+            f"{calc.formatear_numero(top['trafico_ajustado'])} — más del doble de la mediana — por eso su "
+            f"índice es {top['eficiencia_normalizada']:.0f}.\n\n"
+            "El **número de notas** es una métrica totalmente aparte: se ve en la tarjeta \"Notas totales\" "
+            "y en el gráfico de barras de abajo."
+        )
+
+
+_DIFICULTAD_ICONO = {"Fácil": "🟢", "Media": "🔵", "Difícil": "🔴"}
+
+
+def _top_economia():
+    with st.container(border=True, key="card_top_economia"):
+        st.subheader("💹 Mejor periodista de economía — respaldado en datos")
+        st.caption(
+            "Enfoque editorial del portal: quién escribe economía/finanzas con más tráfico real por nota, "
+            "no por percepción. Solo cuenta subsecciones verificadas como contenido económico real (se "
+            "excluyó \"money-invest/daily-news\" y \"happening-now\": pese al nombre, son noticia general, "
+            "no economía) — 7 periodos acumulados (jul-2026 censo + histórico ene-jun), mínimo 3 notas."
+        )
+        ganador = dr.top_periodista_tema()
+        if not ganador:
+            st.caption("Sin suficiente muestra todavía en las secciones de economía/finanzas verificadas.")
+            return
+
+        col_foto, col_datos = st.columns([1, 4], vertical_alignment="center")
+        with col_foto:
+            st.image(avatar_data_uri(ganador["autor"], "#334155", 200), width=90)
+        with col_datos:
+            st.markdown(f"### {ganador['autor']}")
+            st.markdown(
+                f"**{ganador['trafico_por_nota']:,.0f}** tráfico/nota promedio &nbsp;·&nbsp; "
+                f"{ganador['notas']} notas de economía/finanzas &nbsp;·&nbsp; "
+                f"{calc.formatear_numero(ganador['trafico'])} tráfico total".replace(",", "."))
+
+        st.write("")
+        st.markdown("**Con qué notas lo demuestra:**")
+        for n in ganador["top_notas"]:
+            st.markdown(f"- {n['titulo']} — **{calc.formatear_numero(n['vistas'])}** "
+                        f"({dr.seccion_label(n['seccion_raw'])})")
+        st.caption("Muestra chica a propósito (economía/finanzas todavía es una sección pequeña del sitio) — "
+                   "más una señal a vigilar que un veredicto definitivo.")
+
+
+def _dificultad_canal_seccion():
+    with st.container(border=True, key="card_secciones_dificultad"):
+        st.subheader("Dificultad y canal por sección")
+        st.caption("Dato agregado de TODO lo disponible (julio completo + histórico ene-jun) — "
+                   "no cambia con el periodo seleccionado arriba, es contexto del portal completo.")
+        agg = dr.secciones_resumen_agregado()
+        tabla_mostrar = agg.copy()
+        tabla_mostrar["Sección"] = tabla_mostrar["seccion_raw"].apply(dr.seccion_label)
+        tabla_mostrar["Tráfico"] = tabla_mostrar["vistas"].apply(calc.formatear_numero)
+        tabla_mostrar["Dificultad"] = tabla_mostrar["dificultad_categoria"].apply(
+            lambda d: f"{_DIFICULTAD_ICONO[d]} {d}")
+        tabla_mostrar["Canal dominante"] = tabla_mostrar.apply(
+            lambda r: f"{r['canal_dominante']} ({r['pct_canal_dominante']:.0f}%)"
+            if pd.notna(r["pct_canal_dominante"]) else "—", axis=1)
+        st.dataframe(
+            tabla_mostrar[["Sección", "Tráfico", "Dificultad", "Canal dominante"]],
+            hide_index=True, width="stretch", height=min(460, 40 + 36 * len(tabla_mostrar)),
+        )
+
+
+def render(tabla):
+    if tabla.empty:
+        st.info("No hay datos para el rango de fechas seleccionado.")
+        return None
+
+    _kpis(tabla)
+    _explicacion_eficiencia(tabla)
+    st.write("")
+
+    _top_economia()
+    st.write("")
+
+    with st.container(border=True, key="card_tendencia_portal"):
+        _tendencia_portal()
+    st.write("")
+
+    col_izq, col_der = st.columns([1, 1.3])
+    with col_izq:
+        with st.container(border=True, key="card_aporte"):
+            _aporte_trafico(tabla)
+    with col_der:
+        with st.container(border=True, key="card_cuadrante"):
+            seleccion_cuadrante = _cuadrante(tabla)
+
+    st.write("")
+    with st.container(border=True, key="card_notas"):
+        _notas_por_periodista(tabla)
+
+    st.write("")
+    with st.container(border=True, key="card_tabla"):
+        seleccion_selector = _selector_perfil(tabla)
+        seleccion_tabla = _tabla_principal(tabla)
+
+    st.write("")
+    _dificultad_canal_seccion()
+
+    return seleccion_cuadrante or seleccion_tabla or seleccion_selector
