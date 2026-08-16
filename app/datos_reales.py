@@ -33,6 +33,7 @@ Métricas sin fuente real disponible en esta versión (marcadas explícitamente,
 nunca inventadas): rebote_pct, temas_propios_pct, flags_ia, ctr (bruto).
 """
 
+import glob
 import re
 from datetime import date
 
@@ -46,6 +47,24 @@ EXCLUIR_AUTOR = {"revistamercado", "SIN_AUTOR"}
 
 MESES_LABEL = {"01": "Enero", "02": "Febrero", "03": "Marzo", "04": "Abril", "05": "Mayo", "06": "Junio"}
 MESES_DIAS = {"01": 31, "02": 28, "03": 31, "04": 30, "05": 31, "06": 30}
+MESES_TODOS = {**MESES_LABEL, "07": "Julio", "08": "Agosto", "09": "Septiembre",
+                "10": "Octubre", "11": "Noviembre", "12": "Diciembre"}
+
+
+def _detectar_mes_parcial() -> str | None:
+    """Mes en curso, aún sin cerrar -- detectado por la presencia de
+    data/periodistas_<AAAA-MM>.csv (lo produce data/construir_periodistas_mes.py,
+    corrido periódicamente sobre el export más reciente de Drive). Si hay más
+    de uno (no debería, pero por si acaso), se queda con el más reciente por
+    orden lexicográfico AAAA-MM. Ningún cambio de código hace falta el mes que
+    entra: basta con que la rutina programada deje el CSV nuevo."""
+    archivos = sorted(glob.glob(f"{DATA_DIR}/periodistas_????-??.csv"))
+    if not archivos:
+        return None
+    return archivos[-1].split("periodistas_")[-1].replace(".csv", "")
+
+
+MES_PARCIAL = _detectar_mes_parcial()
 
 PERIODOS: dict[str, dict] = {
     "2026-07": {"tipo": "completo", "label": "Julio 2026 · censo completo"},
@@ -53,16 +72,29 @@ PERIODOS: dict[str, dict] = {
 for _m, _lbl in MESES_LABEL.items():
     PERIODOS[f"2026-{_m}"] = {"tipo": "historico", "mes": _m, "label": f"{_lbl} 2026 · muestra"}
 
-PERIODO_DEFAULT = "2026-07"
-# Orden de despliegue en el selector: julio primero (es el censo completo, el
-# más rico), luego los históricos de más reciente a más antiguo.
-ORDEN_PERIODOS = ["2026-07", "2026-06", "2026-05", "2026-04", "2026-03", "2026-02", "2026-01"]
+if MES_PARCIAL and MES_PARCIAL not in PERIODOS:
+    _anio_p, _mes_p = MES_PARCIAL.split("-")
+    PERIODOS[MES_PARCIAL] = {
+        "tipo": "parcial",
+        "label": f"{MESES_TODOS.get(_mes_p, _mes_p)} {_anio_p} (parcial)",
+    }
+
+# El mes en curso (si ya hay datos parciales para él) es el default y el
+# primero del selector -- misma UX que Colombia.com: se abre mostrando lo más
+# fresco, no un censo antiguo. Si todavía no existe, julio (censo completo)
+# sigue siendo el default.
+PERIODO_DEFAULT = MES_PARCIAL if MES_PARCIAL else "2026-07"
+ORDEN_PERIODOS = ([MES_PARCIAL] if MES_PARCIAL else []) + [
+    "2026-07", "2026-06", "2026-05", "2026-04", "2026-03", "2026-02", "2026-01"]
 
 
 def periodo_fechas(periodo: str = PERIODO_DEFAULT) -> tuple[date, date]:
     info = PERIODOS[periodo]
     if info["tipo"] == "completo":
         return date(2026, 7, 1), date(2026, 7, 31)
+    if info["tipo"] == "parcial":
+        anio, mes = periodo.split("-")
+        return date(int(anio), int(mes), 1), date.today()
     mes = int(info["mes"])
     return date(2026, mes, 1), date(2026, mes, MESES_DIAS[info["mes"]])
 
@@ -211,10 +243,52 @@ def _cargar_crudo_historico(mes: str):
     return notas, procesado_mes
 
 
+@st.cache_data
+def _cargar_crudo_parcial(mes: str):
+    """Tier 'parcial' — mes en curso, todavía sin cerrar. Autor real vía
+    JSON-LD (igual método que julio), pero scrapeado INCREMENTALMENTE por
+    data/construir_notas_mes_actual.py (solo las notas nuevas de cada corrida,
+    reusando data/mapa_autor_ruta.csv como caché) — no hay semáforo SEO ni
+    EEAT para este tier todavía: eso solo se calcula en el cierre mensual
+    (data/cerrar_mes.py), no en cada refresco del mes en curso. Todas esas
+    columnas quedan en NaN a propósito, mismo patrón que ya usa el Tier 1
+    histórico cuando una nota no fue parte de la muestra scrapeada."""
+    notas = pd.read_csv(f"{DATA_DIR}/notas_{mes}.csv")
+    notas = notas[~notas["autor"].isin(EXCLUIR_AUTOR)].reset_index(drop=True)
+    notas["seccion_raw"] = _extraer_seccion(notas["ruta"])
+    notas["fecha"] = notas["fecha_real"]
+    notas["es_sindicado"] = False
+    for col in ["impresiones_discover", "impresiones_news", "tiempo_interaccion_seg",
+                "canal_dominante", "pct_canal_dominante", "pct_cumplimiento", "semaforo", "palabras_body"]:
+        notas[col] = np.nan
+
+    raw_path = sorted(glob.glob(f"{DATA_DIR}/raw_historico/ga4_pages_screens_periodos_*.csv"))
+    if raw_path:
+        procesado = pd.read_csv(sorted(raw_path)[-1])
+        procesado = procesado[procesado["periodo"] == "actual"].copy()
+        procesado["ruta"] = (procesado["pagePath"]
+                              .str.replace("https://www.revistamercado.do", "", regex=False)
+                              .str.replace("https://revistamercado.do", "", regex=False)
+                              .str.rstrip("/").replace("", "/"))
+        procesado = procesado.groupby("ruta", as_index=False)["screenPageViews"].sum().rename(
+            columns={"screenPageViews": "vistas"})
+        procesado["seccion_raw"] = _extraer_seccion(procesado["ruta"])
+        procesado = procesado.merge(
+            notas[["ruta", "clics_search", "clics_discover", "clics_news"]], on="ruta", how="left")
+        for col in ["clics_search", "clics_discover", "clics_news"]:
+            procesado[col] = procesado[col].fillna(0)
+    else:
+        procesado = notas
+
+    return notas, procesado
+
+
 def _crudo(periodo: str):
     info = PERIODOS[periodo]
     if info["tipo"] == "completo":
         return _cargar_crudo_completo()
+    if info["tipo"] == "parcial":
+        return _cargar_crudo_parcial(periodo)
     return _cargar_crudo_historico(info["mes"])
 
 

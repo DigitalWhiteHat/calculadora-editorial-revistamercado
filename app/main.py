@@ -60,7 +60,10 @@ with st.sidebar:
     if periodo_elegido != periodo:
         st.session_state.periodo = periodo_elegido
         st.rerun()
-    if not dr.es_periodo_completo(periodo):
+    tipo_periodo = dr.PERIODOS[periodo]["tipo"]
+    if tipo_periodo == "parcial":
+        st.caption("🔄 Mes en curso — tráfico y autor real, todavía sin semáforo SEO (se calcula al cerrar el mes)")
+    elif tipo_periodo == "historico":
         st.caption("⚠️ Muestra histórica — tráfico real y completo, SEO solo sobre notas muestreadas")
     st.write("")
 
