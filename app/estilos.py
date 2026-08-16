@@ -56,25 +56,37 @@ div[class*="st-key-card_"] {
 .cp-brand-logo-img { height: 40px; width: auto; }
 .cp-brand-sep { color: #C7CDD9; }
 .cp-brand-label { font-size: 0.72rem; letter-spacing: 0.06em; font-weight: 600; color: #64748B; }
-.cp-breadcrumb { color: #64748B; font-size: 0.95rem; margin: 2px 0 14px 0; }
+.cp-breadcrumb { color: #64748B; font-size: 1.1rem; margin: 2px 0 14px 0; }
 .cp-breadcrumb b { color: #232020; }
+
+/* Texto de contenido (st.caption y párrafos de st.markdown) — +3pt sobre el
+   tamaño por defecto de Streamlit, que se veía demasiado pequeño. No toca
+   títulos/encabezados ni los valores grandes de las tarjetas. */
+[data-testid="stCaptionContainer"], [data-testid="stCaptionContainer"] p {
+    font-size: 1.05rem !important;
+    line-height: 1.5 !important;
+}
+[data-testid="stMarkdownContainer"] p {
+    font-size: 1.05rem;
+    line-height: 1.55;
+}
 
 .cp-kpi-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 6px; }
 .cp-kpi-card {
     background: #FFFFFF; border: 1px solid #E7EAF0; border-radius: 14px;
     padding: 16px 18px; box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
 }
-.cp-kpi-label { font-size: 0.95rem; color: #64748B; display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+.cp-kpi-label { font-size: 1.1rem; color: #64748B; display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
 .cp-kpi-value { font-size: 2.1rem; font-weight: 700; color: #232020; line-height: 1.1; }
-.cp-kpi-delta { font-size: 0.92rem; font-weight: 600; margin-top: 5px; display: inline-block; }
+.cp-kpi-delta { font-size: 1.05rem; font-weight: 600; margin-top: 5px; display: inline-block; }
 
 .cp-pill {
     display: inline-block; padding: 3px 12px; border-radius: 999px;
-    font-size: 0.88rem; font-weight: 700; letter-spacing: 0.02em;
+    font-size: 1.02rem; font-weight: 700; letter-spacing: 0.02em;
 }
 .cp-delta {
     display: inline-flex; align-items: center; gap: 3px;
-    font-size: 0.92rem; font-weight: 600;
+    font-size: 1.05rem; font-weight: 600;
 }
 
 .cp-metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; height: 100%; }
@@ -83,7 +95,7 @@ div[class*="st-key-card_"] {
     padding: 14px 16px; box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
     display: flex; flex-direction: column; justify-content: center;
 }
-.cp-metric-label { font-size: 0.9rem; color: #64748B; margin-bottom: 7px; line-height: 1.25; }
+.cp-metric-label { font-size: 1.05rem; color: #64748B; margin-bottom: 7px; line-height: 1.25; }
 .cp-metric-value { font-size: 1.75rem; font-weight: 700; color: #232020; line-height: 1.15; }
 .cp-metric-delta { font-size: 0.9rem; font-weight: 600; margin-top: 5px; }
 
@@ -98,7 +110,7 @@ div[class*="st-key-card_"] {
     font-size: 0.8rem; font-weight: 700; color: #FFFFFF; background: #334155;
 }
 
-.cp-card-title { font-size: 0.95rem; color: #64748B; margin-bottom: 6px; }
+.cp-card-title { font-size: 1.1rem; color: #64748B; margin-bottom: 6px; }
 .cp-card-value { font-size: 1.9rem; font-weight: 700; color: #232020; line-height: 1.15; }
 .cp-header-beat { font-size: 1.05rem; color: #334155; margin-top: 4px; font-weight: 500; }
 .cp-card-desc { font-size: 1.05rem; color: #64748B; line-height: 1.4; margin-top: 2px; }
@@ -128,12 +140,12 @@ div[class*="st-key-card_"] {
     font-weight: 600; color: #232020; font-size: 1rem;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.cp-nota-meta { font-size: 0.84rem; color: #64748B; margin-top: 2px; }
+.cp-nota-meta { font-size: 1rem; color: #64748B; margin-top: 2px; }
 .cp-nota-bar-track { background: #F1F5F9; border-radius: 6px; height: 6px; margin-top: 7px; overflow: hidden; }
 .cp-nota-bar-fill { height: 100%; border-radius: 6px; }
 .cp-nota-trafico { text-align: right; flex-shrink: 0; min-width: 90px; }
 .cp-nota-clics { font-weight: 700; color: #232020; font-size: 1.1rem; }
-.cp-nota-pct { font-size: 0.8rem; color: #64748B; margin-top: 2px; }
+.cp-nota-pct { font-size: 0.95rem; color: #64748B; margin-top: 2px; }
 
 @media (prefers-color-scheme: dark) {
     div[class*="st-key-card_"],
@@ -184,11 +196,6 @@ def inyectar_css():
     # st.html() filtra <script> por seguridad y nunca lo ejecuta -- components.html() sí corre
     # JS real (es el mecanismo estándar de Streamlit para esto, ej. inyectar analytics).
     components.html(SCRIPT_NOINDEX, height=0, width=0)
-
-
-def pill(texto: str, color_key: str) -> str:
-    return (f'<span class="cp-pill" style="background:{BG_ESTADO[color_key]};'
-            f'color:{TXT_ESTADO[color_key]}">{html.escape(texto)}</span>')
 
 
 def pill(texto: str, color_key: str) -> str:

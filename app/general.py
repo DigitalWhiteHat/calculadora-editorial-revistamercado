@@ -253,7 +253,7 @@ def _selector_perfil(tabla):
 def _tabla_principal(tabla):
     st.caption("O haz clic en una fila de la tabla / un punto del cuadrante para ver su perfil.")
     st.caption(
-        "**Semáforo SEO** = % promedio de cumplimiento del checklist de 15 ítems automatizados "
+        "**Semáforo SEO** = % promedio de cumplimiento del checklist de 14 ítems automatizados "
         "(título, meta descripción, estructura, enlaces internos, imagen, etc.) sobre las notas evaluadas "
         "de cada periodista: 🟢 80% o más · 🟡 entre 60% y 79% · 🔴 menos de 60%. "
         "Haz clic en un periodista y baja a \"¿En qué está fallando el SEO?\" para ver el desglose ítem por ítem."
