@@ -9,6 +9,7 @@ alerta crítica" (el rojo de estado ya significa 🔴 en toda la app)."""
 import html
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 COLOR_ESTADO = {"green": "#16A34A", "blue": "#3457D5", "red": "#DC2626"}
 BG_ESTADO = {"green": "#DCFCE7", "blue": "#DBEAFE", "red": "#FEE2E2"}
@@ -180,7 +181,9 @@ SCRIPT_NOINDEX = """
 def inyectar_css():
     st.html(CSS_GLOBAL)
     # Datos por periodista con nombre propio -- nunca debe indexarse, sin importar el hosting.
-    st.html(SCRIPT_NOINDEX)
+    # st.html() filtra <script> por seguridad y nunca lo ejecuta -- components.html() sí corre
+    # JS real (es el mecanismo estándar de Streamlit para esto, ej. inyectar analytics).
+    components.html(SCRIPT_NOINDEX, height=0, width=0)
 
 
 def pill(texto: str, color_key: str) -> str:
