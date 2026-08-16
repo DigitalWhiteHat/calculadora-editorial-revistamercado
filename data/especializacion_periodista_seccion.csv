@@ -1,0 +1,189 @@
+autor,seccion,notas,trafico,trafico_por_nota,confianza,mediana_seccion_otros,pct_trafico_periodista
+Agatha Thomas,empresas,25,6862.0,274.0,alta,87.0,86.2
+Agatha Thomas,lifestyle,7,980.0,140.0,media,165.0,12.3
+Agatha Thomas,medihealth,5,116.0,23.0,media,59.5,1.5
+Ana Sosa,market-brief/finanzas,1,230.0,230.0,baja,143.5,2.9
+Ana Sosa,empresas/sport-business,7,1526.0,218.0,media,260.0,19.3
+Ana Sosa,money-invest,7,1456.0,208.0,media,86.0,18.4
+Ana Sosa,empresas,4,459.0,115.0,media,87.0,5.8
+Ana Sosa,sostenibilidad,1,114.0,114.0,baja,57.0,1.4
+Ana Sosa,lifestyle/viajes,3,306.0,102.0,media,63.5,3.9
+Ana Sosa,business,35,3026.0,86.0,alta,86.0,38.2
+Ana Sosa,money-invest/daily-news,2,131.0,66.0,baja,195.0,1.7
+Ana Sosa,politica,4,232.0,58.0,media,163.0,2.9
+Ana Sosa,lifestyle,8,443.0,55.0,media,165.0,5.6
+Andrea Mercedes,construccion,3,4828.0,1609.0,media,152.0,1.0
+Andrea Mercedes,actualidad,45,58656.0,1303.0,alta,136.0,11.8
+Andrea Mercedes,money-invest/daily-news,542,425378.0,785.0,alta,195.0,85.4
+Andrea Mercedes,lifestyle,16,3036.0,190.0,alta,165.0,0.6
+Andrea Mercedes,empresas/sport-business,16,2046.0,128.0,alta,260.0,0.4
+Andrea Mercedes,money-invest,25,2151.0,86.0,alta,86.0,0.4
+Andrea Mercedes,mercado-women,3,254.0,85.0,media,48.0,0.1
+Andrea Mercedes,money-invest/republica-dominicana,5,380.0,76.0,media,93.0,0.1
+Andrea Mercedes,money-invest/internacional-economia,4,267.0,67.0,media,76.0,0.1
+Andrea Mercedes,empresas,16,765.0,48.0,alta,87.0,0.2
+Andrea Mercedes,nacional,4,181.0,45.0,media,603.5,0.0
+Ashley Presinal,empresas,28,1106.0,40.0,alta,87.0,100.0
+Darling Gil,mercado,3,1658.0,553.0,media,54.0,13.1
+Darling Gil,lifestyle,11,3467.0,315.0,alta,165.0,27.5
+Darling Gil,empresas/brand-content,26,4109.0,158.0,alta,89.0,32.6
+Darling Gil,empresas,9,850.0,94.0,media,87.0,6.7
+Darling Gil,money-invest/republica-dominicana,3,280.0,93.0,media,93.0,2.2
+Darling Gil,mercado-exchange,1,79.0,79.0,baja,52.0,0.6
+Darling Gil,market-brief,6,429.0,72.0,media,52.5,3.4
+Darling Gil,money-invest/daily-news,1,69.0,69.0,baja,195.0,0.5
+Darling Gil,mercado-women/executive-profiles,5,283.0,57.0,media,61.5,2.2
+Darling Gil,actualidad,6,312.0,52.0,media,136.0,2.5
+Darling Gil,cover-story,13,653.0,50.0,alta,64.0,5.2
+Darling Gil,money-invest,8,279.0,35.0,media,86.0,2.2
+Darling Gil,regular,3,93.0,31.0,media,31.0,0.7
+Darling Gil,ediciones-especiales,2,54.0,27.0,baja,27.0,0.4
+Edwin Lozada,money-invest/daily-news,27,60530.0,2242.0,alta,195.0,51.6
+Edwin Lozada,empresas/sport-business,14,23376.0,1670.0,alta,260.0,19.9
+Edwin Lozada,nacional,14,22401.0,1600.0,alta,603.5,19.1
+Edwin Lozada,lifestyle,4,3976.0,994.0,media,165.0,3.4
+Edwin Lozada,money-invest/happening-now,5,3939.0,788.0,media,491.0,3.4
+Edwin Lozada,actualidad,10,1731.0,173.0,alta,136.0,1.5
+Edwin Lozada,money-invest/internacional-economia,5,433.0,87.0,media,76.0,0.4
+Edwin Lozada,money-invest,10,629.0,63.0,alta,86.0,0.5
+Edwin Lozada,empresas,5,199.0,40.0,media,87.0,0.2
+Edwin Lozada,mercado-women,6,152.0,25.0,media,48.0,0.1
+Elba Reyes,money-invest/daily-news,122,362430.0,2971.0,alta,195.0,46.8
+Elba Reyes,nacional,2,2248.0,1124.0,baja,603.5,0.3
+Elba Reyes,money-invest/happening-now,9,9316.0,1035.0,media,491.0,1.2
+Elba Reyes,empresas/sport-business,161,91566.0,569.0,alta,260.0,11.8
+Elba Reyes,medihealth/wellbeing,9,3837.0,426.0,media,233.0,0.5
+Elba Reyes,lifestyle/relojes,7,2922.0,417.0,media,223.5,0.4
+Elba Reyes,actualidad,273,102651.0,376.0,alta,136.0,13.3
+Elba Reyes,empresas,145,44238.0,305.0,alta,87.0,5.7
+Elba Reyes,mercado-women/trends,27,7091.0,263.0,alta,178.0,0.9
+Elba Reyes,lifestyle,278,53565.0,193.0,alta,165.0,6.9
+Elba Reyes,mercado-women,75,14179.0,189.0,alta,48.0,1.8
+Elba Reyes,money-invest/republica-dominicana,115,18624.0,162.0,alta,93.0,2.4
+Elba Reyes,money-invest,292,44008.0,151.0,alta,86.0,5.7
+Elba Reyes,lifestyle/experiencias,23,2591.0,113.0,alta,71.5,0.3
+Elba Reyes,medihealth/salud,72,7693.0,107.0,alta,107.0,1.0
+Elba Reyes,medihealth,5,512.0,102.0,media,59.5,0.1
+Elba Reyes,cover-story,3,233.0,78.0,media,64.0,0.0
+Elba Reyes,lifestyle/automoviles,6,471.0,78.0,media,58.0,0.1
+Elba Reyes,lifestyle/viajes,5,380.0,76.0,media,63.5,0.0
+Elba Reyes,money-invest/internacional-economia,39,2754.0,71.0,alta,76.0,0.4
+Elba Reyes,lifestyle/mercadoteca,6,384.0,64.0,media,81.0,0.0
+Elba Reyes,internacional,8,488.0,61.0,media,63.0,0.1
+Elba Reyes,construccion,12,722.0,60.0,alta,152.0,0.1
+Elba Reyes,market-brief,8,447.0,56.0,media,52.5,0.1
+Elba Reyes,mercado-exchange,6,291.0,48.0,media,52.0,0.0
+Elba Reyes,empresas/gestion,6,162.0,27.0,media,48.0,0.0
+Elba Reyes,sostenibilidad,6,141.0,24.0,media,57.0,0.0
+Gabriel Rico Albarrán,politica,1,268.0,268.0,baja,163.0,1.6
+Gabriel Rico Albarrán,empresas/sport-business,6,731.0,122.0,media,260.0,4.3
+Gabriel Rico Albarrán,money-invest/daily-news,13,1578.0,121.0,alta,195.0,9.3
+Gabriel Rico Albarrán,medihealth,31,1786.0,58.0,alta,59.5,10.5
+Gabriel Rico Albarrán,actualidad,78,4320.0,55.0,alta,136.0,25.4
+Gabriel Rico Albarrán,mercado,19,1030.0,54.0,alta,54.0,6.1
+Gabriel Rico Albarrán,mercado-exchange,60,3191.0,53.0,alta,52.0,18.8
+Gabriel Rico Albarrán,empresas,56,2741.0,49.0,alta,87.0,16.1
+Gabriel Rico Albarrán,mercado-interview,12,396.0,33.0,alta,33.0,2.3
+Gabriel Rico Albarrán,money-invest,24,594.0,25.0,alta,86.0,3.5
+Gabriel Rico Albarrán,lifestyle,6,130.0,22.0,media,165.0,0.8
+Gabriel Rico Albarrán,empresas/brand-content,6,120.0,20.0,media,89.0,0.7
+Gabriel Rico Albarrán,money-invest/internacional-economia,6,117.0,20.0,media,76.0,0.7
+Jhojhanni Fiorini,empresas/sport-business,33,26184.0,793.0,alta,260.0,4.1
+Jhojhanni Fiorini,lifestyle,72,56809.0,789.0,alta,165.0,9.0
+Jhojhanni Fiorini,medihealth/salud,33,22504.0,682.0,alta,107.0,3.6
+Jhojhanni Fiorini,interview,2,1299.0,650.0,baja,650.0,0.2
+Jhojhanni Fiorini,actualidad,512,310809.0,607.0,alta,136.0,49.2
+Jhojhanni Fiorini,money-invest/republica-dominicana,165,50531.0,306.0,alta,93.0,8.0
+Jhojhanni Fiorini,construccion,16,3905.0,244.0,alta,152.0,0.6
+Jhojhanni Fiorini,country-report,1,232.0,232.0,baja,232.0,0.0
+Jhojhanni Fiorini,medihealth,47,7840.0,167.0,alta,59.5,1.2
+Jhojhanni Fiorini,money-invest/happening-now,2,326.0,163.0,baja,491.0,0.1
+Jhojhanni Fiorini,money-invest/internacional-economia,226,33515.0,148.0,alta,76.0,5.3
+Jhojhanni Fiorini,empresas/gestion,17,2321.0,137.0,alta,48.0,0.4
+Jhojhanni Fiorini,money-invest,464,62650.0,135.0,alta,86.0,9.9
+Jhojhanni Fiorini,sostenibilidad/energia-y-minas,6,773.0,129.0,media,94.0,0.1
+Jhojhanni Fiorini,empresas/brand-business,13,1630.0,125.0,alta,99.0,0.3
+Jhojhanni Fiorini,money-invest/daily-news,33,3842.0,116.0,alta,195.0,0.6
+Jhojhanni Fiorini,empresas/executive-news,10,1111.0,111.0,alta,36.0,0.2
+Jhojhanni Fiorini,lifestyle/experiencias,18,1843.0,102.0,alta,71.5,0.3
+Jhojhanni Fiorini,criptomonedas,24,2108.0,88.0,alta,65.0,0.3
+Jhojhanni Fiorini,empresas,362,31549.0,87.0,alta,87.0,5.0
+Jhojhanni Fiorini,sostenibilidad,14,1218.0,87.0,alta,57.0,0.2
+Jhojhanni Fiorini,nacional,12,994.0,83.0,alta,603.5,0.2
+Jhojhanni Fiorini,internacional,6,390.0,65.0,media,63.0,0.1
+Jhojhanni Fiorini,lifestyle/automoviles,4,231.0,58.0,media,58.0,0.0
+Jhojhanni Fiorini,market-brief/finanzas,6,340.0,57.0,media,143.5,0.1
+Jhojhanni Fiorini,market-brief,93,4559.0,49.0,alta,52.5,0.7
+Jhojhanni Fiorini,mercado-women,14,673.0,48.0,alta,48.0,0.1
+Jhojhanni Fiorini,lifestyle/viajes,10,409.0,41.0,alta,63.5,0.1
+Jhojhanni Fiorini,sostenibilidad/cambio-climatico,6,204.0,34.0,media,34.0,0.0
+Jhojhanni Fiorini,empresas/mypimes,6,181.0,30.0,media,30.0,0.0
+Jhojhanni Fiorini,construccion/infraestructura,6,173.0,29.0,media,98.0,0.0
+Jhojhanni Fiorini,mercado-exchange,27,726.0,27.0,alta,52.0,0.1
+Jhojhanni Fiorini,market-brief/bolsa-de-valores,6,136.0,23.0,media,21.0,0.0
+Karime Rivas,mercado-women/working-monthers,8,3751.0,469.0,media,469.0,10.8
+Karime Rivas,mercado-women/leadership,94,17000.0,181.0,alta,100.0,49.2
+Karime Rivas,lifestyle/mercadoteca,6,653.0,109.0,media,81.0,1.9
+Karime Rivas,mercado-women/trends,36,3342.0,93.0,alta,178.0,9.7
+Karime Rivas,mercado-exchange,3,232.0,77.0,media,52.0,0.7
+Karime Rivas,mercado-women/executive-profiles,40,2635.0,66.0,alta,61.5,7.6
+Karime Rivas,influencers2,6,370.0,62.0,media,62.0,1.1
+Karime Rivas,medihealth,12,728.0,61.0,alta,59.5,2.1
+Karime Rivas,coaching,6,246.0,41.0,media,41.0,0.7
+Karime Rivas,medihealth/wellbeing,30,1200.0,40.0,alta,233.0,3.5
+Karime Rivas,medihealth/expert,6,207.0,34.0,media,34.0,0.6
+Karime Rivas,medihealth/salud,31,1049.0,34.0,alta,107.0,3.0
+Karime Rivas,lifestyle/experiencias,6,197.0,33.0,media,71.5,0.6
+Karime Rivas,mercado-women,55,1578.0,29.0,alta,48.0,4.6
+Karime Rivas,mercado-women/career,19,516.0,27.0,alta,27.0,1.5
+Karime Rivas,lifestyle,6,153.0,26.0,media,165.0,0.4
+Karime Rivas,empresas/executive-news,6,149.0,25.0,media,36.0,0.4
+Karime Rivas,empresas,24,577.0,24.0,alta,87.0,1.7
+Miguel Vega,empresas/sport-business,9,2715.0,302.0,media,260.0,34.0
+Miguel Vega,money-invest/daily-news,1,269.0,269.0,baja,195.0,3.4
+Miguel Vega,ediciones-especiales/collection-estilos-de-vida,2,240.0,120.0,baja,120.0,3.0
+Miguel Vega,actualidad,4,397.0,99.0,media,136.0,5.0
+Miguel Vega,empresas,32,2806.0,88.0,alta,87.0,35.2
+Miguel Vega,internacional,4,280.0,70.0,media,63.0,3.5
+Miguel Vega,money-invest,9,605.0,67.0,media,86.0,7.6
+Miguel Vega,sostenibilidad/energia-y-minas,4,235.0,59.0,media,94.0,2.9
+Miguel Vega,cfo-edition,3,159.0,53.0,media,53.0,2.0
+Miguel Vega,empresas/executive-news,3,142.0,47.0,media,36.0,1.8
+Miguel Vega,sostenibilidad,5,134.0,27.0,media,57.0,1.7
+Miranda Cross,market-order/affairs,1,57.0,57.0,baja,57.0,56.4
+Miranda Cross,market-order/retratos,1,44.0,44.0,baja,44.0,43.6
+Rodrigo Muñoz,market-brief/finanzas,19,6370.0,335.0,alta,143.5,12.2
+Rodrigo Muñoz,money-invest/happening-now,2,387.0,194.0,baja,491.0,0.7
+Rodrigo Muñoz,empresas,58,10284.0,177.0,alta,87.0,19.7
+Rodrigo Muñoz,construccion/infraestructura,7,1172.0,167.0,media,98.0,2.2
+Rodrigo Muñoz,money-invest,104,9906.0,95.0,alta,86.0,19.0
+Rodrigo Muñoz,money-invest/republica-dominicana,14,1251.0,89.0,alta,93.0,2.4
+Rodrigo Muñoz,actualidad,31,2705.0,87.0,alta,136.0,5.2
+Rodrigo Muñoz,lifestyle/mercadoteca,20,1612.0,81.0,alta,81.0,3.1
+Rodrigo Muñoz,money-invest/internacional-economia,31,2523.0,81.0,alta,76.0,4.8
+Rodrigo Muñoz,empresas/brand-business,61,4428.0,73.0,alta,99.0,8.5
+Rodrigo Muñoz,empresas/sport-business,12,840.0,70.0,alta,260.0,1.6
+Rodrigo Muñoz,lifestyle,64,4047.0,63.0,alta,165.0,7.8
+Rodrigo Muñoz,lifestyle/viajes,25,1286.0,51.0,alta,63.5,2.5
+Rodrigo Muñoz,mercado-exchange,3,152.0,51.0,media,52.0,0.3
+Rodrigo Muñoz,empresas/gestion,18,867.0,48.0,alta,48.0,1.7
+Rodrigo Muñoz,internacional,6,287.0,48.0,media,63.0,0.6
+Rodrigo Muñoz,criptomonedas,6,254.0,42.0,media,65.0,0.5
+Rodrigo Muñoz,lifestyle/experiencias,13,529.0,41.0,alta,71.5,1.0
+Rodrigo Muñoz,lifestyle/hoteles,13,442.0,34.0,alta,34.0,0.8
+Rodrigo Muñoz,entidades,6,198.0,33.0,media,33.0,0.4
+Rodrigo Muñoz,legal,6,193.0,32.0,media,32.0,0.4
+Rodrigo Muñoz,lifestyle/automoviles,12,376.0,31.0,alta,58.0,0.7
+Rodrigo Muñoz,ejecutivos,6,178.0,30.0,media,30.0,0.3
+Rodrigo Muñoz,lifestyle/relojes,12,354.0,30.0,alta,223.5,0.7
+Rodrigo Muñoz,market-brief,12,337.0,28.0,alta,52.5,0.6
+Rodrigo Muñoz,empresas/generations,6,160.0,27.0,media,27.0,0.3
+Rodrigo Muñoz,construccion,6,159.0,26.0,media,152.0,0.3
+Rodrigo Muñoz,empresas/executive-news,30,632.0,21.0,alta,36.0,1.2
+Rodrigo Muñoz,market-brief/bolsa-de-valores,6,116.0,19.0,media,21.0,0.2
+Rodrigo Muñoz,mercado-women/leadership,6,112.0,19.0,media,100.0,0.2
+pferreras,medihealth,13,634.0,49.0,alta,59.5,42.1
+pferreras,empresas,18,513.0,28.0,alta,87.0,34.0
+pferreras,mercado-norte,6,150.0,25.0,media,25.0,10.0
+pferreras,mercado,6,146.0,24.0,media,54.0,9.7
+pferreras,market-brief/finanzas,6,64.0,11.0,media,143.5,4.2

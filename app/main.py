@@ -9,6 +9,7 @@ import datos_reales as dr
 import general
 import individual
 import notas as vista_notas
+import reemplazos as vista_reemplazos
 import secciones as vista_secciones
 from avatares import logo_revistamercado_data_uri
 from estilos import inyectar_css
@@ -38,9 +39,10 @@ NAV_ITEMS = [
     ("🗂️", "Secciones", "secciones"),
     ("📝", "Notas", "notas"),
     ("🔔", "Alertas", "alertas"),
+    ("🔁", "Reemplazos", "reemplazos"),
     ("⚙️", "Configuración", None),
 ]
-VISTAS_PRINCIPALES = {"general", "secciones", "notas", "alertas"}
+VISTAS_PRINCIPALES = {"general", "secciones", "notas", "alertas", "reemplazos"}
 
 with st.sidebar:
     st.markdown(
@@ -139,6 +141,8 @@ elif st.session_state.vista == "notas":
     vista_notas.render(df_notas)
 elif st.session_state.vista == "alertas":
     vista_alertas.render(tabla_periodistas)
+elif st.session_state.vista == "reemplazos":
+    vista_reemplazos.render(tabla_periodistas)
 else:
     slug_seleccionado = general.render(tabla_periodistas)
     if slug_seleccionado:
