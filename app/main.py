@@ -13,7 +13,7 @@ import reemplazos as vista_reemplazos
 import secciones as vista_secciones
 from avatares import logo_revistamercado_data_uri
 from estilos import inyectar_css
-from exportar_pdf import generar_pdf_general, generar_pdf_periodista
+from exportar_pdf import generar_pdf_general, generar_pdf_periodista_cacheado
 
 st.set_page_config(page_title="Desempeño Editorial — Revista Mercado", layout="wide", page_icon="📊")
 inyectar_css()
@@ -99,21 +99,11 @@ with col_periodo:
         f'📅 Periodo: <b>{periodo_label}</b></div>', unsafe_allow_html=True,
     )
 with col_export:
-    if st.session_state.vista == "individual" and st.session_state.periodista_slug:
-        fila_pdf = tabla_periodistas[tabla_periodistas["slug"] == st.session_state.periodista_slug]
-        if not fila_pdf.empty:
-            fila_pdf = fila_pdf.iloc[0]
-            notas_pdf = df_notas[df_notas["slug"] == st.session_state.periodista_slug]
-            pdf_bytes = generar_pdf_periodista(fila_pdf, notas_pdf, "assets/brand/revistamercado_logo.png", periodo_label)
-            nombre_archivo = f"reporte_{fila_pdf['slug']}.pdf"
-        else:
-            pdf_bytes = generar_pdf_general(tabla_periodistas, periodo_label)
-            nombre_archivo = "reporte_equipo.pdf"
-    else:
-        pdf_bytes = generar_pdf_general(tabla_periodistas, periodo_label)
-        nombre_archivo = "reporte_equipo.pdf"
-    st.download_button("📄 Exportar PDF", data=pdf_bytes, file_name=nombre_archivo,
-                        mime="application/pdf", width="stretch", disabled=tabla_periodistas.empty)
+    # Placeholder: el PDF completo (4 gráficos vía kaleido) tarda varios segundos la
+    # primera vez por periodista (luego queda en caché). Se llena al final del script,
+    # DESPUÉS de renderizar el contenido principal, para que la navegación del perfil
+    # no se sienta congelada esperando el PDF antes de mostrar nada.
+    export_placeholder = st.empty()
 
 if st.session_state.vista == "individual" and st.session_state.periodista_slug:
     col_breadcrumb, col_selector = st.columns([3, 1])
@@ -149,3 +139,16 @@ else:
         st.session_state.periodista_slug = slug_seleccionado
         st.session_state.vista = "individual"
         st.rerun()
+
+with export_placeholder.container():
+    if st.session_state.vista == "individual" and st.session_state.periodista_slug:
+        pdf_bytes = generar_pdf_periodista_cacheado(
+            st.session_state.periodista_slug, "assets/brand/revistamercado_logo.png", periodo_label)
+        nombre_archivo = f"reporte_{st.session_state.periodista_slug}.pdf"
+    else:
+        pdf_bytes = None
+    if pdf_bytes is None:
+        pdf_bytes = generar_pdf_general(tabla_periodistas, periodo_label)
+        nombre_archivo = "reporte_equipo.pdf"
+    st.download_button("📄 Exportar PDF", data=pdf_bytes, file_name=nombre_archivo,
+                        mime="application/pdf", width="stretch", disabled=tabla_periodistas.empty)

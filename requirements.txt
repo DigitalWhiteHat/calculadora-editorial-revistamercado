@@ -5,6 +5,6 @@ numpy
 pillow
 fpdf2
 watchdog
-kaleido
+kaleido<1.0
 beautifulsoup4
 requests
