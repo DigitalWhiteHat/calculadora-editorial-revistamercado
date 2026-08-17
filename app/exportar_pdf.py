@@ -269,7 +269,7 @@ def generar_pdf_periodista(fila, notas_periodista, logo_path: str, periodo_label
         ("Engagement (tiempo en pagina)", engagement_txt, AZUL),
         ("Canibalizacion interna", _fmt(fila["canibalizacion_pct"], "{:.0f}%"),
          ROJO if (fila["canibalizacion_pct"] or 0) > 8 else VERDE),
-        ("Extension promedio (palabras)", f"{fila['palabras_promedio']:.0f}", AZUL),
+        ("Extension promedio (palabras)", _fmt(fila["palabras_promedio"], "{:.0f}"), AZUL),
         ("Notas con semaforo SEO verde", f"{fila['semaforo_verde_pct']:.0f}%", VERDE),
     ]
     ancho_m = (ANCHO_UTIL - 3 * 5) / 4

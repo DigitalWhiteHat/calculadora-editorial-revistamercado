@@ -250,19 +250,32 @@ def _cargar_crudo_parcial(mes: str):
     """Tier 'parcial' — mes en curso, todavía sin cerrar. Autor real vía
     JSON-LD (igual método que julio), pero scrapeado INCREMENTALMENTE por
     data/construir_notas_mes_actual.py (solo las notas nuevas de cada corrida,
-    reusando data/mapa_autor_ruta.csv como caché) — no hay semáforo SEO ni
-    EEAT para este tier todavía: eso solo se calcula en el cierre mensual
-    (data/cerrar_mes.py), no en cada refresco del mes en curso. Todas esas
-    columnas quedan en NaN a propósito, mismo patrón que ya usa el Tier 1
-    histórico cuando una nota no fue parte de la muestra scrapeada."""
+    reusando data/mapa_autor_ruta.csv como caché). EEAT y palabras_body siguen
+    sin dato para este tier (se calculan en el cierre mensual, data/cerrar_mes.py)
+    -- pero el semáforo SEO SÍ tiene una muestra real desde el 16-ago-2026 (ver
+    data/semaforo_muestra_mes_actual.py, pedido de Edwin tras encontrar que el
+    tope fijo del histórico -12/autor/mes- no era representativo: acá el tamaño
+    de muestra es proporcional, mínimo 10% de las notas reales de cada
+    periodista, con Jhojhanni Fiorini muestreando aparte sus notas de lotería
+    -servicio diario recurrente- del resto). Si ese archivo no existe todavía
+    (nadie ha corrido la muestra de este mes), semaforo/pct_cumplimiento quedan
+    en NaN, mismo patrón que el histórico para notas fuera de su muestra."""
     notas = pd.read_csv(f"{DATA_DIR}/notas_{mes}.csv")
     notas = notas[~notas["autor"].isin(EXCLUIR_AUTOR)].reset_index(drop=True)
     notas["seccion_raw"] = _extraer_seccion(notas["ruta"])
     notas["fecha"] = notas["fecha_real"]
     notas["es_sindicado"] = False
     for col in ["impresiones_discover", "impresiones_news", "tiempo_interaccion_seg",
-                "canal_dominante", "pct_canal_dominante", "pct_cumplimiento", "semaforo", "palabras_body"]:
+                "canal_dominante", "pct_canal_dominante", "palabras_body"]:
         notas[col] = np.nan
+
+    semaforo_path = f"{DATA_DIR}/semaforo_muestra_notas_{mes}.csv"
+    try:
+        muestra_seo = pd.read_csv(semaforo_path)[["ruta", "pct_cumplimiento"]]
+        notas = notas.merge(muestra_seo, on="ruta", how="left")
+    except FileNotFoundError:
+        notas["pct_cumplimiento"] = np.nan
+    notas["semaforo"] = notas["pct_cumplimiento"].apply(_color_semaforo)
 
     raw_path = sorted(glob.glob(f"{DATA_DIR}/raw_historico/ga4_pages_screens_periodos_*.csv"))
     if raw_path:

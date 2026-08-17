@@ -1,6 +1,3 @@
 entidad,keyword_ganadora,volumen,tendencia_delta,trend_ultimo_mes,top1_dominio,top1_url,revistamercado_en_top5,fecha_generado
-Mundial,fixture de mundial,4400,0.5,1.0,www.fifa.com,https://www.fifa.com/es/tournaments/mens/worldcup/canadamexicousa2026/articles/calendario-fixture-mundial-2026-partidos-fechas,False,2026-08-16
-Santo Domingo,santo domingo dominican republic,8100,0.31,0.55,es.wikipedia.org,https://es.wikipedia.org/wiki/Santo_Domingo,False,2026-08-16
-Abinader,presidente de republica dominicana,18100,0.52,1.0,es.wikipedia.org,https://es.wikipedia.org/wiki/Luis_Abinader,False,2026-08-16
-EE UU,trump,8100,0.3,0.67,es.wikipedia.org,https://es.wikipedia.org/wiki/Donald_Trump,False,2026-08-16
-Dólar hoy en República Dominicana,precio del dolar,246000,0.48,0.82,caribeexpress.com.do,https://caribeexpress.com.do/,False,2026-08-16
+Elecciones en Colombia,elecciones en colombia,480,0.98,1.0,es.wikipedia.org,https://es.wikipedia.org/wiki/Elecciones_presidenciales_de_Colombia_de_2026,False,2026-08-16
+Terremoto en Venezuela,terremoto venezuela,720,0.5,1.0,,,False,2026-08-16

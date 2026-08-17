@@ -24,8 +24,10 @@ def _formatear_volumen(v: float) -> str:
 def _tarjeta(row) -> None:
     delta = float(row["tendencia_delta"])
     icono = "🔥" if delta >= UMBRAL_TENDENCIA_ALTA else ("📈" if delta > 0 else "➖")
-    en_top5 = bool(row["revistamercado_en_top5"])
-    if en_top5:
+    tiene_serp = pd.notna(row.get("top1_dominio")) and str(row.get("top1_dominio", "")).strip() != ""
+    if not tiene_serp:
+        chip = '<span style="background:#F1F5F9;color:#475569;border-radius:999px;padding:3px 12px;font-size:0.85rem;font-weight:700">⚪ Sin datos de SERP</span>'
+    elif bool(row["revistamercado_en_top5"]):
         chip = '<span style="background:#DCFCE7;color:#166534;border-radius:999px;padding:3px 12px;font-size:0.85rem;font-weight:700">✅ Ya en el top 5</span>'
     else:
         chip = '<span style="background:#FEF3C7;color:#92400E;border-radius:999px;padding:3px 12px;font-size:0.85rem;font-weight:700">🔓 Oportunidad -- no aparece</span>'
@@ -42,9 +44,11 @@ def _tarjeta(row) -> None:
             f'-- {_formatear_volumen(row["volumen"])} de búsquedas, tendencia {delta:+.0%} vs. hace 6 meses</div>',
             unsafe_allow_html=True,
         )
+        pie = (f'Hoy rankea #1: <a href="{html.escape(row["top1_url"])}" target="_blank">{html.escape(row["top1_dominio"])}</a>'
+               if tiene_serp else
+               'Semrush todavía no tiene resultados de búsqueda indexados para esta keyword (término muy reciente).')
         st.markdown(
-            f'<div style="margin-top:4px;font-size:0.88rem;color:#64748B">'
-            f'Hoy rankea #1: <a href="{html.escape(row["top1_url"])}" target="_blank">{html.escape(row["top1_dominio"])}</a></div>',
+            f'<div style="margin-top:4px;font-size:0.88rem;color:#64748B">{pie}</div>',
             unsafe_allow_html=True,
         )
 
@@ -64,13 +68,15 @@ def render():
         "real. No se actualiza solo: pídele a Claude que genere un lote nuevo cuando lo necesites."
     )
 
-    n_oportunidad = int((~df["revistamercado_en_top5"]).sum())
-    st.markdown(
-        f'<div style="background:#FEF3C7;color:#92400E;border-radius:10px;padding:10px 16px;'
-        f'font-weight:600;margin-bottom:14px">🔓 {n_oportunidad} de {len(df)} entidades del lote de hoy: '
-        f'revistamercado.do no aparece en el top 5 de Google para su keyword en tendencia.</div>',
-        unsafe_allow_html=True,
-    )
+    con_serp = df[df["top1_dominio"].notna() & (df["top1_dominio"].astype(str).str.strip() != "")]
+    n_oportunidad = int((~con_serp["revistamercado_en_top5"]).sum())
+    if len(con_serp):
+        st.markdown(
+            f'<div style="background:#FEF3C7;color:#92400E;border-radius:10px;padding:10px 16px;'
+            f'font-weight:600;margin-bottom:14px">🔓 {n_oportunidad} de {len(con_serp)} entidades con datos de SERP: '
+            f'revistamercado.do no aparece en el top 5 de Google para su keyword en tendencia.</div>',
+            unsafe_allow_html=True,
+        )
 
     ordenado = df.sort_values("tendencia_delta", ascending=False).reset_index(drop=True)
     for _, row in ordenado.iterrows():

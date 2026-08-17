@@ -33,7 +33,13 @@ DIR = Path(__file__).parent
 RAW = DIR / "raw_historico"
 BASE = "https://revistamercado.do"
 HEADERS = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"}
-MAX_NUEVAS_POR_CORRIDA = 150  # tope de scraping en vivo por corrida -- evita corridas de horas
+MAX_NUEVAS_POR_CORRIDA_DEFAULT = 150  # tope para una corrida RUTINARIA (diaria) -- casi
+# todo ya está en el caché de corridas previas, así que 150 nuevas de sobra en el día a
+# día. Para la PRIMERA corrida real de un mes (o para ponerse al día después de un hueco)
+# hace falta muchas más -- pasar un 2do argumento por línea de comandos para eso, ver
+# main.py: bug real encontrado 16-ago-2026, Edwin señaló que agosto mostraba 7-29 notas
+# por periodista cuando escriben 8-9 notas AL DÍA -- con el tope de 150 fijo, la primera
+# corrida real solo alcanzó a identificar 150 de 12.252 rutas candidatas (1.2%).
 
 PREFIJOS_NO_ARTICULO = ("/category/", "/tag/", "/wp-", "/author/", "/post_author/",
                         "/page/", "/feed", "/buscar", "/search", "/carrito", "/checkout",
@@ -132,7 +138,7 @@ def cargar_gsc() -> pd.DataFrame:
     return pivot.merge(busq, on="ruta", how="left")
 
 
-def main(mes: str):
+def main(mes: str, tope_nuevas: int = MAX_NUEVAS_POR_CORRIDA_DEFAULT):
     ga4 = cargar_ga4()
     gsc = cargar_gsc()
     trafico = ga4.merge(gsc, on="ruta", how="outer")
@@ -150,9 +156,9 @@ def main(mes: str):
         columns=["ruta", "autor", "titulo", "seccion", "fecha", "es_sindicado"])
     conocidas = set(cache["ruta"])
 
-    nuevas_candidatas = candidatas[~candidatas["ruta"].isin(conocidas)].head(MAX_NUEVAS_POR_CORRIDA)
+    nuevas_candidatas = candidatas[~candidatas["ruta"].isin(conocidas)].head(tope_nuevas)
     print(f"Ya conocidas en mapa_autor_ruta.csv: {len(candidatas) - len(nuevas_candidatas)}")
-    print(f"Nuevas a scrapear esta corrida (tope {MAX_NUEVAS_POR_CORRIDA}): {len(nuevas_candidatas)}")
+    print(f"Nuevas a scrapear esta corrida (tope {tope_nuevas}): {len(nuevas_candidatas)}")
 
     filas_nuevas = []
     for i, row in nuevas_candidatas.iterrows():
@@ -193,7 +199,8 @@ def main(mes: str):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Uso: python3 data/construir_notas_mes_actual.py <mes AAAA-MM>")
+    if len(sys.argv) not in (2, 3):
+        print("Uso: python3 data/construir_notas_mes_actual.py <mes AAAA-MM> [tope_nuevas]")
         sys.exit(1)
-    main(sys.argv[1])
+    tope = int(sys.argv[2]) if len(sys.argv) == 3 else MAX_NUEVAS_POR_CORRIDA_DEFAULT
+    main(sys.argv[1], tope)

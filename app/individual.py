@@ -292,7 +292,7 @@ def _metricas_clave(fila):
                      "propia en la misma sección</span>", "🧭", "teal"),
         metrica_card("Temas propios vs. asignados", "—", sin_dato,
                      "🏷️", "purple"),
-        metrica_card("Extensión promedio (palabras)", f"{fila['palabras_promedio']:.0f}", "", "📄", "blue"),
+        metrica_card("Extensión promedio (palabras)", _fmt(fila["palabras_promedio"], "{:.0f}", "— sin dato"), "", "📄", "blue"),
         metrica_card("Notas con semáforo SEO verde", f"{fila['semaforo_verde_pct']:.0f}%",
                      f"<span class='cp-delta' style='color:#64748B'>{int(fila['notas_verde'])}🟢 "
                      f"{int(fila['notas_amarillo'])}🟡 {int(fila['notas_rojo'])}🔴</span>", "✅", "green"),

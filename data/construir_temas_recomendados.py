@@ -24,18 +24,21 @@ de metodología incomparable entre exports de Search Console con límite de
 1.000 filas de la UI), revistamercado.do SÍ tiene impresiones_search reales y
 SIN límite de filas en julio y en el histórico ene-jun (verificado: 859 y
 5.140 valores >0 respectivamente, distribución continua, no un tope redondo)
--- se usan los 7 periodos completos (ene-jul) como base comparable, no solo 6.
+-- se usan los 7 periodos completos (ene-jul) para el PICO histórico de cada
+entidad.
 
-Agosto (parcial, en curso) SÍ entra para contar meses_activos/span de las
-notas (mismo criterio que colombia.com, que también incluye su mes parcial) --
-pero NO entra en el share de impresiones del portal: notas_<mes>.csv del mes
-parcial solo cubre las rutas con autor ya identificado (69 de un portal mucho
-más grande), no todas las rutas como sí hacen procesado_2026-07*.csv y
-procesado_historico_*.csv -- usarlo ahí inflaría artificialmente el ratio de
-cualquier entidad con actividad en agosto. Limitación residual documentada,
-no resuelta: se resolvería con un export de impresiones portal-completo de
-agosto (ej. sc_consolidado ya sirve, ver data/raw_historico/), no con más
-lógica -- pendiente para cuando agosto cierre.
+Bug real encontrado 16-ago-2026 (Edwin, sobre Temas del día): "Mundial" salía
+con demanda_reciente_ratio=1.0 -- pero esa cifra se calculaba contra JULIO
+(ULTIMO_MES_COMPARABLE), congelado en el pico del Mundial 2026 (que cerró en
+julio) y nunca actualizado -- "no me puedes sacar un tema de mundial cuando
+estamos a mediados de agosto, eso está mal hecho". La demanda RECIENTE ahora
+se mide contra la ventana móvil más actual de Drive (data/raw_historico/
+sc_consolidado_*.csv vía cargar_gsc() de construir_notas_mes_actual.py --
+PORTAL COMPLETO, sin necesitar autoría, ~10-jul a ~13-ago al momento de
+escribir esto: no es un mes calendario limpio, pero es la señal más actual
+disponible y ya no queda congelada en un pico de hace semanas). El PICO
+histórico se sigue calculando sobre ene-jul (meses calendario limpios); solo
+el punto de comparación "reciente" cambió de julio a esta ventana.
 
 Uso: python3 data/construir_temas_recomendados.py
 Escribe: data/temas_recomendados.csv
@@ -49,15 +52,19 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent))
 import entidades_periodista as ep
+from construir_notas_mes_actual import cargar_gsc
 
 DIR = Path(__file__).parent
 EXCLUIR_AUTOR = {"revistamercado", "SIN_AUTOR"}
 SUFIJO_JULIO = "2026-07-01_2026-07-31"
+MES_VENTANA_ACTUAL = "actual"  # clave especial, no un mes calendario -- ver docstring
 
-# Julio (censo completo) es el último mes con impresiones PORTAL-COMPLETAS
-# comparables -- ver limitación de agosto documentada arriba.
-MESES_IMPRESIONES_COMPARABLES = ["2026-01", "2026-02", "2026-03", "2026-04", "2026-05", "2026-06", "2026-07"]
-ULTIMO_MES_COMPARABLE = MESES_IMPRESIONES_COMPARABLES[-1]
+# Meses calendario limpios (ene-jul), usados para el PICO histórico de cada entidad.
+MESES_PICO = ["2026-01", "2026-02", "2026-03", "2026-04", "2026-05", "2026-06", "2026-07"]
+# Comparable = pico + la ventana más actual -- la demanda "reciente" se mide contra
+# MES_VENTANA_ACTUAL, no contra julio (ver bug real documentado arriba).
+MESES_IMPRESIONES_COMPARABLES = MESES_PICO + [MES_VENTANA_ACTUAL]
+ULTIMO_MES_COMPARABLE = MES_VENTANA_ACTUAL
 
 
 def _cargar_notas_con_mes() -> pd.DataFrame:
@@ -86,9 +93,10 @@ def _cargar_notas_con_mes() -> pd.DataFrame:
 
 
 def _cargar_impresiones_portal_por_ruta_mes() -> pd.DataFrame:
-    """ruta, mes, impresiones -- PORTAL COMPLETO (no solo rutas con autor),
-    solo julio + histórico (ver limitación de agosto en el docstring del
-    módulo)."""
+    """ruta, mes, impresiones -- PORTAL COMPLETO (no solo rutas con autor).
+    ene-jul de procesado_*/procesado_historico_* (meses calendario limpios,
+    para el PICO) + una fila "actual" de la ventana móvil más reciente de
+    Drive (para la demanda RECIENTE -- ver docstring del módulo)."""
     julio = pd.read_csv(DIR / f"procesado_{SUFIJO_JULIO}.csv")
     julio = julio[["ruta", "impresiones_search"]].copy()
     julio["mes"] = "2026-07"
@@ -97,7 +105,10 @@ def _cargar_impresiones_portal_por_ruta_mes() -> pd.DataFrame:
     hist = hist[["ruta", "mes", "impresiones_search"]].copy()
     hist["mes"] = "2026-" + hist["mes"].astype(int).astype(str).str.zfill(2)
 
-    todas = pd.concat([julio, hist], ignore_index=True)
+    actual = cargar_gsc()[["ruta", "impresiones_search"]].copy()
+    actual["mes"] = MES_VENTANA_ACTUAL
+
+    todas = pd.concat([julio, hist, actual], ignore_index=True)
     todas = todas.rename(columns={"impresiones_search": "impresiones"})
     return todas[todas["mes"].isin(MESES_IMPRESIONES_COMPARABLES)]
 
@@ -116,7 +127,7 @@ def main():
         if serie.empty:
             return 0.0
         share = (serie / portal_impresiones_mes.reindex(serie.index)).fillna(0)
-        pico = share.max()
+        pico = share.reindex(MESES_PICO).fillna(0).max()  # solo meses calendario limpios
         if pico <= 0:
             return 0.0
         reciente = share.reindex([ULTIMO_MES_COMPARABLE]).fillna(0).mean()
