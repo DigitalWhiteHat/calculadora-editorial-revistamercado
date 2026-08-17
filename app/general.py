@@ -404,6 +404,52 @@ def _top_economia(periodo):
                    "más una señal a vigilar que un veredicto definitivo.")
 
 
+def _advertencias_declive():
+    """"Qué está bajando" -- secciones (mes en curso vs. julio, tráfico/día) +
+    entidades/temas (ventana móvil de ~17 días, todo el portal). Pedido de
+    Edwin, 17-ago-2026: "le hace falta el tema de qué está bajando... como lo
+    hicimos por entidades" -- mismo patrón visual de calculadora-periodistas
+    (colombia.com)."""
+    declive_seccion = dr.advertencias_declive_secciones()
+    declive_entidad = dr.advertencias_declive_entidades()
+    if declive_seccion.empty and declive_entidad.empty:
+        return
+    with st.container(border=True, key="card_advertencias"):
+        st.subheader("⚠️ Qué está bajando")
+
+        st.markdown(f"**Por sección** (tráfico/día, todo el portal, "
+                    f"{dr.MES_LABEL_LARGO.get(dr.MES_PARCIAL, dr.MES_PARCIAL)} vs. julio):")
+        st.caption("Compara ritmo diario, no el acumulado crudo, para que un mes parcial no se vea peor solo por tener menos días.")
+        if declive_seccion.empty:
+            st.success("Ninguna sección con caída relevante (≥15%) este periodo.")
+        else:
+            for r in declive_seccion.itertuples():
+                st.markdown(
+                    f"🔻 **{dr.seccion_label(r.seccion_raw)}** — "
+                    f"{r.trafico_dia_anterior:.0f}/día en julio vs. {r.trafico_dia_actual:.0f}/día ahora "
+                    f"(**{r.pct_cambio:.0f}%**)"
+                )
+
+        st.write("")
+        st.markdown("**Por entidad/tema** (ventana móvil de ~17 días vs. los ~17 días anteriores):")
+        st.caption(
+            "🏷️ = entidad (persona, equipo, lugar) · 📌 = tema. Solo entidades con tráfico "
+            "real en ambas ventanas (no las que \"desaparecieron\" del todo — eso puede ser una nota "
+            "que ya no está en portada, no una caída de interés)."
+        )
+        if declive_entidad.empty:
+            st.success("Ninguna entidad/tema con caída relevante (≥50%) en la última ventana.")
+        else:
+            for r in declive_entidad.itertuples():
+                icono = "🏷️" if r.tipo == "entidad" else "📌"
+                st.markdown(
+                    f"🔻 {icono} **{r.entidad}** — "
+                    f"{calc.formatear_numero(r.trafico_anterior)} en la ventana anterior vs. "
+                    f"{calc.formatear_numero(r.trafico_actual)} ahora "
+                    f"(**{r.pct_cambio:.0f}%**)"
+                )
+
+
 def _dificultad_canal_seccion():
     with st.container(border=True, key="card_secciones_dificultad"):
         st.subheader("Dificultad y canal por sección")
@@ -487,6 +533,9 @@ def render(tabla, periodo):
 
     with st.container(border=True, key="card_tendencia_portal"):
         _tendencia_portal()
+    st.write("")
+
+    _advertencias_declive()
     st.write("")
 
     col_izq, col_der = st.columns([1, 1.3])

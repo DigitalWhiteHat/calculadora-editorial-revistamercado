@@ -1431,3 +1431,47 @@ def cargar_temas_del_dia() -> pd.DataFrame:
         return pd.read_csv(f"{DATA_DIR}/temas_del_dia.csv")
     except FileNotFoundError:
         return pd.DataFrame()
+
+
+@st.cache_data
+def advertencias_declive_secciones(umbral_pct: float = -15.0, top_n: int = 8) -> pd.DataFrame:
+    """Qué SECCIONES vienen bajando -- mes en curso (MES_PARCIAL) vs. julio
+    (censo completo), tráfico/día para que un mes parcial no se vea peor solo
+    por tener menos días. Pedido de Edwin, 17-ago-2026: "le hace falta el tema
+    de qué está bajando" -- mismo patrón ya construido en calculadora-periodistas
+    (colombia.com). Si no hay mes parcial todavía, no hay nada que comparar."""
+    if not MES_PARCIAL:
+        return pd.DataFrame()
+    trafico_actual = secciones_trafico_real(MES_PARCIAL)
+    trafico_anterior = secciones_trafico_real("2026-07")
+    dias_actual = (periodo_fechas(MES_PARCIAL)[1] - periodo_fechas(MES_PARCIAL)[0]).days + 1
+    dias_anterior = (periodo_fechas("2026-07")[1] - periodo_fechas("2026-07")[0]).days + 1
+
+    secciones = set(trafico_actual) | set(trafico_anterior)
+    filas = []
+    for s in secciones:
+        act = trafico_actual.get(s, 0) / dias_actual
+        ant = trafico_anterior.get(s, 0) / dias_anterior
+        if ant <= 0 or act <= 0:
+            continue
+        pct = 100 * (act - ant) / ant
+        if pct <= umbral_pct:
+            filas.append({"seccion_raw": s, "trafico_dia_actual": act, "trafico_dia_anterior": ant, "pct_cambio": pct})
+    if not filas:
+        return pd.DataFrame()
+    return pd.DataFrame(filas).sort_values("pct_cambio").head(top_n).reset_index(drop=True)
+
+
+@st.cache_data
+def advertencias_declive_entidades(umbral_pct: float = -50.0, top_n: int = 8) -> pd.DataFrame:
+    """Qué ENTIDADES/TEMAS vienen bajando -- ventana móvil de ~17 días (no mes
+    calendario), a nivel de TODO el portal. Ver data/calcular_declive_entidades.py
+    para la ventana exacta y el bug real (comparar tráfico ACUMULADO por fecha de
+    publicación sesga todo hacia "cayendo") que ya se descartó en colombia.com
+    antes de construir esto -- mismo criterio aplicado aquí desde el principio."""
+    try:
+        df = pd.read_csv(f"{DATA_DIR}/entidades_declive_portal.csv")
+    except FileNotFoundError:
+        return pd.DataFrame()
+    df = df[df["pct_cambio"] <= umbral_pct].sort_values("pct_cambio")
+    return df.head(top_n).reset_index(drop=True)
