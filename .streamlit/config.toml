@@ -21,11 +21,11 @@ grayColor = "#64748B"
 chartCategoricalColors = ["#3457D5", "#16A34A", "#F59E0B", "#DC2626", "#8B5CF6", "#0EA5E9"]
 
 [theme.sidebar]
-backgroundColor = "#0B1E3D"
-secondaryBackgroundColor = "#132A50"
-textColor = "#E4E9F2"
-borderColor = "#1B305A"
-primaryColor = "#5B8DEF"
+backgroundColor = "#232020"
+secondaryBackgroundColor = "#332E2B"
+textColor = "#F4F1EC"
+borderColor = "#443E3A"
+primaryColor = "#C72035"
 
 [server]
 headless = true

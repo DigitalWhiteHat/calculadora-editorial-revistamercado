@@ -110,6 +110,95 @@ def _tabla(df, df_notas_seccion):
                "volumen real (<1.000 visitas en 7 periodos) — no es tráfico editorial del sitio.")
 
 
+def _seccion_mes_ligera(periodo):
+    """Panorama de UN periodo puntual (no los 7 acumulados) -- para cuando el
+    selector de arriba está en un mes histórico o el parcial en curso, en vez
+    de julio (censo completo). Portado de calculadora-periodistas/app/secciones.py
+    (Colombia.com), adaptado a la columna `seccion_raw` de Revista Mercado."""
+    st.subheader(f"Panorama del portal — {dr.PERIODOS[periodo]['label']}")
+    st.info(
+        "📊 Tráfico y notas reales de este periodo. Las herramientas de abajo (simulador, "
+        "especialización, propuesta de redistribución) usan 7 periodos acumulados y no cambian "
+        "con el periodo que elijas aquí arriba — son para decidir, no una foto de un solo mes."
+    )
+    df_mes = dr.secciones_por_periodo(periodo)
+    if df_mes.empty:
+        st.warning("No hay notas identificadas para este periodo.")
+        return
+    df_mes = df_mes.copy()
+    df_mes["label"] = df_mes["seccion"].apply(_label)
+
+    tarjetas = [
+        kpi_card("🌐", "Tráfico total del portal", calc.formatear_numero(df_mes["trafico"].sum())),
+        kpi_card("📝", "Notas identificadas", f"{int(df_mes['notas'].sum())}"),
+        kpi_card("📊", "Secciones con volumen", f"{len(df_mes)}"),
+    ]
+    st.markdown(f'<div class="cp-kpi-row">{"".join(tarjetas)}</div>', unsafe_allow_html=True)
+    st.write("")
+
+    with st.container(border=True, key="card_seccion_mes_grafico"):
+        st.subheader("Tráfico por sección")
+        ordenado = df_mes.sort_values("trafico", ascending=True)
+        fig = go.Figure(go.Bar(
+            x=ordenado["trafico"], y=ordenado["label"], orientation="h", marker_color="#3457D5",
+            text=[calc.formatear_numero(v) for v in ordenado["trafico"]], textposition="outside",
+            hovertemplate="%{y}<br>Tráfico: %{x:,.0f}<extra></extra>",
+        ))
+        fig.update_layout(
+            height=max(360, 26 * len(ordenado)), margin=dict(l=0, r=60, t=10, b=10),
+            xaxis_title=None, yaxis_title=None, showlegend=False,
+            plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
+            xaxis=dict(showgrid=True, gridcolor="#E2E6ED"),
+            yaxis=dict(automargin=True),
+        )
+        st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
+
+    st.write("")
+    with st.container(border=True, key="card_seccion_mes_tabla"):
+        st.subheader("Detalle por sección")
+        vista = df_mes.sort_values("trafico", ascending=False).copy()
+        vista["trafico_txt"] = vista["trafico"].apply(calc.formatear_numero)
+        st.dataframe(
+            vista[["label", "notas", "trafico_txt", "eficiencia"]], hide_index=True, width="stretch",
+            column_config={
+                "label": st.column_config.TextColumn("Sección", width="medium"),
+                "notas": st.column_config.NumberColumn("Notas", width="small"),
+                "trafico_txt": st.column_config.TextColumn("Tráfico", width="small"),
+                "eficiencia": st.column_config.NumberColumn("Tráfico / nota", format="%.0f", width="small"),
+            },
+        )
+
+
+def _herramientas_7meses(tabla_periodistas, esp, df_notas_seccion):
+    """Simulador, especialización, simulador de escenarios y propuesta de
+    redistribución: SIEMPRE con 7 periodos acumulados, sin importar el periodo
+    elegido arriba — son herramientas de decisión, no una foto de un mes."""
+    st.write("")
+    with st.container(border=True, key="card_eficiencia_seccion"):
+        _eficiencia_por_seccion(df_notas_seccion)
+
+    st.write("")
+    with st.container(border=True, key="card_simulador"):
+        _simulador(df_notas_seccion)
+
+    if not esp.empty:
+        st.write("")
+        with st.container(border=True, key="card_especializacion"):
+            _especializacion_periodistas(esp)
+
+        st.write("")
+        with st.container(border=True, key="card_simulador_escenarios"):
+            _simulador_escenarios(esp, df_notas_seccion)
+
+    st.write("")
+    with st.container(border=True, key="card_propuesta"):
+        _propuesta_redistribucion(df_notas_seccion, tabla_periodistas)
+
+    st.write("")
+    with st.container(border=True, key="card_titulares_secciones"):
+        _titulares_por_seccion()
+
+
 def _eficiencia_por_seccion(df_notas):
     st.subheader("Cuántas notas produce cada sección — y qué tan bien le rinden")
     st.caption(
@@ -434,10 +523,16 @@ def _titulares_por_seccion():
 
 
 def render(tabla_periodistas, periodo=None):
-    df_panorama = _panorama()
+    periodo = periodo or dr.PERIODO_DEFAULT
     df_notas_seccion = dr.notas_por_seccion_agregado()
     esp = dr.especializacion_todos()
 
+    if not dr.es_periodo_completo(periodo):
+        _seccion_mes_ligera(periodo)
+        _herramientas_7meses(tabla_periodistas, esp, df_notas_seccion)
+        return
+
+    df_panorama = _panorama()
     st.subheader("Panorama del portal — 7 periodos (jul-2026 censo + histórico ene-jun)")
     st.caption("No solo lo que tiene periodista asignado: así se reparte TODO el tráfico real, incluidas las "
                "subsecciones — que es donde de verdad trabajan los periodistas de Revista Mercado, no en la "
@@ -450,27 +545,4 @@ def render(tabla_periodistas, periodo=None):
     with st.container(border=True, key="card_secciones_tabla"):
         _tabla(df_panorama, df_notas_seccion)
 
-    st.write("")
-    with st.container(border=True, key="card_eficiencia_seccion"):
-        _eficiencia_por_seccion(df_notas_seccion)
-
-    st.write("")
-    with st.container(border=True, key="card_simulador"):
-        _simulador(df_notas_seccion)
-
-    if not esp.empty:
-        st.write("")
-        with st.container(border=True, key="card_especializacion"):
-            _especializacion_periodistas(esp)
-
-        st.write("")
-        with st.container(border=True, key="card_simulador_escenarios"):
-            _simulador_escenarios(esp, df_notas_seccion)
-
-    st.write("")
-    with st.container(border=True, key="card_propuesta"):
-        _propuesta_redistribucion(df_notas_seccion, tabla_periodistas)
-
-    st.write("")
-    with st.container(border=True, key="card_titulares_secciones"):
-        _titulares_por_seccion()
+    _herramientas_7meses(tabla_periodistas, esp, df_notas_seccion)

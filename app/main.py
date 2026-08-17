@@ -53,22 +53,6 @@ with st.sidebar:
     st.caption("Desempeño Editorial")
     st.write("")
 
-    opciones_periodo = [p for p in dr.ORDEN_PERIODOS if p in dr.PERIODOS]
-    idx_actual = opciones_periodo.index(periodo) if periodo in opciones_periodo else 0
-    periodo_elegido = st.selectbox(
-        "Periodo", opciones_periodo, index=idx_actual,
-        format_func=lambda p: dr.PERIODOS[p]["label"], key="selector_periodo",
-    )
-    if periodo_elegido != periodo:
-        st.session_state.periodo = periodo_elegido
-        st.rerun()
-    tipo_periodo = dr.PERIODOS[periodo]["tipo"]
-    if tipo_periodo == "parcial":
-        st.caption("🔄 Mes en curso — tráfico y autor real, todavía sin semáforo SEO (se calcula al cerrar el mes)")
-    elif tipo_periodo == "historico":
-        st.caption("⚠️ Muestra histórica — tráfico real y completo, SEO solo sobre notas muestreadas")
-    st.write("")
-
     vista_activa = st.session_state.vista if st.session_state.vista in VISTAS_PRINCIPALES else "general"
     for icono, etiqueta, vista_key in NAV_ITEMS:
         if vista_key is not None:
@@ -90,14 +74,23 @@ st.markdown(
     f'</div></div>', unsafe_allow_html=True,
 )
 
-periodo_label = dr.PERIODOS[periodo]["label"]
-
 col_espacio, col_periodo, col_export = st.columns([3, 2, 1])
 with col_periodo:
-    st.markdown(
-        f'<div style="text-align:right;padding-top:6px;color:#64748B;font-size:0.92rem">'
-        f'📅 Periodo: <b>{periodo_label}</b></div>', unsafe_allow_html=True,
+    opciones_periodo = [p for p in dr.ORDEN_PERIODOS if p in dr.PERIODOS]
+    idx_actual = opciones_periodo.index(periodo) if periodo in opciones_periodo else 0
+    periodo_elegido = st.selectbox(
+        "📅 Periodo", opciones_periodo, index=idx_actual,
+        format_func=lambda p: dr.PERIODOS[p]["label"], key="selector_periodo",
     )
+    if periodo_elegido != periodo:
+        st.session_state.periodo = periodo_elegido
+        st.rerun()
+    tipo_periodo = dr.PERIODOS[periodo]["tipo"]
+    if tipo_periodo == "parcial":
+        st.caption("🔄 Mes en curso — tráfico y autor real, todavía sin semáforo SEO (se calcula al cerrar el mes)")
+    elif tipo_periodo == "historico":
+        st.caption("⚠️ Muestra histórica — tráfico real y completo, SEO solo sobre notas muestreadas")
+periodo_label = dr.PERIODOS[periodo]["label"]
 with col_export:
     # Placeholder: el PDF completo (4 gráficos vía kaleido) tarda varios segundos la
     # primera vez por periodista (luego queda en caché). Se llena al final del script,

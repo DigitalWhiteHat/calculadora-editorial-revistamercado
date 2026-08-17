@@ -1250,3 +1250,18 @@ def alertas_tendencia() -> list[dict]:
             "mensaje": f"{racha} periodos seguidos (hasta {ultimo_periodo}) con eficiencia por debajo de la mediana del equipo.",
         })
     return resultados
+
+
+def secciones_por_periodo(periodo: str = PERIODO_DEFAULT) -> pd.DataFrame:
+    """Tráfico y notas reales por sección para UN periodo puntual (a diferencia de
+    secciones_resumen_agregado(), que siempre son los 7 periodos acumulados y no cambia
+    con el selector de arriba) -- para la vista "mes ligero" de Secciones/Notas cuando el
+    periodo elegido no es el censo completo de julio."""
+    _, procesado = _crudo(periodo)
+    articulos = procesado[_parece_articulo(procesado["ruta"])].copy()
+    if articulos.empty:
+        return pd.DataFrame(columns=["seccion", "notas", "trafico", "eficiencia"])
+    agg = articulos.groupby("seccion_raw").agg(notas=("ruta", "count"), trafico=("vistas", "sum")).reset_index()
+    agg = agg.rename(columns={"seccion_raw": "seccion"})
+    agg["eficiencia"] = (agg["trafico"] / agg["notas"]).round(0)
+    return agg.sort_values("trafico", ascending=False).reset_index(drop=True)

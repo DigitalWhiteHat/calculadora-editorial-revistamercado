@@ -9,6 +9,7 @@ import calculos as calc
 import datos_reales as dr
 from avatares import avatar_data_uri
 from estilos import BG_ESTADO, TXT_ESTADO, delta_html, ecuacion_titular_box, kpi_card
+from graficos import agregar_proyeccion, texto_metodologia_proyeccion
 from google_updates import UPDATES_2026
 
 COLOR_ESTADO = {"green": "#16A34A", "blue": "#3457D5", "red": "#DC2626"}
@@ -77,6 +78,12 @@ def _tendencia_portal():
                 bgcolor="rgba(255,255,255,0.92)", bordercolor="#DC2626", borderwidth=1, borderpad=3,
             )
 
+    proyeccion = dr.proyeccion_fin_de_mes(por_periodo, "trafico", col_mes="periodo")
+    if proyeccion:
+        label_actual = por_periodo["mes_label"].iloc[-1]
+        label_proy = f"{label_actual} (proy.)"
+        agregar_proyeccion(fig, proyeccion, x_actual=label_actual, x_proyectado=label_proy)
+
     fig.update_layout(
         height=380, margin=dict(l=0, r=10, t=50, b=10),
         yaxis_title=None, showlegend=False,
@@ -85,6 +92,8 @@ def _tendencia_portal():
         xaxis=dict(showgrid=False),
     )
     st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
+    if proyeccion:
+        st.caption(texto_metodologia_proyeccion(proyeccion))
 
 
 def _aporte_trafico(tabla):

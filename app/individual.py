@@ -12,6 +12,7 @@ import secciones
 from avatares import avatar_data_uri
 from estilos import avatar_badge, card_value, delta_html, ecuacion_titular_box, metrica_card, nota_row, pill, trafico_card
 from google_updates import UPDATES_2026
+from graficos import agregar_proyeccion, marcar_mes_parcial, texto_metodologia_proyeccion
 
 COLOR_ESTADO = {"green": "#16A34A", "blue": "#3457D5", "red": "#DC2626"}
 ICONO_ESTADO = {"green": "📈", "blue": "➡️", "red": "🔻"}
@@ -214,6 +215,12 @@ def _trafico_historico(historial, nombre_display, meta, periodistas_meta):
                     bgcolor="rgba(255,255,255,0.92)", bordercolor="#DC2626", borderwidth=1, borderpad=3,
                 )
 
+        proyeccion = dr.proyeccion_fin_de_mes(serie, "trafico", col_mes="mes")
+        if proyeccion:
+            label_actual = serie["mes_label"].iloc[-1]
+            label_proy = f"{label_actual} (proy.)"
+            agregar_proyeccion(fig, proyeccion, x_actual=label_actual, x_proyectado=label_proy)
+
         # Orden cronológico EXPLÍCITO del eje X: con dos trazas de meses
         # distintos (ej. Ana Sosa arranca en abril, Andrea Mercedes tiene
         # desde marzo), Plotly por defecto ordena las categorías por el
@@ -230,6 +237,8 @@ def _trafico_historico(historial, nombre_display, meta, periodistas_meta):
             xaxis=dict(showgrid=False, categoryorder="array", categoryarray=orden_meses),
         )
         st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
+        if proyeccion:
+            st.caption(texto_metodologia_proyeccion(proyeccion))
 
 
 def _eficiencia_historica(historial, nombre_display):
@@ -252,6 +261,8 @@ def _eficiencia_historica(historial, nombre_display):
                                   line=dict(color="#3457D5", width=3), marker=dict(size=7),
                                   text=[f"{v:.0f}" for v in serie["indice"]], textposition="top center",
                                   name=nombre_display))
+        if dr.mes_es_parcial(serie["mes"].iloc[-1]):
+            marcar_mes_parcial(fig, serie["mes_label"].iloc[-1], serie["indice"].iloc[-1])
         fig.update_layout(
             height=420, margin=dict(l=10, r=10, t=10, b=10), showlegend=True,
             legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0),
@@ -303,6 +314,8 @@ def _posicion_google(historial, meta):
         fig = go.Figure(go.Scatter(x=serie["mes_label"], y=serie["posicion_promedio"], mode="lines+markers+text",
                                     text=[f"{v:.1f}" for v in serie["posicion_promedio"]], textposition="top center",
                                     line=dict(color="#3457D5", width=3), marker=dict(size=10)))
+        if dr.mes_es_parcial(serie["mes"].iloc[-1]):
+            marcar_mes_parcial(fig, serie["mes_label"].iloc[-1], serie["posicion_promedio"].iloc[-1])
         fig.update_layout(
             height=280, margin=dict(l=10, r=10, t=10, b=10),
             yaxis=dict(autorange="reversed", title="Posición", showgrid=True, gridcolor="#E2E6ED"),
