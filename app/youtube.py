@@ -22,12 +22,21 @@ Dos periodos disponibles:
   cruzando el total (10.59M vistas) contra el Sheet de KPIs que Edwin ya
   mantiene a mano -- coincide.
 
-Ingresos: la columna "Ingresos estimados" viene vacía/0 en AMBOS snapshots,
-agosto y el histórico completo, incluida la fila "Total" -- se confirmó que no
-es un recorte de agosto, es el nivel de acceso de la cuenta conectada (aparece
-como "Editor", no "Propietario"/"Administrador con ingresos", el rol que
-YouTube exige para mostrar ingresos). Se declara así en la UI, nunca se
-inventa un número.
+Ingresos: SÍ son reales y SÍ están en esta vista (Edwin tenía razón en
+cuestionar el "sin acceso" original). El export "Modo avanzado" filtrado por
+"Orgánica" (AD_STATUS_ORGANIC) devuelve Ingresos vacío para TODO el canal --
+esa combinación específica de dimensiones no la cruza YouTube Studio, no es un
+tema de permisos. Cambiando el filtro a "Videos" (o sin filtro de contenido)
+los ingresos SÍ aparecen, y coinciden con la pestaña estándar Analytics ->
+Ingresos (fuera de modo avanzado). Los ingresos que ves aquí vienen de un
+export APARTE (data/youtube_ingresos_raw.csv y
+data/youtube_ingresos_agosto_raw.csv, fusionados por video_id vía
+data/fusionar_ingresos_youtube.py) -- no llevan el filtro "Orgánica" porque esa
+combinación sigue rota, así que son ingresos de TODO el tráfico del video (no
+solo el orgánico). Cobertura: 125/159 videos en agosto (99.7% de los US$237.91
+reales) y 239/497 en histórico (84% de los US$1.857,24 reales) -- el resto no
+cayó en el Top 500 por ingresos que YouTube Studio deja exportar, casi siempre
+porque su ingreso real es marginal.
 
 Tendencia mensual: data/youtube_tendencia_mensual.csv son vistas orgánicas a
 nivel de CANAL (no por video), tomadas del Sheet de KPIs 2026 que Edwin ya
@@ -97,6 +106,7 @@ def _kpis(df: pd.DataFrame):
     total_horas = df["horas_reproduccion"].sum()
     pct_reprod_prom = (df["vistas"] * df["pct_reproducido"]).sum() / total_vistas if total_vistas else 0
     ingresos_total = df["ingresos_usd"].fillna(0).sum()
+    con_ingresos = df["ingresos_usd"].notna().sum()
 
     tarjetas = [
         kpi_card("👁️", "Vistas orgánicas (snapshot)", calc.formatear_numero(total_vistas)),
@@ -104,12 +114,12 @@ def _kpis(df: pd.DataFrame):
         kpi_card("📊", "% promedio reproducido", f"{pct_reprod_prom:.0f}%",
                   help_text="Ponderado por vistas -- >100% es normal en videos cortos con repeticiones (loop)."),
         kpi_card("🎬", "Videos en esta vista", f"{len(df)}"),
-        kpi_card("💰", "Ingresos estimados", "Sin acceso" if ingresos_total == 0 else calc.formatear_numero(ingresos_total),
-                  help_text="YouTube Studio no devuelve ingresos con el nivel de acceso actual (cuenta conectada como "
-                             "'Editor', no 'Propietario'/'Administrador con ingresos') -- confirmado tanto en agosto "
-                             "como en el histórico completo. No es que sean $0 reales -- es que este acceso no los "
-                             "puede ver. Pídele a quien administre el canal que dé acceso de ingresos, o que exporte "
-                             "esa pestaña aparte."),
+        kpi_card("💰", "Ingresos estimados", f"US$ {ingresos_total:,.2f}",
+                  help_text=f"Suma de los {con_ingresos}/{len(df)} videos con ingreso real confirmado (export de "
+                             f"YouTube Studio -> Analytics -> Ingresos, sin filtro de contenido -- ver aviso abajo). "
+                             f"Los videos sin ingreso en esta vista no cayeron en el Top 500 por ingresos que "
+                             f"YouTube Studio deja exportar -- casi siempre porque su ingreso real es marginal, no "
+                             f"porque falte acceso a verlo."),
     ]
     st.markdown(f'<div class="cp-kpi-row">{"".join(tarjetas)}</div>', unsafe_allow_html=True)
 
@@ -118,9 +128,11 @@ def _aviso_snapshot(periodo_key: str):
     info = PERIODOS_YT[periodo_key]
     st.info(
         f"📸 **Esto es un snapshot manual**, no un dato que se actualiza solo como el resto de la app. "
-        f"Exportado de YouTube Studio el {FECHA_SNAPSHOT}, canal 'Mercado Media Network', filtrado a "
-        f"**{info['desc']}**. Para refrescarlo: YouTube Studio → Analytics → Modo avanzado → filtro "
-        f"'Orgánica' → exportar a Google Sheets → pedirle a Claude que regenere los datos con ese Sheet nuevo."
+        f"Exportado de YouTube Studio el {FECHA_SNAPSHOT}, canal 'Mercado Media Network'. Vistas filtradas a "
+        f"**{info['desc']}**; ingresos vienen de un export aparte sin ese filtro (ver detalle en el código). "
+        f"Para refrescar ambos: YouTube Studio → Analytics → Modo avanzado → exportar la tabla de Contenido "
+        f"filtrada por 'Orgánica' (vistas) y la pestaña Ingresos → Contenido (ingresos, sin filtro) → pedirle "
+        f"a Claude que regenere los datos con esos Sheets nuevos."
     )
 
 
@@ -201,8 +213,9 @@ def _por_categoria(df: pd.DataFrame):
 def _tabla_videos(df: pd.DataFrame):
     st.subheader("Catálogo de videos")
     st.caption(
-        "Filtra por categoría, formato o palabra clave del título. Los ingresos vienen vacíos para todo el "
-        "canal (ver aviso arriba) -- no es que sean $0 reales, es que esta cuenta no puede verlos."
+        "Filtra por categoría, formato o palabra clave del título. Haz clic en la columna 'Ingresos' para "
+        "ordenar por lo que más/menos genera. Los videos sin ingreso no cayeron en el Top 500 por ingresos "
+        "que YouTube Studio deja exportar -- ver aviso arriba, no es un $0 real garantizado."
     )
 
     col_cat, col_formato, col_buscar = st.columns([2, 1, 2])
@@ -229,10 +242,9 @@ def _tabla_videos(df: pd.DataFrame):
     tabla["fecha_txt"] = tabla["fecha_publicacion"].apply(lambda f: f.strftime("%d-%b-%Y") if pd.notna(f) else "—")
     tabla["formato"] = tabla["es_short"].map({True: "Short", False: "Largo"})
     tabla["reproducido_txt"] = tabla["pct_reproducido"].apply(lambda p: f"{p:.0f}%")
-    tabla["ingresos_txt"] = tabla["ingresos_usd"].apply(
-        lambda v: calc.formatear_numero(v) if pd.notna(v) and v else "Sin acceso")
+    tabla["ingresos_usd"] = tabla["ingresos_usd"].astype("Float64")
 
-    columnas = ["titulo", "fecha_txt", "vistas", "reproducido_txt", "ingresos_txt", "categoria", "formato"]
+    columnas = ["titulo", "fecha_txt", "vistas", "reproducido_txt", "ingresos_usd", "categoria", "formato"]
     st.dataframe(
         tabla[columnas], hide_index=True, width="stretch", height=480,
         column_config={
@@ -240,7 +252,7 @@ def _tabla_videos(df: pd.DataFrame):
             "fecha_txt": st.column_config.TextColumn("Publicado", width="small"),
             "vistas": st.column_config.NumberColumn("Vistas", width="small", format="%d"),
             "reproducido_txt": st.column_config.TextColumn("% reproducido", width="small"),
-            "ingresos_txt": st.column_config.TextColumn("Ingresos", width="small"),
+            "ingresos_usd": st.column_config.NumberColumn("Ingresos", width="small", format="US$ %.2f"),
             "categoria": st.column_config.TextColumn("Categoría", width="medium"),
             "formato": st.column_config.TextColumn("Formato", width="small"),
         },
@@ -248,17 +260,41 @@ def _tabla_videos(df: pd.DataFrame):
 
 
 def _empresarios_detalle(df: pd.DataFrame):
-    with st.expander("🔎 Ver el detalle completo de 'Empresarios / Liderazgo'"):
-        st.caption(
-            "Cada uno de estos videos coincide con una palabra clave real de entrevista/liderazgo ejecutivo "
-            "(entrevista, CEO, presidente, liderazgo, nombre de la empresa, etc.) -- no se clasifican aquí solo "
-            "por ser videos largos. Ordenados de mejor a peor."
-        )
-        sub = df[df["categoria"] == "Empresarios / Liderazgo"].sort_values("vistas", ascending=False)
-        for r in sub.itertuples():
-            fecha = r.fecha_publicacion.strftime("%d-%b-%Y") if pd.notna(r.fecha_publicacion) else "—"
-            dur_min = int(r.duracion_seg) // 60
-            st.markdown(f"- **{r.titulo}** — {int(r.vistas)} vistas · {dur_min} min · {fecha}")
+    st.subheader("Detalle: 'Empresarios / Liderazgo'")
+    sub = df[df["categoria"] == "Empresarios / Liderazgo"].sort_values("vistas", ascending=False)
+    if sub.empty:
+        st.caption("Sin videos de esta categoría en el periodo elegido.")
+        return
+
+    vpv = sub["vistas"].mean()
+    noticias = df[df["categoria"] == "Noticias breves (geopolítica/actualidad)"]
+    vpv_noticias = noticias["vistas"].mean() if not noticias.empty else None
+    comparativa = (f" Promedio {calc.formatear_numero(vpv)} vistas/video vs. "
+                   f"{calc.formatear_numero(vpv_noticias)} de noticias breves." if vpv_noticias else "")
+    st.caption(
+        f"{len(sub)} videos. Cada uno coincide con una palabra clave real de entrevista/liderazgo ejecutivo "
+        f"(entrevista, CEO, presidente, liderazgo, nombre de la empresa, etc.) -- no se clasifican aquí solo por "
+        f"ser videos largos.{comparativa}"
+    )
+
+    tabla = sub.copy()
+    tabla["fecha_txt"] = tabla["fecha_publicacion"].apply(lambda f: f.strftime("%d-%b-%Y") if pd.notna(f) else "—")
+    tabla["duracion_min"] = (tabla["duracion_seg"] / 60).round(1)
+    tabla["reproducido_txt"] = tabla["pct_reproducido"].apply(lambda p: f"{p:.0f}%")
+    tabla["ingresos_usd"] = tabla["ingresos_usd"].astype("Float64")
+
+    columnas = ["titulo", "fecha_txt", "duracion_min", "vistas", "reproducido_txt", "ingresos_usd"]
+    st.dataframe(
+        tabla[columnas], hide_index=True, width="stretch", height=min(480, 44 + 36 * len(tabla)),
+        column_config={
+            "titulo": st.column_config.TextColumn("Título", width="large"),
+            "fecha_txt": st.column_config.TextColumn("Publicado", width="small"),
+            "duracion_min": st.column_config.NumberColumn("Duración (min)", width="small", format="%.1f"),
+            "vistas": st.column_config.NumberColumn("Vistas", width="small", format="%d"),
+            "reproducido_txt": st.column_config.TextColumn("% reproducido", width="small"),
+            "ingresos_usd": st.column_config.NumberColumn("Ingresos", width="small", format="US$ %.2f"),
+        },
+    )
 
 
 def render():
@@ -288,12 +324,16 @@ def render():
 
     with st.container(border=True, key="card_yt_tabla"):
         _tabla_videos(df)
+    st.write("")
+
+    with st.container(border=True, key="card_yt_empresarios"):
         _empresarios_detalle(df)
 
     st.write("")
     st.caption(
-        "Pendiente para una próxima vuelta: ingresos reales (requiere acceso de administrador con ingresos, no "
-        "editor -- confirmado sin acceso tanto en agosto como en el histórico completo) y fuentes de tráfico "
-        "(búsqueda vs. sugeridos vs. externo). El histórico está limitado al Top 500 por tiempo de reproducción "
-        "-- tope de exportación de YouTube Studio en modo avanzado, no una elección nuestra."
+        "Pendiente para una próxima vuelta: fuentes de tráfico (búsqueda vs. sugeridos vs. externo) y cobertura "
+        "de ingresos al 100% de los videos (hoy 99.7% del monto real en agosto, 84% en histórico -- el resto no "
+        "cayó en el Top 500 por ingresos que YouTube Studio deja exportar). El histórico de vistas está limitado "
+        "al Top 500 por tiempo de reproducción -- tope de exportación de YouTube Studio en modo avanzado, no una "
+        "elección nuestra."
     )
