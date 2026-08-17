@@ -63,6 +63,22 @@ importar cuánta demanda tenga -- la recurrencia de MESES no basta como señal
 por sí sola, porque la cobertura extendida de UN solo evento grande (semanas
 de seguimiento de un terremoto) también genera meses_activos>=3.
 
+Bug real #4, 17-ago-2026 (auditoría de Edwin sobre TODAS las secciones tras el
+fix de entidades_periodista.py: "no sé dónde utilizaste el esquema anterior y
+no sé si lo corregiste"): _es_coyuntural() de arriba es una LISTA CURADA a
+mano (_PALABRAS_COYUNTURALES) -- exactamente el enfoque que Edwin rechazó ese
+mismo día para entidades_periodista.py ("hay forma de inferirlo... miras la
+entidad en Search Console"), y que solo funciona por coincidencia con los
+eventos que ya conocíamos (Mundial, Juegos Centroamericanos, elecciones) --
+un evento nuevo sin esas palabras exactas en el título se cuela igual que se
+colaba antes. Se agrega la misma señal real y validada de
+entidades_periodista.py (cargar_tendencia_reciente_gsc + _tendencia_reciente_
+declinando: aporte MARGINAL diario de impresiones reales de Search Console
+entre snapshots consecutivos de sc_consolidado_*.csv, no listas de palabras)
+como filtro ADICIONAL -- se excluye si CUALQUIERA de los dos disparra
+(es_coyuntural por vocabulario O es_declive_reciente por tendencia real), para
+no perder cobertura mientras el histórico de snapshots todavía es corto.
+
 Uso: python3 data/construir_temas_recomendados.py
 Escribe: data/temas_recomendados.csv
 """
@@ -205,6 +221,10 @@ def main():
     stats = ep.construir_estadisticas_propios(notas["titulo"].dropna().tolist())
     print(f"Palabras con estadística de mayúscula calculada: {len(stats)}")
 
+    tendencia_reciente_gsc = ep.cargar_tendencia_reciente_gsc()
+    print(f"Tendencia reciente: {len(tendencia_reciente_gsc)} snapshots diarios de "
+          f"data/raw_historico/sc_consolidado_*.csv (ver bug real #4 arriba)")
+
     filas = []
     for row in notas.itertuples():
         ents = ep.extraer_entidades_titulo(row.titulo, stats)
@@ -266,6 +286,9 @@ def main():
 
         titulos_por_entidad_canon = grupo.groupby("entidad_canon")["titulo"].apply(list)
         agg["es_coyuntural"] = agg["entidad_canon"].map(titulos_por_entidad_canon).apply(_es_coyuntural)
+        agg["es_declive_reciente"] = agg["entidad_canon"].apply(
+            lambda ec: ep._tendencia_reciente_declinando(
+                rutas_por_entidad_canon.get(ec, set()), tendencia_reciente_gsc)[0])
         resultado.append(agg)
 
     rollup = pd.concat(resultado, ignore_index=True)
@@ -283,19 +306,25 @@ def main():
 
     span_meses = rollup.apply(_span, axis=1)
     _UMBRAL_DEMANDA_RECIENTE = 0.10
-    rollup["es_recurrente"] = (
+    candidata_por_recurrencia = (
         (rollup["meses_activos"] >= 3)
         & (span_meses >= 3)
         & (rollup["demanda_reciente_ratio"] >= _UMBRAL_DEMANDA_RECIENTE)
-        & (~rollup["es_coyuntural"])
     )
-    n_excluidas_coyuntura = int((rollup["es_coyuntural"] & (rollup["meses_activos"] >= 3)
-                                  & (span_meses >= 3)).sum())
+    rollup["es_recurrente"] = (
+        candidata_por_recurrencia & (~rollup["es_coyuntural"]) & (~rollup["es_declive_reciente"])
+    )
+    n_excluidas_coyuntura = int((rollup["es_coyuntural"] & candidata_por_recurrencia).sum())
+    n_excluidas_declive = int((rollup["es_declive_reciente"] & ~rollup["es_coyuntural"]
+                                & candidata_por_recurrencia).sum())
     if n_excluidas_coyuntura:
         print(f"Excluidas por coyuntura (evento puntual, no tema de fondo): {n_excluidas_coyuntura}")
+    if n_excluidas_declive:
+        print(f"Excluidas por declive reciente real (impresiones GSC, no en la lista curada): {n_excluidas_declive}")
 
     columnas = ["autor", "entidad", "tipo", "notas", "confianza", "meses_activos",
-                "mes_primero", "mes_reciente", "demanda_reciente_ratio", "es_coyuntural", "es_recurrente"]
+                "mes_primero", "mes_reciente", "demanda_reciente_ratio", "es_coyuntural",
+                "es_declive_reciente", "es_recurrente"]
     salida = rollup[columnas].sort_values(["autor", "es_recurrente", "meses_activos"], ascending=[True, False, False])
     salida.to_csv(DIR / "temas_recomendados.csv", index=False)
     print(f"\n-> temas_recomendados.csv ({len(salida)} filas, {int(salida['es_recurrente'].sum())} marcadas recurrentes)")
