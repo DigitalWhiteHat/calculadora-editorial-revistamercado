@@ -41,13 +41,31 @@ def _kpis(tabla):
 
 def _tendencia_portal():
     st.subheader("Tendencia del portal — 7 periodos (jul-2026 censo + histórico ene-jun)")
+    por_periodo = dr.trafico_total_por_periodo()
+
+    # El mes parcial grafica SESIONES (visitas GA4 reales, la cifra 1:1 contra
+    # "Visitas" de Looker Studio/GA4) -- los periodos cerrados solo tienen
+    # páginas vistas guardadas (no se conservó sesiones en su momento). Mezclar
+    # ambas métricas en la MISMA línea sin decirlo confundió a Edwin (17-ago-
+    # 2026: "me sigues diciendo que hay 387.000 visitas cuando no es cierto")
+    # -- el número que se grafica y el que se cruza contra su reporte real
+    # ahora son el MISMO, no dos cifras distintas en la misma pantalla.
+    por_periodo["valor_grafico"] = por_periodo["trafico"]
+    usa_sesiones = bool(dr.MES_PARCIAL) and pd.notna(
+        por_periodo.loc[por_periodo["periodo"] == dr.MES_PARCIAL, "sesiones"]).any()
+    labels_x = por_periodo["mes_label"].tolist()
+    if usa_sesiones:
+        por_periodo.loc[por_periodo["periodo"] == dr.MES_PARCIAL, "valor_grafico"] = \
+            por_periodo.loc[por_periodo["periodo"] == dr.MES_PARCIAL, "sesiones"]
+        labels_x[-1] = f"{labels_x[-1]} · visitas"  # el mes en curso es el último por construcción
+
     st.caption(
         "Tráfico TOTAL real reportado por GA4 cada periodo (todo el portal, sin filtrar por clasificación de "
-        "artículo) — no cambia con el selector de periodo de arriba. Los puntos rojos son periodos con un "
-        "update de Google conocido — pasa el mouse por encima para ver cuál, y compáralo con la forma de la "
-        "línea antes/después."
+        "artículo) — no cambia con el selector de periodo de arriba. Los periodos cerrados (líneas sólidas "
+        "ene-jul) son **páginas vistas**; el mes en curso es **visitas (sesiones GA4)** — la misma cifra "
+        "comparable 1:1 contra 'Visitas' en Looker Studio/GA4, marcada '· visitas' en el eje. Los puntos "
+        "rojos son periodos con un update de Google conocido."
     )
-    por_periodo = dr.trafico_total_por_periodo()
 
     updates_por_periodo: dict[str, list[dict]] = {}
     for u in UPDATES_2026:
@@ -56,9 +74,9 @@ def _tendencia_portal():
             updates_por_periodo.setdefault(mes_str, []).append(u)
 
     fig = go.Figure(go.Scatter(
-        x=por_periodo["mes_label"], y=por_periodo["trafico"], mode="lines+markers+text",
+        x=labels_x, y=por_periodo["valor_grafico"], mode="lines+markers+text",
         line=dict(color="#3457D5", width=3), marker=dict(size=9, color="#3457D5"),
-        text=[calc.formatear_numero(v) for v in por_periodo["trafico"]], textposition="top center",
+        text=[calc.formatear_numero(v) for v in por_periodo["valor_grafico"]], textposition="top center",
         hovertemplate="%{x}<br>Tráfico: %{y:,.0f}<extra></extra>",
     ))
 
@@ -66,33 +84,23 @@ def _tendencia_portal():
     if not con_update.empty:
         hover_txt = [" · ".join(u["nombre"] for u in updates_por_periodo[p]) for p in con_update["periodo"]]
         fig.add_trace(go.Scatter(
-            x=con_update["mes_label"], y=con_update["trafico"], mode="markers",
+            x=con_update["mes_label"], y=con_update["valor_grafico"], mode="markers",
             marker=dict(size=15, color="#DC2626", symbol="diamond", line=dict(width=2, color="white")),
             hovertext=hover_txt, hovertemplate="%{x}<br>%{hovertext}<extra></extra>", showlegend=False,
         ))
         for p, r in zip(con_update["periodo"], con_update.itertuples()):
             tipos = " + ".join(sorted({u["tipo"] for u in updates_por_periodo[p]}))
             fig.add_annotation(
-                x=r.mes_label, y=r.trafico, text=tipos, showarrow=True, arrowhead=0, arrowcolor="#DC2626",
+                x=r.mes_label, y=r.valor_grafico, text=tipos, showarrow=True, arrowhead=0, arrowcolor="#DC2626",
                 ax=0, ay=-38, font=dict(size=10, color="#DC2626"),
                 bgcolor="rgba(255,255,255,0.92)", bordercolor="#DC2626", borderwidth=1, borderpad=3,
             )
 
-    proyeccion = dr.proyeccion_fin_de_mes(por_periodo, "trafico", col_mes="periodo")
+    proyeccion = dr.proyeccion_fin_de_mes(por_periodo, "valor_grafico", col_mes="periodo")
     if proyeccion:
-        label_actual = por_periodo["mes_label"].iloc[-1]
+        label_actual = labels_x[-1]
         label_proy = f"{label_actual} (proy.)"
         agregar_proyeccion(fig, proyeccion, x_actual=label_actual, x_proyectado=label_proy)
-
-    fila_parcial = por_periodo[por_periodo["periodo"] == dr.MES_PARCIAL] if dr.MES_PARCIAL else pd.DataFrame()
-    if not fila_parcial.empty and pd.notna(fila_parcial["sesiones"].iloc[0]):
-        st.caption(
-            f"📊 {fila_parcial['mes_label'].iloc[0]} hasta hoy: "
-            f"**{calc.formatear_numero(fila_parcial['sesiones'].iloc[0])} visitas (sesiones GA4)** -- "
-            f"esta es la cifra comparable 1:1 contra 'Visitas' en Looker Studio/GA4. "
-            f"El gráfico de arriba usa páginas vistas ({calc.formatear_numero(fila_parcial['trafico'].iloc[0])}), "
-            "que es una métrica distinta (una sesión puede ver varias páginas)."
-        )
 
     fig.update_layout(
         height=380, margin=dict(l=0, r=10, t=50, b=10),
@@ -351,20 +359,22 @@ def _explicacion_eficiencia(tabla):
 _DIFICULTAD_ICONO = {"Fácil": "🟢", "Media": "🔵", "Difícil": "🔴"}
 
 
-def _top_economia():
+def _top_economia(periodo):
     with st.container(border=True, key="card_top_economia"):
-        st.subheader("💹 Mejor periodista de economía — respaldado en datos")
+        st.subheader(f"💹 Mejor periodista de economía — {dr.MES_LABEL_LARGO.get(periodo, periodo)}")
         st.caption(
-            "Enfoque editorial del portal: quién escribe economía/finanzas con más tráfico real por nota, "
-            "no por percepción. Solo cuenta subsecciones donde se leyeron los titulares reales uno por uno y "
-            "son consistentemente contenido económico/financiero (\"money-invest/daily-news\", "
-            "\"happening-now\" e \"internacional-economia\" quedaron fuera: pese al nombre, son noticia "
-            "general, rankings de seguridad/corrupción y geopolítica, no economía) — 7 periodos acumulados "
-            "(jul-2026 censo + histórico ene-jun), mínimo 3 notas."
+            "Enfoque editorial del portal: quién le deja más tráfico real al portal en secciones de economía "
+            "dura (empresas, finanzas, mercados), **en el periodo seleccionado arriba** — no acumulado en "
+            "varios meses, para no inflar a quien concentra pocas notas en estas secciones frente a quien "
+            "publica mucho volumen diario pero solo una fracción cae aquí. Solo cuenta subsecciones donde se "
+            "leyeron los titulares reales uno por uno y son consistentemente contenido económico/financiero "
+            "(quedaron fuera \"empresas\" raíz, brand-content, gestión, sport-business y money-invest/"
+            "daily-news pese al nombre: son noticia general, deporte con marco de dinero o contenido "
+            "patrocinado, no economía) — mínimo 3 notas para entrar al ranking."
         )
-        ganador = dr.top_periodista_tema()
+        ganador = dr.top_periodista_tema(periodo)
         if not ganador:
-            st.caption("Sin suficiente muestra todavía en las secciones de economía/finanzas verificadas.")
+            st.caption("Sin suficiente muestra este periodo en las secciones de economía/finanzas verificadas.")
             return
 
         col_foto, col_datos = st.columns([1, 4], vertical_alignment="center")
@@ -373,17 +383,17 @@ def _top_economia():
         with col_datos:
             st.markdown(f"### {ganador['autor']}")
             st.markdown(
-                f"**{ganador['trafico_por_nota']:,.0f}** tráfico/nota promedio &nbsp;·&nbsp; "
+                f"**{calc.formatear_numero(ganador['trafico'])}** tráfico total &nbsp;·&nbsp; "
                 f"{ganador['notas']} notas de economía/finanzas &nbsp;·&nbsp; "
-                f"{calc.formatear_numero(ganador['trafico'])} tráfico total".replace(",", "."))
+                f"{ganador['trafico_por_nota']:,.0f} tráfico/nota promedio".replace(",", "."))
 
         if len(ganador["ranking"]) > 1:
             st.write("")
-            st.markdown("**Contra quién compite (tráfico/nota, mínimo 3 notas):**")
+            st.markdown("**Contra quién compite (tráfico total, mínimo 3 notas):**")
             for i, r in enumerate(ganador["ranking"], start=1):
                 marca = "🥇" if i == 1 else f"{i}."
-                st.markdown(f"{marca} {r['autor']} — **{r['trafico_por_nota']:,.0f}** tráfico/nota "
-                            f"({int(r['notas'])} notas)".replace(",", "."))
+                st.markdown(f"{marca} {r['autor']} — **{calc.formatear_numero(r['trafico'])}** tráfico total "
+                            f"({int(r['notas'])} notas, {r['trafico_por_nota']:,.0f}/nota)".replace(",", "."))
 
         st.write("")
         st.markdown("**Con qué notas lo demuestra:**")
@@ -463,7 +473,7 @@ def _titulares_patrones_real():
         )
 
 
-def render(tabla):
+def render(tabla, periodo):
     if tabla.empty:
         st.info("No hay datos para el rango de fechas seleccionado.")
         return None
@@ -472,7 +482,7 @@ def render(tabla):
     _explicacion_eficiencia(tabla)
     st.write("")
 
-    _top_economia()
+    _top_economia(periodo)
     st.write("")
 
     with st.container(border=True, key="card_tendencia_portal"):

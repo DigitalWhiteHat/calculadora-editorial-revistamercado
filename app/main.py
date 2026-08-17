@@ -35,7 +35,6 @@ if "periodista_slug" not in st.session_state or not any(
 tabla_periodistas = dr.cargar_periodistas(periodo)
 df_notas = dr.cargar_notas(periodo)
 
-# "Configuración" sigue deshabilitada (fase posterior del proyecto).
 NAV_ITEMS = [
     ("🏠", "Dashboard", "general"),
     ("🗂️", "Secciones", "secciones"),
@@ -44,7 +43,6 @@ NAV_ITEMS = [
     ("🔍", "Diagnóstico SEO", "diagnostico_seo"),
     ("🗓️", "Temas del día", "temas_del_dia"),
     ("🔁", "Reemplazos", "reemplazos"),
-    ("⚙️", "Configuración", None),
 ]
 VISTAS_PRINCIPALES = {"general", "secciones", "notas", "alertas", "diagnostico_seo", "temas_del_dia", "reemplazos"}
 
@@ -135,7 +133,7 @@ elif st.session_state.vista == "temas_del_dia":
 elif st.session_state.vista == "reemplazos":
     vista_reemplazos.render(tabla_periodistas)
 else:
-    slug_seleccionado = general.render(tabla_periodistas)
+    slug_seleccionado = general.render(tabla_periodistas, periodo)
     if slug_seleccionado:
         st.session_state.periodista_slug = slug_seleccionado
         st.session_state.vista = "individual"

@@ -804,7 +804,23 @@ def especializacion_todos() -> pd.DataFrame:
 # Solo estas 2 subsecciones son consistentemente contenido económico/
 # financiero real al releer sus titulares (tarjetas de crédito, AFP, canasta
 # básica, acciones, perfil crediticio).
-SECCIONES_ECONOMIA = ("market-brief/finanzas", "market-brief/bolsa-de-valores")
+#
+# Ampliado 2026-08-17 (feedback de Edwin: "empresas, finanzas, economía, todo
+# lo que sea economía dura" debería contar) -- releídos los titulares reales
+# de las 7 subsecciones de "empresas":
+#   SÍ cuentan: brand-business (rankings de marcas, historia corporativa,
+#   M&A -- McDonald's vs Burger King, Natura vende Avon), executive-news
+#   (nombramientos de CEO/presidentes reales), mypimes (data real de pymes).
+#   NO cuentan pese al nombre: "empresas" raíz (mezcla total -- Bad Bunny,
+#   Samsung, DEA, sin foco económico), brand-content (contenido patrocinado/
+#   institucional genérico, no periodismo económico), gestion (consejos de
+#   management/soft skills, no economía dura), generations (career-ranking
+#   genérico), sport-business (deporte con marco de dinero -- Mundial,
+#   Clásico de Béisbol -- no economía).
+SECCIONES_ECONOMIA = (
+    "market-brief/finanzas", "market-brief/bolsa-de-valores",
+    "empresas/brand-business", "empresas/executive-news", "empresas/mypimes",
+)
 
 
 def _en_secciones(seccion_raw: pd.Series, prefijos: tuple[str, ...]) -> pd.Series:
@@ -812,17 +828,32 @@ def _en_secciones(seccion_raw: pd.Series, prefijos: tuple[str, ...]) -> pd.Serie
 
 
 @st.cache_data
-def top_periodista_tema(prefijos: tuple[str, ...] = SECCIONES_ECONOMIA, min_notas: int = 3) -> dict | None:
-    """El periodista con mejor tráfico/nota REAL dentro de un grupo de
-    secciones (ej. economía/finanzas), con los 7 periodos acumulados —
+def top_periodista_tema(periodo: str = PERIODO_DEFAULT, prefijos: tuple[str, ...] = SECCIONES_ECONOMIA,
+                         min_notas: int = 3) -> dict | None:
+    """El periodista que más tráfico REAL le deja al portal dentro de un grupo
+    de secciones (ej. economía/finanzas), en el periodo seleccionado —
     respaldado en datos, no en percepción. min_notas evita premiar una sola
     nota viral aislada como si fuera especialización real.
+
+    POR PERIODO, no acumulado en los 7 meses -- cambio 2026-08-17, feedback de
+    Edwin: acumular meses distorsiona la comparación (alguien que escribe
+    pocas notas en total pero casi todas caen en estas secciones se ve
+    inflado frente a alguien que publica mucho volumen diario -ej. Fiorini,
+    8-9 notas/día- pero solo una fracción pequeña cae en estas 2-3
+    subsecciones cada mes). Ahora responde al selector de periodo de arriba,
+    igual que el resto del dashboard, en vez de ser una tarjeta fija.
+
+    Ranking por TRÁFICO TOTAL, no tráfico/nota promedio -- mismo día, mismo
+    feedback: el criterio anterior (promedio) podía premiar a alguien con
+    pocas notas de alto rendimiento por encima de quien sostiene la sección
+    con volumen real. trafico_por_nota se sigue calculando y mostrando (es
+    útil para ver eficiencia), pero ya no decide el ganador.
 
     Incluye "ranking" (top 5 candidatos con esa muestra mínima) -- pedido de
     Edwin, 16-ago-2026: "no me queda claro por qué es el mejor periodista
     económico". Declarar un ganador sin mostrar contra quién compite no se
     puede verificar a ojo; con el ranking al lado se ve la distancia real."""
-    todo = _notas_todo_periodo()
+    todo, _ = _crudo(periodo)
     sub = todo[_en_secciones(todo["seccion_raw"], prefijos)]
     if sub.empty:
         return None
@@ -831,12 +862,12 @@ def top_periodista_tema(prefijos: tuple[str, ...] = SECCIONES_ECONOMIA, min_nota
     if agg.empty:
         return None
     agg["trafico_por_nota"] = agg["trafico"] / agg["notas"]
-    agg = agg.sort_values("trafico_por_nota", ascending=False).reset_index(drop=True)
+    agg = agg.sort_values("trafico", ascending=False).reset_index(drop=True)
     ganador = agg.iloc[0]
 
     notas_ganador = sub[sub["autor"] == ganador["autor"]].sort_values("vistas", ascending=False)
     top_notas = notas_ganador.drop_duplicates("ruta").head(5)[["titulo", "ruta", "seccion_raw", "vistas"]].to_dict("records")
-    ranking = agg.head(5)[["autor", "notas", "trafico_por_nota"]].to_dict("records")
+    ranking = agg.head(5)[["autor", "notas", "trafico", "trafico_por_nota"]].to_dict("records")
 
     return dict(
         autor=ganador["autor"], notas=int(ganador["notas"]), trafico=float(ganador["trafico"]),
