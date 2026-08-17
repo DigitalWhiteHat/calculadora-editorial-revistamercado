@@ -71,6 +71,9 @@ with st.sidebar:
             st.button(f"{icono}  {etiqueta}", key=f"nav_{etiqueta}", width="stretch", disabled=True,
                       help="Pendiente de rediseñar con KPIs propios de Revista Mercado")
 
+    st.write("")
+    st.caption("Elaborada por Edwin Lozada")
+
 st.markdown(
     f'<div class="cp-topbar"><div class="cp-brand">'
     f'<img src="{logo_revistamercado_data_uri()}" class="cp-brand-logo-img" alt="Revista Mercado">'

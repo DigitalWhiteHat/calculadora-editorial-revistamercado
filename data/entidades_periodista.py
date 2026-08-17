@@ -28,6 +28,7 @@ Escribe data/entidades_periodista.csv (autor, forma, tipo, notas, confianza,
     pct_del_periodista, rutas)
 """
 
+import glob
 import re
 import unicodedata
 from collections import defaultdict
@@ -173,6 +174,35 @@ EVENTOS_CONCLUIDOS_CONOCIDOS = {
     "mundial de clubes": "2026-07-19",
 }
 GRACIA_POST_EVENTO_DIAS = 21  # cobertura real de cierre/resumen post-evento, no señal de que sigue vigente
+
+# Cuarta señal -- pedido de Edwin, 17-ago-2026, con capturas reales de Search
+# Console: "Juegos Centroamericanos" (Elba) ya se desplomó a casi cero para el
+# 15-ago, pero ratio_declive_impresiones daba 1.0 (sigue en su pico) porque el
+# bucket mensual de agosto es UN SOLO agregado de la ventana móvil completa
+# (~10-jul a 13-ago) -- mezcla los días de pico con los días ya caídos y el
+# promedio no lo detecta. Gap real: ninguna de las 3 señales anteriores mira
+# DENTRO del mes en curso.
+#
+# Arreglo: el export diario de Apps Script (Drive, ga4_pages_screens_periodos_
+# *.csv) ya guarda un archivo NUEVO cada día con el bloque "actual" (~17 días
+# más recientes de la ventana móvil) -- si se conservan varios de esos
+# archivos diarios (no solo el último), se puede armar una serie de pocos
+# puntos pero 100% real de "cuánto tráfico tuvo este grupo en su bloque
+# reciente", un día distinto por archivo. Verificado con datos reales:
+# - "juegos centroamericanos" (31 notas): 22389 -> 20430 -> 19257 -> 18446
+#   vistas (4 archivos, 12/15/16/17-ago) -- estrictamente descendente aunque
+#   la ventana se corre hacia adelante cada día (debería SUBIR si el evento
+#   siguiera generando tráfico nuevo).
+# - "precio del dólar" (126 notas, evergreen real): 1630 -> 1799 -> 1604 ->
+#   1477 -- SUBE en el primer paso, no es monótona. Misma forma para "dólar
+#   hoy en república" (100 notas). Esta es justo la distinción que pidió
+#   Edwin: "si sube y baja, constante, construye. Si cae a pique de forma
+#   sostenida, ya no sirve" -- monotonía estricta (con tolerancia mínima de
+#   ruido) separa los dos casos reales sin usar ninguna lista curada.
+UMBRAL_RATIO_TENDENCIA_RECIENTE = 0.85  # <85% del primer punto disponible tras 3+ caídas seguidas = declive real
+MIN_PICO_PAGEVIEWS_TENDENCIA_RECIENTE = 2000  # piso para no evaluar la señal sobre ruido de un grupo chico
+MIN_SNAPSHOTS_TENDENCIA_RECIENTE = 3  # con menos de 3 puntos no hay forma de distinguir monotonía de ruido
+TOLERANCIA_RUIDO_MONOTONIA = 1.03  # permite +3% entre puntos consecutivos sin romper la racha descendente
 
 MIN_RATIO_PROPIO = 0.70
 MIN_NOTAS_FUSION_OVERLAP = 0.80
@@ -370,8 +400,58 @@ def _ratio_declive_impresiones(rutas, impresiones_por_ruta_mes: dict) -> float |
     return por_mes[ultimo_mes] / pico
 
 
+def cargar_tendencia_reciente_ga4() -> list[tuple[str, dict[str, float]]]:
+    """Serie de pocos puntos (uno por archivo diario conservado) con las
+    vistas del bloque "actual" de cada snapshot de data/raw_historico/
+    ga4_pages_screens_periodos_*.csv -- ver UMBRAL_RATIO_TENDENCIA_RECIENTE
+    arriba para el porqué. Devuelve [(fecha_fin_str, {ruta: vistas}), ...]
+    ordenado cronológicamente. Lista vacía si no hay archivos (la señal
+    simplemente no se evalúa, no rompe nada)."""
+    archivos = sorted(glob.glob("data/raw_historico/ga4_pages_screens_periodos_*.csv"))
+    puntos = []
+    for path in archivos:
+        try:
+            df = pd.read_csv(path, usecols=["periodo", "periodo_fin", "pagePath", "screenPageViews"])
+        except (FileNotFoundError, ValueError):
+            continue
+        df = df[df["periodo"] == "actual"]
+        if df.empty:
+            continue
+        fecha_fin = str(df["periodo_fin"].iloc[0])
+        df = df.copy()
+        df["ruta"] = (df["pagePath"]
+                      .str.replace("https://www.revistamercado.do", "", regex=False)
+                      .str.replace("https://revistamercado.do", "", regex=False)
+                      .str.rstrip("/"))
+        por_ruta = df.groupby("ruta")["screenPageViews"].sum().to_dict()
+        puntos.append((fecha_fin, por_ruta))
+    # de-duplica por fecha_fin (dos archivos de días distintos pueden compartir
+    # el mismo cierre de ventana) y ordena cronológicamente
+    por_fecha = {fecha: pts for fecha, pts in puntos}
+    return [(fecha, por_fecha[fecha]) for fecha in sorted(por_fecha.keys())]
+
+
+def _tendencia_reciente_declinando(rutas, snapshots: list[tuple[str, dict[str, float]]]) -> tuple[bool, float | None]:
+    """True si el bloque "actual" del grupo cae de forma ESTRICTAMENTE
+    sostenida entre snapshots diarios reales (no una sola ventana promedio) --
+    ver UMBRAL_RATIO_TENDENCIA_RECIENTE arriba. Devuelve (declinando, ratio
+    último/primero) -- ratio None si no hay suficientes snapshots o el pico
+    no supera el piso de ruido."""
+    if len(snapshots) < MIN_SNAPSHOTS_TENDENCIA_RECIENTE:
+        return False, None
+    rutas_norm = {r.rstrip("/") for r in rutas}
+    serie = [sum(por_ruta.get(r, 0.0) for r in rutas_norm) for _, por_ruta in snapshots]
+    if max(serie) < MIN_PICO_PAGEVIEWS_TENDENCIA_RECIENTE:
+        return False, None
+    monotona = all(serie[i + 1] <= serie[i] * TOLERANCIA_RUIDO_MONOTONIA for i in range(len(serie) - 1))
+    ratio = serie[-1] / serie[0] if serie[0] > 0 else None
+    declinando = bool(monotona and ratio is not None and ratio < UMBRAL_RATIO_TENDENCIA_RECIENTE)
+    return declinando, ratio
+
+
 def procesar_autor(df_autor: pd.DataFrame, stats_globales: dict[str, float],
-                    fecha_corte_reciente=None, impresiones_por_ruta_mes: dict | None = None) -> pd.DataFrame:
+                    fecha_corte_reciente=None, impresiones_por_ruta_mes: dict | None = None,
+                    tendencia_reciente_ga4: list | None = None) -> pd.DataFrame:
     total_notas = len(df_autor)
     candidatos = []  # (forma_original, tipo, ruta)
     normalizadas_por_ruta = {}
@@ -473,18 +553,23 @@ def procesar_autor(df_autor: pd.DataFrame, stats_globales: dict[str, float],
         concluido_por_evento_conocido = bool(
             vencio_gracia and ratio_declive is not None and ratio_declive < UMBRAL_RATIO_DECLIVE_EVENTO_CONOCIDO
         )
+        concluido_por_tendencia_reciente, ratio_tendencia_reciente = _tendencia_reciente_declinando(
+            g["rutas"], tendencia_reciente_ga4 or [])
         es_evento_concluido = (concluido_por_volumen or concluido_por_silencio
-                                or concluido_por_tendencia or concluido_por_evento_conocido)
+                                or concluido_por_tendencia or concluido_por_evento_conocido
+                                or concluido_por_tendencia_reciente)
 
         filas.append({"forma": forma_final, "tipo": tipo_final, "notas": n_notas,
                       "pct_del_periodista": round(100 * n_notas / total_notas, 1),
                       "rutas": "|".join(sorted(g["rutas"])),
                       "es_evento_concluido": es_evento_concluido,
-                      "ratio_declive_impresiones": round(ratio_declive, 3) if ratio_declive is not None else None})
+                      "ratio_declive_impresiones": round(ratio_declive, 3) if ratio_declive is not None else None,
+                      "ratio_tendencia_reciente": round(ratio_tendencia_reciente, 3) if ratio_tendencia_reciente is not None else None})
 
     if not filas:
         return pd.DataFrame(columns=["forma", "tipo", "notas", "pct_del_periodista", "rutas",
-                                      "es_evento_concluido", "ratio_declive_impresiones"])
+                                      "es_evento_concluido", "ratio_declive_impresiones",
+                                      "ratio_tendencia_reciente"])
     return pd.DataFrame(filas).sort_values("notas", ascending=False)
 
 
@@ -511,9 +596,15 @@ def main():
     print(f"Impresiones mensuales cargadas para {len(impresiones_por_ruta_mes)} rutas "
           f"(correr data/construir_impresiones_mensuales.py si está vacío/desactualizado)")
 
+    tendencia_reciente_ga4 = cargar_tendencia_reciente_ga4()
+    print(f"Tendencia reciente: {len(tendencia_reciente_ga4)} snapshots diarios de "
+          f"data/raw_historico/ga4_pages_screens_periodos_*.csv "
+          f"(mínimo {MIN_SNAPSHOTS_TENDENCIA_RECIENTE} para evaluar la señal)")
+
     resultados = []
     for autor, df_autor in mapa.groupby("autor"):
-        r = procesar_autor(df_autor, stats, fecha_corte_reciente, impresiones_por_ruta_mes)
+        r = procesar_autor(df_autor, stats, fecha_corte_reciente, impresiones_por_ruta_mes,
+                            tendencia_reciente_ga4)
         if r.empty:
             continue
         r.insert(0, "autor", autor)
