@@ -275,6 +275,29 @@ def nota_row(rank: int, titulo: str, meta: str, clics_txt: str, pct_txt: str,
             f'</div>')
 
 
+def ecuacion_titular_box(etiqueta: str, ecuacion: str, ejemplo: dict | None = None) -> str:
+    """Caja destacada para una ecuación de titular (histórico, mes, sección o periodista) --
+    portado de calculadora-periodistas/app/estilos.py (Colombia.com), mismo estilo en
+    Dashboard, Secciones y perfiles para que se lea como una sola familia de hallazgo.
+
+    ejemplo (opcional): dict de dr.ejemplo_titular_* -- una nota REAL que ya trae varias de las
+    piezas de la ecuación, para que se vea cómo se escribe en la práctica, no solo la fórmula
+    abstracta."""
+    ejemplo_html = ""
+    if ejemplo:
+        trafico_fmt = f"{ejemplo['trafico']:,.0f}".replace(",", ".")
+        ejemplo_html = (
+            f'<div class="cp-nota-meta" style="margin-top:6px;font-style:italic">'
+            f'📰 Ejemplo real: “{html.escape(ejemplo["titulo"])}” — {trafico_fmt} de tráfico '
+            f'({ejemplo["rasgos_presentes"]}/{ejemplo["rasgos_totales"]} piezas de la ecuación)</div>'
+        )
+    return (
+        f'<div class="cp-nota-row" style="background:#F1F5F9;border-radius:10px;padding:12px 16px">'
+        f'<div class="cp-nota-info"><div class="cp-nota-meta" style="font-size:0.95rem">🧮 {html.escape(etiqueta.upper())}</div>'
+        f'<div class="cp-nota-titulo" style="white-space:normal">{ecuacion}</div>{ejemplo_html}</div></div>'
+    )
+
+
 def kpi_card(icono: str, label: str, valor: str, delta_html_str: str = "", help_text: str = "") -> str:
     delta_block = delta_html_str or '<span class="cp-delta" style="color:#94A3B8">—</span>'
     label_seguro = html.escape(label)

@@ -10,7 +10,7 @@ import calculos as calc
 import datos_reales as dr
 import secciones
 from avatares import avatar_data_uri
-from estilos import avatar_badge, card_value, delta_html, metrica_card, nota_row, pill, trafico_card
+from estilos import avatar_badge, card_value, delta_html, ecuacion_titular_box, metrica_card, nota_row, pill, trafico_card
 from google_updates import UPDATES_2026
 
 COLOR_ESTADO = {"green": "#16A34A", "blue": "#3457D5", "red": "#DC2626"}
@@ -452,6 +452,71 @@ ITEMS_EEAT_POR_NOTA = [
 ]
 
 
+def _titulares_periodista(meta):
+    """Qué ecuación de titular (rasgo estructural) le rinde a ESTE periodista -- portado de
+    calculadora-periodistas/app/individual.py (Colombia.com). Mismo motor que la ecuación de
+    portada (Dashboard) y por sección, acá agrupado por autor."""
+    autor = meta["autor_original"]
+    with st.container(border=True, key="card_titulares_real"):
+        st.subheader("🧮 Qué ecuación de titular le rinde")
+        st.caption(
+            "Minado en automático sobre sus títulos y tráfico real, con todo su histórico "
+            "disponible (no un solo periodo, para tener muestra suficiente). \"Con vs. sin\" "
+            "compara el tráfico promedio de sus títulos que tienen ese rasgo contra los que no."
+        )
+
+        secciones_propias = dr.secciones_con_titulares_por_autor(autor)
+        seccion_sel = None
+        if secciones_propias:
+            opciones = ["Todas sus secciones (agregado)"] + [
+                secciones.LABELS_SECCION.get(s, dr.seccion_label(s)) for s in secciones_propias]
+            mapa_label_a_slug = dict(zip(
+                [secciones.LABELS_SECCION.get(s, dr.seccion_label(s)) for s in secciones_propias], secciones_propias))
+            seleccion = st.selectbox(
+                "🗂️ Ver la ecuación de una sección puntual de este periodista",
+                opciones, key="titulares_autor_seccion_sel",
+            )
+            if seleccion != opciones[0]:
+                seccion_sel = mapa_label_a_slug[seleccion]
+        else:
+            st.caption(
+                "Ninguna sección propia con muestra suficiente (mínimo 10 notas) todavía -- "
+                "mostrando el agregado de todas sus notas."
+            )
+
+        if seccion_sel:
+            rasgos = dr.patrones_titulares_por_autor_y_seccion(autor, seccion_sel)
+            etiqueta_seccion = secciones.LABELS_SECCION.get(seccion_sel, dr.seccion_label(seccion_sel))
+            etiqueta_ecuacion = f"Ecuación de titular -- {meta['nombre']} en {etiqueta_seccion}"
+        else:
+            rasgos = dr.patrones_titulares_por_autor(autor)
+            etiqueta_ecuacion = f"Ecuación de titular -- {meta['nombre']} -- todas sus secciones"
+
+        if rasgos.empty:
+            st.caption("Sin muestra suficiente (mínimo 10 notas con título, 3 con y 3 sin cada "
+                       "rasgo) para medir esto con confianza en este corte todavía.")
+            return
+
+        ecuacion = dr.sintetizar_ecuacion_titular(rasgos)
+        if ecuacion:
+            if seccion_sel:
+                ejemplo = dr.ejemplo_titular_por_autor_y_seccion(autor, seccion_sel, rasgos)
+            else:
+                ejemplo = dr.ejemplo_titular_por_autor(autor, rasgos)
+            st.markdown(ecuacion_titular_box(etiqueta_ecuacion, ecuacion, ejemplo), unsafe_allow_html=True)
+            st.caption(
+                "Calculada en automático (mismo motor que la ecuación de portada y por sección) "
+                "tomando las piezas con más lift a favor y en contra -- no es juicio editorial "
+                "hecho a mano, es una aproximación mecánica sobre datos reales."
+            )
+        else:
+            st.caption(
+                "Ninguna pieza de la ecuación (ancla, fuente, verbo de consulta, año...) tiene "
+                "lift suficiente todavía para armar una ecuación con confianza -- ver el detalle "
+                "de rasgos abajo si quieres revisarlo de todas formas."
+            )
+
+
 def _eeat_checklist(meta):
     eeat = dr.eeat_por_autor(meta["autor_original"])
     with st.container(border=True, key="card_eeat_checklist"):
@@ -687,6 +752,9 @@ def render(tabla, df_notas, slug, periodo=dr.PERIODO_DEFAULT):
         _eeat(fila)
     with col_seo:
         _cumplimiento_seo(fila)
+
+    st.write("")
+    _titulares_periodista(meta)
 
     st.write("")
     _eeat_checklist(meta)

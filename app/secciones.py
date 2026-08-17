@@ -11,7 +11,7 @@ import streamlit as st
 
 import calculos as calc
 import datos_reales as dr
-from estilos import kpi_card
+from estilos import ecuacion_titular_box, kpi_card
 
 COLOR_CON_PERIODISTA = "#16A34A"
 COLOR_SIN_PERIODISTA = "#94A3B8"
@@ -389,6 +389,50 @@ def _propuesta_redistribucion(df_notas, tabla_periodistas):
     )
 
 
+def _titulares_por_seccion():
+    """Qué ecuación de titular le sirve a cada sección -- portado de
+    calculadora-periodistas/app/secciones.py (Colombia.com). Mismo motor que la ecuación de
+    portada del Dashboard y la de cada periodista, acá agrupado por sección -- todo el
+    histórico real disponible (no un solo periodo), mismo criterio que el resto de esta
+    pestaña para tener muestra suficiente."""
+    st.subheader("🧮 Qué ecuación de titular le sirve a cada sección")
+    secciones_disp = dr.secciones_con_titulares_real()
+    if not secciones_disp:
+        st.caption("Sin secciones con muestra suficiente (≥10 notas con título) todavía.")
+        return
+    opciones = [_label(s) for s in secciones_disp]
+    mapa_label_a_slug = dict(zip(opciones, secciones_disp))
+    seleccion = st.selectbox("🗂️ Sección", opciones, key="seccion_titulares_sel")
+    seccion_sel = mapa_label_a_slug[seleccion]
+    st.caption(
+        "Minado en automático sobre títulos y tráfico reales, con todo el histórico disponible "
+        "(no un solo periodo, para tener muestra suficiente). \"Con vs. sin\" compara el tráfico "
+        "promedio de los títulos que tienen ese rasgo contra los que no."
+    )
+
+    rasgos = dr.patrones_titulares_por_seccion(seccion_sel)
+    if rasgos.empty:
+        st.caption(f"Sin rasgos con muestra suficiente (mínimo 3 notas con y sin cada rasgo) en {seleccion}.")
+        return
+    ecuacion = dr.sintetizar_ecuacion_titular(rasgos)
+    if ecuacion:
+        ejemplo = dr.ejemplo_titular_por_seccion(seccion_sel, rasgos)
+        st.markdown(
+            ecuacion_titular_box(f"Ecuación de titular -- {seleccion}", ecuacion, ejemplo),
+            unsafe_allow_html=True,
+        )
+        st.caption(
+            "Calculada en automático (mismo motor que la ecuación de portada y por periodista) "
+            "tomando las piezas con más lift a favor y en contra en esta sección."
+        )
+        st.write("")
+    else:
+        st.caption(
+            f"Ninguna pieza de la ecuación tiene lift suficiente todavía en {seleccion} para "
+            "armar una ecuación con confianza."
+        )
+
+
 def render(tabla_periodistas, periodo=None):
     df_panorama = _panorama()
     df_notas_seccion = dr.notas_por_seccion_agregado()
@@ -426,3 +470,7 @@ def render(tabla_periodistas, periodo=None):
     st.write("")
     with st.container(border=True, key="card_propuesta"):
         _propuesta_redistribucion(df_notas_seccion, tabla_periodistas)
+
+    st.write("")
+    with st.container(border=True, key="card_titulares_secciones"):
+        _titulares_por_seccion()

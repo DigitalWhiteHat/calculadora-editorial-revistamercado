@@ -33,8 +33,10 @@ Métricas sin fuente real disponible en esta versión (marcadas explícitamente,
 nunca inventadas): rebote_pct, temas_propios_pct, flags_ia, ctr (bruto).
 """
 
+import calendar
 import glob
 import re
+import unicodedata
 from datetime import date
 
 import numpy as np
@@ -844,3 +846,377 @@ def diagnostico_seo_por_autor_mes(autor_original: str, periodo: str) -> list[dic
             continue
         salida.append({"item": item, "label": label, "pct": float(fila[item])})
     return sorted(salida, key=lambda x: x["pct"])
+
+
+# ============================================================================
+# Ecuación de titular -- portado de calculadora-periodistas/app/datos_reales.py
+# (Colombia.com), pedido de Edwin (16-ago-2026): "en los autores falta la
+# ecuación... necesito que sea igual con los datos de colombia.com". LAS ANCLAS
+# CÍVICAS/INSTITUCIONALES NO SE COPIARON de Colombia.com -- ese vocabulario
+# (Sisbén, DIAN, ICBF...) es 100% de trámites/entidades del gobierno
+# colombiano y no aplica a revistamercado.do. Se investigaron minando los
+# títulos reales de mayor tráfico de RM (16-ago-2026, 6.577 títulos con
+# tráfico real): cédula, Bono Madre, Ley 30-26, reforma fiscal y elecciones
+# (cobertura internacional Perú/Colombia) resultaron ser anclas reales con
+# lift fuerte (institucional +668%, cívica +790%, lotería +173%) -- ver
+# memoria del proyecto para el detalle completo de la investigación.
+# ============================================================================
+
+def mes_es_parcial(mes: str) -> bool:
+    """True si `mes` es el periodo en curso -- reusa MES_PARCIAL (autodetectado
+    por presencia de periodistas_<mes>.csv), no una fecha de corte fija a mano
+    como en Colombia.com."""
+    return mes == MES_PARCIAL
+
+
+def proyeccion_fin_de_mes(serie: pd.DataFrame, col_valor: str, col_mes: str = "periodo") -> dict | None:
+    """Si el último periodo de `serie` está en curso, proyecta su cierre al ritmo del tramo
+    ya cubierto -- regla de tres simple: valor_actual / días_transcurridos * días_del_mes.
+    Devuelve None si todos los periodos de la serie ya cerraron. Solo tiene sentido para
+    métricas ACUMULABLES (tráfico, notas) -- un índice o una posición promedio no crecen
+    linealmente con los días del mes."""
+    if serie.empty:
+        return None
+    ultimo = serie.sort_values(col_mes).iloc[-1]
+    mes = str(ultimo[col_mes])
+    if not mes_es_parcial(mes):
+        return None
+    anio, mes_num = int(mes[:4]), int(mes[5:7])
+    dias_totales = calendar.monthrange(anio, mes_num)[1]
+    dias_transcurridos = date.today().day
+    valor_actual = float(ultimo[col_valor])
+    return {
+        "mes": mes,
+        "dias_transcurridos": dias_transcurridos,
+        "dias_totales": dias_totales,
+        "valor_actual": valor_actual,
+        "valor_proyectado": valor_actual / dias_transcurridos * dias_totales if dias_transcurridos else valor_actual,
+    }
+
+
+_PATRON_NUMERO = re.compile(r"\d")
+_PATRON_ANIO = re.compile(r"\b20\d{2}\b")
+_PATRON_FUENTE = re.compile(r"\bsegun\b")
+_PATRON_COMPARACION = re.compile(
+    r"\bvs\.?\b|\bversus\b|\bmas que\b|\bmenos que\b|\bmejor que\b|\bpeor que\b|"
+    r"\bcomparad|\branking\b|\blos \d+\b|\bmejores\b")
+_PALABRAS_INTERROGATIVAS = {
+    "que", "como", "cual", "cuales", "cuanto", "cuantos", "cuantas",
+    "cuando", "donde", "quien", "por",
+}
+_VERBO_CONSULTA_TILDE = {"cuándo", "cuánto", "cómo", "dónde", "quién", "cuántos", "cuántas"}
+_VERBO_CONSULTA = {
+    "a que hora", "consultar", "paso a paso", "requisitos", "link",
+    "como saber", "como sacar", "como funciona",
+}
+_PROMESA_DATO = {"montos", "tabla", "calendario", "fechas", "topes", "lista", "resultados", "resultado",
+                 "requisitos", "pasos"}
+_MESES_TITULO = {
+    "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
+    "agosto", "septiembre", "octubre", "noviembre", "diciembre", "hoy",
+}
+# Anclas reales de revistamercado.do (RD), NO copiadas de Colombia.com -- ver nota arriba.
+_ANCLA_INSTITUCIONAL = {
+    "cedula", "bono madre", "ley 30-26", "reforma fiscal", "abinader", "impuesto",
+    "dgii", "banco central", "pasaporte",
+}
+_ANCLA_CIVICA = {"elecciones", "eleccion", "segunda vuelta", "votos", "presidencial"}
+_ANCLA_LOTERIA = {"loteria", "loterias", "leidsa", "quiniela real"}
+
+
+def _normalizar_ascii(texto) -> str:
+    return unicodedata.normalize("NFKD", str(texto)).encode("ascii", "ignore").decode("ascii").lower()
+
+
+def _contiene_alguna(texto_norm: str, frases: set) -> bool:
+    return any(f" {frase} " in f" {texto_norm} " for frase in frases)
+
+
+RASGOS_TITULO = [
+    ("tiene_numero", "Cifra/número en el título"),
+    ("tiene_dos_puntos", "Dos puntos (\"tema: gancho\")"),
+    ("tiene_pregunta", "Signo de pregunta"),
+    ("empieza_interrogativa", "Empieza con palabra interrogativa (qué/cómo/cuál/cuánto...)"),
+    ("tiene_ancla_civica", "Ancla cívica/electoral (elecciones, segunda vuelta, votos...)"),
+    ("tiene_ancla_institucional", "Ancla institucional/trámite (cédula, Bono Madre, ley, DGII...)"),
+    ("tiene_ancla_loteria", "Resultado de lotería (Leidsa, Quiniela Real...)"),
+    ("tiene_verbo_consulta", "Verbo de consulta (cuándo/cómo/consultar...)"),
+    ("tiene_fuente", "Fuente citada (\"según...\")"),
+    ("tiene_promesa_dato", "Promesa de dato (tabla/calendario/montos/resultados...)"),
+    ("tiene_anio", "Año en el título"),
+    ("tiene_mes_hoy", "Mes o \"hoy\""),
+    ("tiene_nombre_propio", "Nombre propio (persona o marca)"),
+    ("tiene_comparacion", "Comparación/ranking"),
+]
+
+
+def _rasgos_titulo(titulo) -> dict:
+    n = len(str(titulo))
+    palabras = str(titulo).split()
+    primera = ""
+    if palabras:
+        primera = re.sub(r"[^a-z]", "", _normalizar_ascii(palabras[0]))
+    norm = _normalizar_ascii(titulo)
+    tiene_nombre_propio = any(p[0].isupper() for p in palabras[1:] if p and p[0].isalpha())
+    return {
+        "longitud": n,
+        "categoria_longitud": "Corto (<60c)" if n < 60 else ("Medio (60-90c)" if n <= 90 else "Largo (>90c)"),
+        "tiene_numero": bool(_PATRON_NUMERO.search(_PATRON_ANIO.sub("", str(titulo)))),
+        "tiene_dos_puntos": ":" in str(titulo),
+        "tiene_pregunta": "?" in str(titulo) or "¿" in str(titulo),
+        "empieza_interrogativa": primera in _PALABRAS_INTERROGATIVAS,
+        "tiene_ancla_civica": _contiene_alguna(norm, _ANCLA_CIVICA),
+        "tiene_ancla_institucional": _contiene_alguna(norm, _ANCLA_INSTITUCIONAL),
+        "tiene_ancla_loteria": _contiene_alguna(norm, _ANCLA_LOTERIA),
+        "tiene_verbo_consulta": (
+            _contiene_alguna(norm, _VERBO_CONSULTA)
+            or _contiene_alguna(str(titulo).lower(), _VERBO_CONSULTA_TILDE)
+        ),
+        "tiene_fuente": bool(_PATRON_FUENTE.search(norm)),
+        "tiene_promesa_dato": _contiene_alguna(norm, _PROMESA_DATO),
+        "tiene_anio": bool(_PATRON_ANIO.search(str(titulo))),
+        "tiene_mes_hoy": _contiene_alguna(norm, _MESES_TITULO),
+        "tiene_nombre_propio": tiene_nombre_propio,
+        "tiene_comparacion": bool(_PATRON_COMPARACION.search(norm)),
+    }
+
+
+@st.cache_data
+def _titulos_con_trafico() -> pd.DataFrame:
+    """Título + tráfico/sección/periodo reales, 1 fila por ruta -- para minar qué RASGOS
+    estructurales del título correlacionan con más tráfico. A diferencia de Colombia.com,
+    revistamercado.do no tiene una fuente de "todas las notas" separada de las que ya
+    tienen autor identificado (el pipeline entero depende del scraping JSON-LD por nota) --
+    esta muestra ya está sesgada hacia periodistas verificados, igual que el resto del
+    proyecto (ver MIGRACION-DESDE-COLOMBIACOM.md). Se reusa para "todo el histórico", "por
+    sección" y "por autor" -- una sola fuente, sin duplicar la unión de periodos."""
+    notas_jul, _ = _cargar_crudo_completo()
+    bloques = [notas_jul[["ruta", "titulo", "seccion_raw", "vistas", "autor"]].assign(periodo="2026-07")]
+    for mes in MESES_LABEL:
+        notas_mes, _ = _cargar_crudo_historico(mes)
+        if not notas_mes.empty:
+            bloques.append(
+                notas_mes[["ruta", "titulo", "seccion_raw", "vistas", "autor"]].assign(periodo=f"2026-{mes}"))
+    df = pd.concat(bloques, ignore_index=True)
+    df = df[df["titulo"].notna() & (df["vistas"] > 0)].rename(
+        columns={"vistas": "trafico", "seccion_raw": "seccion"}).reset_index(drop=True)
+    if df.empty:
+        return df
+    rasgos = df["titulo"].apply(_rasgos_titulo).apply(pd.Series)
+    return pd.concat([df, rasgos], axis=1)
+
+
+_COLUMNAS_LIFT_TITULAR = ["rasgo", "trafico_con", "trafico_sin", "lift_pct", "notas_con", "notas_sin"]
+_UMBRAL_MUESTRA_TITULARES = 10
+
+
+def _lift_por_rasgo(sub: pd.DataFrame) -> pd.DataFrame:
+    """Por cada rasgo de RASGOS_TITULO, tráfico promedio CON vs. SIN ese rasgo en `sub` --
+    "lift" = cuánto más (o menos) rinde en promedio. Exige mínimo 3 notas en cada lado."""
+    filas = []
+    for campo, label in RASGOS_TITULO:
+        con = sub[sub[campo]]
+        sin = sub[~sub[campo]]
+        if len(con) < 3 or len(sin) < 3:
+            continue
+        trafico_con = float(con["trafico"].mean())
+        trafico_sin = float(sin["trafico"].mean())
+        lift = 100 * (trafico_con - trafico_sin) / trafico_sin if trafico_sin else float("nan")
+        filas.append({
+            "rasgo": label, "trafico_con": trafico_con, "trafico_sin": trafico_sin,
+            "lift_pct": lift, "notas_con": len(con), "notas_sin": len(sin),
+        })
+    resultado = pd.DataFrame(filas, columns=_COLUMNAS_LIFT_TITULAR)
+    if resultado.empty:
+        return resultado
+    return resultado.sort_values("lift_pct", ascending=False)
+
+
+_SINTESIS_MAP = {
+    "Ancla cívica/electoral (elecciones, segunda vuelta, votos...)": ("[evento cívico/electoral]", "evento cívico"),
+    "Ancla institucional/trámite (cédula, Bono Madre, ley, DGII...)": ("[entidad o trámite]", "entidad/trámite"),
+    "Resultado de lotería (Leidsa, Quiniela Real...)": ("[resultado de lotería]", "resultado de lotería"),
+    "Verbo de consulta (cuándo/cómo/consultar...)": ("[respuesta]", "respuesta directa"),
+    "Fuente citada (\"según...\")": ('«según [fuente]»', "fuente citada"),
+    "Promesa de dato (tabla/calendario/montos/resultados...)": ("[promesa de dato]", "promesa de dato"),
+    "Año en el título": ("[año]", "año"),
+    "Mes o \"hoy\"": ('[mes o "hoy"]', '"hoy"'),
+    "Nombre propio (persona o marca)": ("[nombre propio]", "nombre propio"),
+    "Comparación/ranking": ("[comparación]", "ranking"),
+    "Cifra/número en el título": ("[cifra]", "cifra"),
+    "Signo de pregunta": ("[pregunta directa]", "pregunta"),
+}
+_UMBRAL_SINTESIS_POSITIVO = 40.0
+_UMBRAL_SINTESIS_NEGATIVO = -15.0
+_LABEL_A_CAMPO = {label: campo for campo, label in RASGOS_TITULO}
+
+
+def sintetizar_ecuacion_titular(rasgos: pd.DataFrame, max_positivos: int = 3, max_negativos: int = 2) -> str | None:
+    """A partir de la tabla de _lift_por_rasgo, arma una ecuación de una sola línea al estilo
+    "[evento cívico] + «según [fuente]» -- sin cifra, sin año": las piezas con más lift a favor
+    y en contra por encima de un umbral. Devuelve None si ninguna pieza tiene lift suficiente
+    para decir algo con confianza."""
+    if rasgos.empty:
+        return None
+    candidatos = rasgos[rasgos["rasgo"].isin(_SINTESIS_MAP.keys())]
+    positivos = candidatos[candidatos["lift_pct"] >= _UMBRAL_SINTESIS_POSITIVO].nlargest(max_positivos, "lift_pct")
+    negativos = candidatos[candidatos["lift_pct"] <= _UMBRAL_SINTESIS_NEGATIVO].nsmallest(max_negativos, "lift_pct")
+    if positivos.empty and negativos.empty:
+        return None
+    partes_pos = [_SINTESIS_MAP[r][0] for r in positivos["rasgo"]]
+    partes_neg = [_SINTESIS_MAP[r][1] for r in negativos["rasgo"]]
+    formula = " + ".join(partes_pos) if partes_pos else "(ningún rasgo suma con confianza)"
+    if partes_neg:
+        formula += " -- sin " + ", sin ".join(partes_neg)
+    return formula
+
+
+def _campos_positivos_de_rasgos(rasgos: pd.DataFrame, max_positivos: int = 3) -> list[str]:
+    if rasgos.empty:
+        return []
+    candidatos = rasgos[rasgos["rasgo"].isin(_SINTESIS_MAP.keys())]
+    positivos = candidatos[candidatos["lift_pct"] >= _UMBRAL_SINTESIS_POSITIVO].nlargest(max_positivos, "lift_pct")
+    return [_LABEL_A_CAMPO[r] for r in positivos["rasgo"]]
+
+
+def _ejemplo_real_titular(sub: pd.DataFrame, campos_positivos: list[str]) -> dict | None:
+    """Busca en `sub` la nota real con MÁS piezas de la ecuación presentes a la vez -- para que
+    la ecuación no se lea como algo abstracto, sino como un titular que ya se publicó."""
+    campos_positivos = [c for c in campos_positivos if c in sub.columns]
+    if not campos_positivos or sub.empty:
+        return None
+    conteo = sub[campos_positivos].sum(axis=1)
+    maximo = int(conteo.max())
+    if maximo == 0:
+        return None
+    candidatas = sub[conteo == maximo].sort_values("trafico", ascending=False)
+    fila = candidatas.iloc[0]
+    return {
+        "titulo": fila["titulo"], "trafico": float(fila["trafico"]),
+        "rasgos_presentes": maximo, "rasgos_totales": len(campos_positivos),
+    }
+
+
+def _longitud_agg(sub: pd.DataFrame) -> pd.DataFrame:
+    columnas_out = ["categoria_longitud", "notas", "trafico_promedio"]
+    if sub.empty:
+        return pd.DataFrame(columns=columnas_out)
+    agg = sub.groupby("categoria_longitud").agg(
+        notas=("ruta", "nunique"), trafico_promedio=("trafico", "mean")).reset_index()
+    orden = {"Corto (<60c)": 0, "Medio (60-90c)": 1, "Largo (>90c)": 2}
+    agg["_orden"] = agg["categoria_longitud"].map(orden)
+    return agg.sort_values("_orden").drop(columns="_orden")[columnas_out]
+
+
+def meses_con_titulares_real() -> list[str]:
+    df = _titulos_con_trafico()
+    if df.empty:
+        return []
+    return sorted(df["periodo"].unique().tolist(), reverse=True)
+
+
+def patrones_titulares_real(periodo: str) -> pd.DataFrame:
+    df = _titulos_con_trafico()
+    if df.empty:
+        return pd.DataFrame(columns=_COLUMNAS_LIFT_TITULAR)
+    sub = df[df["periodo"] == periodo]
+    if len(sub) < _UMBRAL_MUESTRA_TITULARES:
+        return pd.DataFrame(columns=_COLUMNAS_LIFT_TITULAR)
+    return _lift_por_rasgo(sub)
+
+
+def longitud_titulares_real(periodo: str) -> pd.DataFrame:
+    df = _titulos_con_trafico()
+    if df.empty:
+        return pd.DataFrame(columns=["categoria_longitud", "notas", "trafico_promedio"])
+    return _longitud_agg(df[df["periodo"] == periodo])
+
+
+def patrones_titulares_todo_el_historico() -> pd.DataFrame:
+    df = _titulos_con_trafico()
+    if df.empty or len(df) < _UMBRAL_MUESTRA_TITULARES:
+        return pd.DataFrame(columns=_COLUMNAS_LIFT_TITULAR)
+    return _lift_por_rasgo(df)
+
+
+def ejemplo_titular_real(periodo: str, rasgos: pd.DataFrame) -> dict | None:
+    df = _titulos_con_trafico()
+    if df.empty:
+        return None
+    return _ejemplo_real_titular(df[df["periodo"] == periodo], _campos_positivos_de_rasgos(rasgos))
+
+
+def ejemplo_titular_todo_el_historico(rasgos: pd.DataFrame) -> dict | None:
+    df = _titulos_con_trafico()
+    if df.empty:
+        return None
+    return _ejemplo_real_titular(df, _campos_positivos_de_rasgos(rasgos))
+
+
+def secciones_con_titulares_real() -> list[str]:
+    df = _titulos_con_trafico()
+    if df.empty:
+        return []
+    conteo = df.groupby("seccion")["ruta"].nunique()
+    return sorted(conteo[conteo >= _UMBRAL_MUESTRA_TITULARES].index.tolist())
+
+
+def patrones_titulares_por_seccion(seccion: str) -> pd.DataFrame:
+    df = _titulos_con_trafico()
+    if df.empty:
+        return pd.DataFrame(columns=_COLUMNAS_LIFT_TITULAR)
+    sub = df[df["seccion"] == seccion]
+    if len(sub) < _UMBRAL_MUESTRA_TITULARES:
+        return pd.DataFrame(columns=_COLUMNAS_LIFT_TITULAR)
+    return _lift_por_rasgo(sub)
+
+
+def ejemplo_titular_por_seccion(seccion: str, rasgos: pd.DataFrame) -> dict | None:
+    df = _titulos_con_trafico()
+    if df.empty:
+        return None
+    return _ejemplo_real_titular(df[df["seccion"] == seccion], _campos_positivos_de_rasgos(rasgos))
+
+
+def patrones_titulares_por_autor(autor_original: str) -> pd.DataFrame:
+    df = _titulos_con_trafico()
+    if df.empty:
+        return pd.DataFrame(columns=_COLUMNAS_LIFT_TITULAR)
+    sub = df[df["autor"] == autor_original]
+    if len(sub) < _UMBRAL_MUESTRA_TITULARES:
+        return pd.DataFrame(columns=_COLUMNAS_LIFT_TITULAR)
+    return _lift_por_rasgo(sub)
+
+
+def ejemplo_titular_por_autor(autor_original: str, rasgos: pd.DataFrame) -> dict | None:
+    df = _titulos_con_trafico()
+    if df.empty:
+        return None
+    return _ejemplo_real_titular(df[df["autor"] == autor_original], _campos_positivos_de_rasgos(rasgos))
+
+
+def secciones_con_titulares_por_autor(autor_original: str) -> list[str]:
+    df = _titulos_con_trafico()
+    if df.empty:
+        return []
+    sub = df[df["autor"] == autor_original]
+    conteo = sub.groupby("seccion")["ruta"].nunique()
+    return sorted(conteo[conteo >= _UMBRAL_MUESTRA_TITULARES].index.tolist())
+
+
+def patrones_titulares_por_autor_y_seccion(autor_original: str, seccion: str) -> pd.DataFrame:
+    df = _titulos_con_trafico()
+    if df.empty:
+        return pd.DataFrame(columns=_COLUMNAS_LIFT_TITULAR)
+    sub = df[(df["autor"] == autor_original) & (df["seccion"] == seccion)]
+    if len(sub) < _UMBRAL_MUESTRA_TITULARES:
+        return pd.DataFrame(columns=_COLUMNAS_LIFT_TITULAR)
+    return _lift_por_rasgo(sub)
+
+
+def ejemplo_titular_por_autor_y_seccion(autor_original: str, seccion: str, rasgos: pd.DataFrame) -> dict | None:
+    df = _titulos_con_trafico()
+    if df.empty:
+        return None
+    sub = df[(df["autor"] == autor_original) & (df["seccion"] == seccion)]
+    return _ejemplo_real_titular(sub, _campos_positivos_de_rasgos(rasgos))

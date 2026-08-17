@@ -8,7 +8,7 @@ import streamlit as st
 import calculos as calc
 import datos_reales as dr
 from avatares import avatar_data_uri
-from estilos import BG_ESTADO, TXT_ESTADO, delta_html, kpi_card
+from estilos import BG_ESTADO, TXT_ESTADO, delta_html, ecuacion_titular_box, kpi_card
 from google_updates import UPDATES_2026
 
 COLOR_ESTADO = {"green": "#16A34A", "blue": "#3457D5", "red": "#DC2626"}
@@ -385,6 +385,55 @@ def _dificultad_canal_seccion():
         )
 
 
+def _titulares_patrones_real():
+    """Qué combinación de rasgos del título rinde más tráfico -- portado de
+    calculadora-periodistas/app/general.py (Colombia.com), pedido de Edwin (16-ago-2026:
+    "en los autores falta la ecuación... necesito que sea igual con los datos de
+    colombia.com"). Las anclas cívicas/institucionales usadas aquí son las de
+    revistamercado.do (cédula, Bono Madre, elecciones...), no las de Colombia.com --
+    ver datos_reales.py."""
+    st.subheader("🧮 Qué combinación de titulares funciona")
+    historico = dr.patrones_titulares_todo_el_historico()
+    if historico.empty:
+        st.caption("Sin títulos reales suficientes todavía.")
+        return
+    ecuacion = dr.sintetizar_ecuacion_titular(historico)
+    if ecuacion:
+        ejemplo = dr.ejemplo_titular_todo_el_historico(historico)
+        st.markdown(
+            ecuacion_titular_box("Ecuación de titular -- todo el histórico", ecuacion, ejemplo),
+            unsafe_allow_html=True,
+        )
+        st.caption(
+            "Minado en automático sobre títulos y tráfico reales de Revista Mercado (7 periodos, "
+            "ene-jul 2026) -- \"con vs. sin\" compara el tráfico promedio de los títulos que "
+            "tienen ese rasgo contra los que no."
+        )
+        st.write("")
+
+    meses = dr.meses_con_titulares_real()
+    if not meses:
+        return
+    mes_sel = st.selectbox("Ver el detalle de un periodo puntual", meses, key="titulares_mes_sel",
+                            format_func=lambda p: dr.PERIODOS.get(p, {}).get("label", p))
+    rasgos = dr.patrones_titulares_real(mes_sel)
+    if rasgos.empty:
+        st.caption("Muestra insuficiente ese periodo para comparar rasgos de forma confiable.")
+        return
+    ecuacion_mes = dr.sintetizar_ecuacion_titular(rasgos)
+    if ecuacion_mes:
+        mes_label = dr.PERIODOS.get(mes_sel, {}).get("label", mes_sel)
+        ejemplo_mes = dr.ejemplo_titular_real(mes_sel, rasgos)
+        st.markdown(
+            ecuacion_titular_box(f"Ecuación de titular -- {mes_label}", ecuacion_mes, ejemplo_mes),
+            unsafe_allow_html=True,
+        )
+        st.caption(
+            "Calculada en automático solo con datos de este periodo -- por eso puede variar de "
+            "la ecuación de arriba, que agrega todo el histórico y por lo tanto tiene más muestra."
+        )
+
+
 def render(tabla):
     if tabla.empty:
         st.info("No hay datos para el rango de fechas seleccionado.")
@@ -420,5 +469,9 @@ def render(tabla):
 
     st.write("")
     _dificultad_canal_seccion()
+
+    st.write("")
+    with st.container(border=True, key="card_titulares_dashboard"):
+        _titulares_patrones_real()
 
     return seleccion_cuadrante or seleccion_tabla or seleccion_selector
