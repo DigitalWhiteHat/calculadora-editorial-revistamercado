@@ -941,18 +941,30 @@ def temas_debiles(autor_original: str, top_n: int = 6, excluir_patron: str | Non
 
 @st.cache_data
 def diagnostico_seo_por_autor_mes(autor_original: str, periodo: str) -> list[dict]:
-    """Desglose ítem-por-ítem para un periodo histórico, sobre la MUESTRA de
-    ese mes (hasta 12 notas/autor) — vía seo_items_por_periodista_mes.csv
-    (data/desglose_seo_historico_por_item.py), reusando el HTML crudo ya
-    scrapeado para semaforo_muestra_6meses.py, sin volver a pedir nada."""
-    try:
-        df = pd.read_csv(f"{DATA_DIR}/seo_items_por_periodista_mes.csv", dtype={"mes": str})
-    except FileNotFoundError:
-        return []
+    """Desglose ítem-por-ítem, sobre la MUESTRA real de ese periodo — dos
+    fuentes según el tipo:
+    - histórico: seo_items_por_periodista_mes.csv (data/desglose_seo_
+      historico_por_item.py), tope fijo 12 notas/autor/mes.
+    - parcial (mes en curso): seo_items_por_periodista_mes_actual.csv
+      (data/desglose_seo_mes_actual_por_item.py), muestra proporcional 10%.
+      Bug real encontrado 2026-08-17 (Edwin, viendo "Sin datos suficientes"
+      en un periodista con 82 notas reales del mes) -- esta función SOLO
+      miraba histórico, nunca parcial, aunque la muestra ya existiera."""
     info = PERIODOS[periodo]
-    if info["tipo"] != "historico":
+    if info["tipo"] == "historico":
+        try:
+            df = pd.read_csv(f"{DATA_DIR}/seo_items_por_periodista_mes.csv", dtype={"mes": str})
+        except FileNotFoundError:
+            return []
+        fila = df[(df["autor"] == autor_original) & (df["mes"] == info["mes"])]
+    elif info["tipo"] == "parcial":
+        try:
+            df = pd.read_csv(f"{DATA_DIR}/seo_items_por_periodista_mes_actual.csv", dtype={"mes": str})
+        except FileNotFoundError:
+            return []
+        fila = df[(df["autor"] == autor_original) & (df["mes"] == periodo)]
+    else:
         return []
-    fila = df[(df["autor"] == autor_original) & (df["mes"] == info["mes"])]
     if fila.empty:
         return []
     fila = fila.iloc[0]
