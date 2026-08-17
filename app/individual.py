@@ -275,7 +275,6 @@ def _eficiencia_historica(historial, nombre_display):
 
 def _metricas_clave(fila):
     engagement = calc.formatear_tiempo(fila["tiempo_pagina_seg"])
-    sin_dato = '<span class="cp-delta" style="color:#94A3B8">— pendiente</span>'
     tarjetas = [
         metrica_card("Volumen de notas publicadas", f"{fila['notas']:.0f}",
                      "<span class='cp-delta' style='color:#64748B'>notas del periodo, conteo directo</span>", "📝", "purple"),
@@ -290,8 +289,6 @@ def _metricas_clave(fila):
         metrica_card("Canibalización interna", f"{fila['canibalizacion_pct']:.0f}%",
                      "<span class='cp-delta' style='color:#64748B'>% de notas con título muy similar a otra "
                      "propia en la misma sección</span>", "🧭", "teal"),
-        metrica_card("Temas propios vs. asignados", "—", sin_dato,
-                     "🏷️", "purple"),
         metrica_card("Extensión promedio (palabras)", _fmt(fila["palabras_promedio"], "{:.0f}", "— sin dato"), "", "📄", "blue"),
         metrica_card("Notas con semáforo SEO verde", f"{fila['semaforo_verde_pct']:.0f}%",
                      f"<span class='cp-delta' style='color:#64748B'>{int(fila['notas_verde'])}🟢 "

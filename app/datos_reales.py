@@ -297,16 +297,20 @@ def _cargar_crudo_parcial(mes: str):
     """Tier 'parcial' — mes en curso, todavía sin cerrar. Autor real vía
     JSON-LD (igual método que julio), pero scrapeado INCREMENTALMENTE por
     data/construir_notas_mes_actual.py (solo las notas nuevas de cada corrida,
-    reusando data/mapa_autor_ruta.csv como caché). EEAT y palabras_body siguen
-    sin dato para este tier (se calculan en el cierre mensual, data/cerrar_mes.py)
-    -- pero el semáforo SEO SÍ tiene una muestra real desde el 16-ago-2026 (ver
+    reusando data/mapa_autor_ruta.csv como caché). EEAT sigue sin dato para
+    este tier (se calcula en el cierre mensual, data/cerrar_mes.py) -- pero
+    tiempo_interaccion_seg (de la misma ventana móvil de GA4 ya cargada) y
+    palabras_body (de la misma muestra SEO scrapeada, data/semaforo_raw_{mes}.csv)
+    SÍ tienen dato real desde este tier, no hace falta esperar al cierre.
+    El semáforo SEO tiene una muestra real desde el 16-ago-2026 (ver
     data/semaforo_muestra_mes_actual.py, pedido de Edwin tras encontrar que el
     tope fijo del histórico -12/autor/mes- no era representativo: acá el tamaño
     de muestra es proporcional, mínimo 10% de las notas reales de cada
     periodista, con Jhojhanni Fiorini muestreando aparte sus notas de lotería
     -servicio diario recurrente- del resto). Si ese archivo no existe todavía
-    (nadie ha corrido la muestra de este mes), semaforo/pct_cumplimiento quedan
-    en NaN, mismo patrón que el histórico para notas fuera de su muestra."""
+    (nadie ha corrido la muestra de este mes), semaforo/pct_cumplimiento/
+    palabras_body quedan en NaN, mismo patrón que el histórico para notas
+    fuera de su muestra."""
     notas = pd.read_csv(f"{DATA_DIR}/notas_{mes}.csv")
     notas = notas[~notas["autor"].isin(EXCLUIR_AUTOR)].reset_index(drop=True)
     notas["seccion_raw"] = _extraer_seccion(notas["ruta"])
@@ -324,16 +328,31 @@ def _cargar_crudo_parcial(mes: str):
         notas["pct_cumplimiento"] = np.nan
     notas["semaforo"] = notas["pct_cumplimiento"].apply(_color_semaforo)
 
+    palabras_path = f"{DATA_DIR}/semaforo_raw_{mes}.csv"
+    try:
+        muestra_palabras = pd.read_csv(palabras_path)[["ruta", "palabras_body"]]
+        notas = notas.drop(columns=["palabras_body"]).merge(muestra_palabras, on="ruta", how="left")
+    except FileNotFoundError:
+        pass
+
     raw_path = sorted(glob.glob(f"{DATA_DIR}/raw_historico/ga4_pages_screens_periodos_*.csv"))
     if raw_path:
-        procesado = pd.read_csv(sorted(raw_path)[-1])
-        procesado = procesado[procesado["periodo"] == "actual"].copy()
-        procesado["ruta"] = (procesado["pagePath"]
+        crudo_ga4 = pd.read_csv(sorted(raw_path)[-1])
+        crudo_ga4 = crudo_ga4[crudo_ga4["periodo"] == "actual"].copy()
+        crudo_ga4["ruta"] = (crudo_ga4["pagePath"]
                               .str.replace("https://www.revistamercado.do", "", regex=False)
                               .str.replace("https://revistamercado.do", "", regex=False)
                               .str.rstrip("/").replace("", "/"))
-        procesado = procesado.groupby("ruta", as_index=False)[["screenPageViews", "sessions"]].sum().rename(
+        procesado = crudo_ga4.groupby("ruta", as_index=False)[["screenPageViews", "sessions"]].sum().rename(
             columns={"screenPageViews": "vistas", "sessions": "sesiones"})
+        # tiempo_interaccion_seg real: promedio de averageSessionDuration
+        # ponderado por sesiones, del mismo export de GA4 -- no hace falta
+        # scrapear nada más ni esperar al cierre de mes para tenerlo.
+        tiempo_por_ruta = (crudo_ga4.groupby("ruta")
+                            .apply(lambda g: np.average(g["averageSessionDuration"],
+                                                         weights=g["sessions"].clip(lower=1)))
+                            .rename("tiempo_interaccion_seg").reset_index())
+        notas = notas.drop(columns=["tiempo_interaccion_seg"]).merge(tiempo_por_ruta, on="ruta", how="left")
         info_ventana = ventana_actual_info(mes)
         if info_ventana:
             # Prorrateo por fracción de días reales del mes dentro de la ventana

@@ -113,6 +113,25 @@ VENTANA_RECIENTE_DIAS = 60
 UMBRAL_NOTAS_RECIENTES_EVENTO_CONCLUIDO = 0.15
 MIN_NOTAS_PARA_EVALUAR_EVENTO_CONCLUIDO = 5
 
+# Segunda señal, independiente del % -- pedido de Edwin, 17-ago-2026: en el
+# perfil de Andrea (coyuntura pura) "elecciones en Perú" seguía sin marcarse
+# concluida aunque la elección ya pasó ("es un hecho coyuntural que no se va
+# a repetir"). Causa real, verificada con las fechas: el extractor parte el
+# mismo evento en variantes de texto ("elecciones perú", "elecciones en
+# perú", "quién ganó las elecciones", "keiko fujimori", "Perú Fujimori"...)
+# que NO fusionan entre sí (su solape de RUTAS es <80%, cada una sale de
+# titulares distintos) -- cada variante fragmentada cae por debajo del
+# volumen mínimo o queda justo en el límite del umbral de %, aunque TODAS
+# comparten el mismo último dato real: nadie escribió sobre esto en más de
+# 50 días. El % es sensible a cuántas notas totales tiene el grupo (una
+# fragmentación de 11 notas cruza el 15% con solo 2 notas recientes; una de
+# 15 notas no); días-desde-la-última-nota no depende del tamaño del grupo,
+# así que no le importa la fragmentación -- si nadie volvió a escribir sobre
+# esto en más de 45 días, está concluido, sin importar cuántas notas tenga
+# el grupo (el mínimo sigue siendo MIN_NOTAS_CANDIDATO=2, no 5: la fecha de
+# la última nota es una señal válida aunque el grupo sea chico).
+UMBRAL_DIAS_SIN_NOTA_NUEVA = 45
+
 MIN_RATIO_PROPIO = 0.70
 MIN_NOTAS_FUSION_OVERLAP = 0.80
 MIN_NOTAS_CANDIDATO = 2  # 1 sola nota no es un patrón, se descarta directo
@@ -328,11 +347,18 @@ def procesar_autor(df_autor: pd.DataFrame, stats_globales: dict[str, float],
             pct_recientes = (fechas_grupo >= fecha_corte_reciente).mean()
         else:
             pct_recientes = None
-        es_evento_concluido = bool(
+        concluido_por_volumen = bool(
             n_notas >= MIN_NOTAS_PARA_EVALUAR_EVENTO_CONCLUIDO
             and pct_recientes is not None
             and pct_recientes < UMBRAL_NOTAS_RECIENTES_EVENTO_CONCLUIDO
         )
+        if len(fechas_grupo) and fecha_corte_reciente is not None:
+            hoy = fecha_corte_reciente + pd.Timedelta(days=VENTANA_RECIENTE_DIAS)
+            dias_desde_ultima = (hoy - fechas_grupo.max()).days
+        else:
+            dias_desde_ultima = None
+        concluido_por_silencio = bool(dias_desde_ultima is not None and dias_desde_ultima > UMBRAL_DIAS_SIN_NOTA_NUEVA)
+        es_evento_concluido = concluido_por_volumen or concluido_por_silencio
 
         filas.append({"forma": forma_final, "tipo": tipo_final, "notas": n_notas,
                       "pct_del_periodista": round(100 * n_notas / total_notas, 1),

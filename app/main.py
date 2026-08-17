@@ -70,8 +70,6 @@ with st.sidebar:
         else:
             st.button(f"{icono}  {etiqueta}", key=f"nav_{etiqueta}", width="stretch", disabled=True,
                       help="Pendiente de rediseñar con KPIs propios de Revista Mercado")
-    st.write("")
-    st.caption("v0.2 · jul-2026 censo completo + ene-jun muestra histórica")
 
 st.markdown(
     f'<div class="cp-topbar"><div class="cp-brand">'
