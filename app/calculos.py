@@ -136,6 +136,9 @@ def formatear_numero(n: float) -> str:
 
 
 def formatear_tiempo(segundos: float) -> str:
+    segundos = float(segundos)
+    if np.isnan(segundos):
+        return "— sin dato"
     segundos = max(0, int(round(segundos)))
     return f"{segundos // 60}:{segundos % 60:02d} min"
 
