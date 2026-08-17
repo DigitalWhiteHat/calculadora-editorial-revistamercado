@@ -5,8 +5,8 @@ especialización/simulador/alertas (esas herramientas siempre usan el
 histórico cerrado, sin importar el periodo elegido en el Dashboard).
 
 Uso: python3 data/construir_periodistas_mes.py <mes AAAA-MM>
-Lee: data/notas_<mes>.csv (ver data/construir_notas_mes_actual.py)
-     data/raw_historico/sc_consolidado_*.csv más reciente (posición real, Search)
+Lee: data/notas_<mes>.csv (ver data/construir_notas_mes_actual.py -- ya trae
+     posición real de Search Console por ruta, no hace falta releer el export crudo)
 Escribe: data/periodistas_<mes>.csv, data/secciones_<mes>.csv
 """
 
@@ -16,32 +16,7 @@ from pathlib import Path
 import pandas as pd
 
 DIR = Path(__file__).parent
-RAW = DIR / "raw_historico"
 EXCLUIR_AUTOR = {"SIN_AUTOR"}
-
-
-def normalizar(url: str) -> str:
-    return (
-        str(url)
-        .replace("https://www.revistamercado.do", "")
-        .replace("https://revistamercado.do", "")
-        .rstrip("/")
-        or "/"
-    )
-
-
-def _ultimo_archivo(patron: str) -> Path:
-    candidatos = sorted(RAW.glob(patron), key=lambda p: p.stat().st_mtime, reverse=True)
-    if not candidatos:
-        raise FileNotFoundError(f"No hay ningún archivo '{patron}' en {RAW}")
-    return candidatos[0]
-
-
-def _posicion_mes() -> pd.DataFrame:
-    sc = pd.read_csv(_ultimo_archivo("sc_consolidado_*.csv"))
-    sc = sc[sc["superficie"] == "Search"].copy()
-    sc["ruta"] = sc["pagina"].apply(normalizar)
-    return sc[["ruta", "clics", "posicion"]].dropna(subset=["posicion"])
 
 
 def main(mes: str):
@@ -51,17 +26,23 @@ def main(mes: str):
     notas = pd.read_csv(notas_path)
     notas = notas[notas["autor"].notna() & ~notas["autor"].isin(EXCLUIR_AUTOR)].copy()
 
-    pos = _posicion_mes()
-    pos = pos[pos["clics"] > 0]
-    cruce = notas.merge(pos, on="ruta", how="inner")
-    cruce["top10"] = cruce["posicion"] <= 10
+    # notas_<mes>.csv ya trae "posicion" (promedio real de Search Console,
+    # calculado en construir_notas_mes_actual.py::cargar_gsc()) y
+    # "clics_search" por ruta -- NO releer sc_consolidado ni volver a cruzar
+    # aquí: un merge contra un segundo dataframe con su propia columna
+    # "posicion" choca de nombres (pandas la renombra a posicion_x/posicion_y
+    # y cruce["posicion"] revienta con KeyError, bug real encontrado corriendo
+    # esto contra agosto 2026 real).
+    con_pos = notas.dropna(subset=["posicion"])
+    con_pos = con_pos[con_pos["clics_search"] > 0].copy()
+    con_pos["top10"] = con_pos["posicion"] <= 10
 
-    if cruce.empty:
+    if con_pos.empty:
         pos_por_autor = pd.DataFrame(columns=["autor", "posicion_promedio", "notas_top10", "notas_con_posicion"])
     else:
-        pos_por_autor = cruce.groupby("autor").apply(
+        pos_por_autor = con_pos.groupby("autor").apply(
             lambda g: pd.Series({
-                "posicion_promedio": (g["posicion"] * g["clics"]).sum() / g["clics"].sum(),
+                "posicion_promedio": (g["posicion"] * g["clics_search"]).sum() / g["clics_search"].sum(),
                 "notas_top10": int(g["top10"].sum()),
                 "notas_con_posicion": len(g),
             }), include_groups=False

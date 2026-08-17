@@ -678,7 +678,29 @@ def _nota_editorial(slug):
         st.caption("Sin notas editoriales registradas en el periodo.")
 
 
-def _notas_destacadas(df_notas, slug):
+def _lista_notas_html(propias):
+    if propias.empty:
+        st.caption("Sin notas en esta vista.")
+        return
+    propias = propias.copy()
+    propias["pct_del_total"] = 100 * propias["clics"] / propias["clics"].sum()
+    top = propias.head(10)
+
+    pct_max = top["pct_del_total"].max()
+    filas_html = []
+    for i, n in enumerate(top.itertuples(), start=1):
+        pos_txt = f"{n.posicion_promedio:.0f}" if n.posicion_promedio == n.posicion_promedio else "s/d"
+        meta = f"{n.canal_dominante} · Posición Google {pos_txt}"
+        filas_html.append(nota_row(
+            rank=i, titulo=n.titulo, meta=meta,
+            clics_txt=calc.formatear_numero(n.clics), pct_txt=f"{n.pct_del_total:.1f}%",
+            barra_pct=100 * n.pct_del_total / pct_max if pct_max else 0,
+            semaforo=n.semaforo,
+        ))
+    st.markdown(f'<div class="cp-nota-list">{"".join(filas_html)}</div>', unsafe_allow_html=True)
+
+
+def _notas_destacadas(df_notas, slug, autor_original=None):
     with st.container(border=True, key="card_notas_destacadas"):
         st.subheader("Notas más vistas del periodo")
         st.caption("De dónde salió el tráfico: ranking de las notas individuales con más clics. "
@@ -687,21 +709,25 @@ def _notas_destacadas(df_notas, slug):
         if propias.empty:
             st.caption("No hay notas registradas para este periodista en el periodo.")
             return
-        propias["pct_del_total"] = 100 * propias["clics"] / propias["clics"].sum()
-        top = propias.head(10)
 
-        pct_max = top["pct_del_total"].max()
-        filas_html = []
-        for i, n in enumerate(top.itertuples(), start=1):
-            pos_txt = f"{n.posicion_promedio:.0f}" if n.posicion_promedio == n.posicion_promedio else "s/d"
-            meta = f"{n.canal_dominante} · Posición Google {pos_txt}"
-            filas_html.append(nota_row(
-                rank=i, titulo=n.titulo, meta=meta,
-                clics_txt=calc.formatear_numero(n.clics), pct_txt=f"{n.pct_del_total:.1f}%",
-                barra_pct=100 * n.pct_del_total / pct_max if pct_max else 0,
-                semaforo=n.semaforo,
-            ))
-        st.markdown(f'<div class="cp-nota-list">{"".join(filas_html)}</div>', unsafe_allow_html=True)
+        # Pedido explícito de Edwin (2026-08-16), mismo criterio que
+        # AUTORES_EXCLUIR_LOTERIA en _temas_fuertes(): para Jhojhanni Fiorini
+        # los resultados de lotería (contenido de servicio diario recurrente,
+        # no elección editorial) dominan el ranking crudo y tapan sus notas
+        # reales -- acá se separan en dos módulos en vez de excluirse en
+        # silencio, para no perder la evidencia de cuánto pesa la lotería.
+        if autor_original in AUTORES_EXCLUIR_LOTERIA:
+            es_loteria = propias["titulo"].str.contains("loter", case=False, na=False)
+            tab_todas, tab_sin = st.tabs(
+                [f"Todas ({len(propias)})", f"Sin loterías ({int((~es_loteria).sum())})"])
+            with tab_todas:
+                _lista_notas_html(propias)
+            with tab_sin:
+                st.caption("ℹ️ Se excluyeron los resultados de lotería de este ranking — contenido de "
+                           "servicio diario recurrente cuyo volumen tapa el resto de sus notas reales.")
+                _lista_notas_html(propias[~es_loteria].reset_index(drop=True))
+        else:
+            _lista_notas_html(propias)
 
 
 def render(tabla, df_notas, slug, periodo=dr.PERIODO_DEFAULT):
@@ -776,4 +802,4 @@ def render(tabla, df_notas, slug, periodo=dr.PERIODO_DEFAULT):
     _diagnostico_seo(meta, periodo)
 
     st.write("")
-    _notas_destacadas(df_notas, slug)
+    _notas_destacadas(df_notas, slug, meta["autor_original"])

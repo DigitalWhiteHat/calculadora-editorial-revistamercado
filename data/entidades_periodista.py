@@ -77,6 +77,20 @@ EXCLUIR_PROPIO = CONECTORES | GENERICOS_TITULAR
 # es la misma situación que "Colombia"/"Colombiacom" en el proyecto hermano.
 EXCLUIR_ENTIDADES_SITIO = {"republica dominicana", "rd"}
 
+# Términos que el detector de propios siempre agarra (mayúscula consistente
+# por estilo editorial) pero que son COYUNTURALES -- ligados a un evento/fecha
+# puntual, no una entidad estable que Google mapea a un perfil único (persona/
+# lugar/organización). Pedido de Edwin, 16-ago-2026: "las entidades no pueden
+# ser elementos coyunturales. Mundial es un elemento coyuntural, así que no
+# puede ser una entidad" -- confirmado en los datos: "Mundial" salía como
+# entidad de 7 de los 8 periodistas del portal (hasta 151 notas en un caso),
+# la más dominante de todo el dataset, precisamente por ser un evento de
+# actualidad y no un beat real de nadie. Se DEGRADA a tema en vez de
+# descartarse del todo (a diferencia de EXCLUIR_ENTIDADES_SITIO, que sí es
+# ruido puro sin señal): sigue siendo una pista real de en qué escribe el
+# periodista, solo que no es una entidad en el sentido estricto de E-E-A-T.
+DEGRADAR_A_TEMA_COYUNTURAL = {"mundial"}
+
 MIN_RATIO_PROPIO = 0.70
 MIN_NOTAS_FUSION_OVERLAP = 0.80
 MIN_NOTAS_CANDIDATO = 2  # 1 sola nota no es un patrón, se descarta directo
@@ -182,7 +196,8 @@ def procesar_autor(df_autor: pd.DataFrame, stats_globales: dict[str, float]) -> 
                 # tema de 4 palabras que incluye "república") cambia cuál es
                 # el raiz final y el filtro exacto deja de aplicar.
                 continue
-            candidatos.append((e, "entidad", row["ruta"]))
+            tipo_e = "tema" if norma in DEGRADAR_A_TEMA_COYUNTURAL else "entidad"
+            candidatos.append((e, tipo_e, row["ruta"]))
             normas_ya_en_esta_nota.add(norma)
         for t in temas:
             norma = normalizar(t)
@@ -220,6 +235,13 @@ def procesar_autor(df_autor: pd.DataFrame, stats_globales: dict[str, float]) -> 
 
     claves_ordenadas = sorted(claves, key=len)
     for idx, a in enumerate(claves_ordenadas):
+        if a in DEGRADAR_A_TEMA_COYUNTURAL:
+            # NO se deja fusionar hacia arriba: si "mundial" se fusionara con
+            # una racha más larga y genuinamente propia que la contiene (ej.
+            # "Clásico Mundial de Béisbol") y esa racha SÍ califica como
+            # entidad, el voto por mayoría de tipo_final la reclasificaría de
+            # vuelta a "entidad" -- justo lo que este término debía evitar.
+            continue
         palabras_a = set(a.split())
         for b in claves_ordenadas[idx + 1:]:
             if a == b or len(a) >= len(b):

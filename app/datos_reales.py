@@ -723,10 +723,16 @@ def especializacion_todos() -> pd.DataFrame:
 # y "money-invest/happening-now" resultaron ser noticia general (elecciones,
 # famosos, YouTube caído), NO economía, pese al nombre de la sección madre.
 # "money-invest/republica-dominicana" está demasiado mezclado con resultados
-# de lotería. Solo estas 3 subsecciones son consistentemente contenido
-# económico/financiero real al leer sus titulares.
-SECCIONES_ECONOMIA = ("market-brief/finanzas", "market-brief/bolsa-de-valores",
-                      "money-invest/internacional-economia")
+# de lotería. "money-invest/internacional-economia" se sacó también (16-ago-2026,
+# feedback de Edwin: "no me queda claro por qué es el mejor periodista
+# económico") -- al releer sus 226 titulares reales resultó ser mayormente
+# geopolítica/rankings de seguridad/corrupción (ej. "Captura de Alex Saab",
+# "Misil nuclear israelí", "Países más corruptos de Latinoamérica"), NO
+# finanzas -- la verificación original de este comentario fue insuficiente.
+# Solo estas 2 subsecciones son consistentemente contenido económico/
+# financiero real al releer sus titulares (tarjetas de crédito, AFP, canasta
+# básica, acciones, perfil crediticio).
+SECCIONES_ECONOMIA = ("market-brief/finanzas", "market-brief/bolsa-de-valores")
 
 
 def _en_secciones(seccion_raw: pd.Series, prefijos: tuple[str, ...]) -> pd.Series:
@@ -738,7 +744,12 @@ def top_periodista_tema(prefijos: tuple[str, ...] = SECCIONES_ECONOMIA, min_nota
     """El periodista con mejor tráfico/nota REAL dentro de un grupo de
     secciones (ej. economía/finanzas), con los 7 periodos acumulados —
     respaldado en datos, no en percepción. min_notas evita premiar una sola
-    nota viral aislada como si fuera especialización real."""
+    nota viral aislada como si fuera especialización real.
+
+    Incluye "ranking" (top 5 candidatos con esa muestra mínima) -- pedido de
+    Edwin, 16-ago-2026: "no me queda claro por qué es el mejor periodista
+    económico". Declarar un ganador sin mostrar contra quién compite no se
+    puede verificar a ojo; con el ranking al lado se ve la distancia real."""
     todo = _notas_todo_periodo()
     sub = todo[_en_secciones(todo["seccion_raw"], prefijos)]
     if sub.empty:
@@ -748,14 +759,16 @@ def top_periodista_tema(prefijos: tuple[str, ...] = SECCIONES_ECONOMIA, min_nota
     if agg.empty:
         return None
     agg["trafico_por_nota"] = agg["trafico"] / agg["notas"]
-    ganador = agg.sort_values("trafico_por_nota", ascending=False).iloc[0]
+    agg = agg.sort_values("trafico_por_nota", ascending=False).reset_index(drop=True)
+    ganador = agg.iloc[0]
 
     notas_ganador = sub[sub["autor"] == ganador["autor"]].sort_values("vistas", ascending=False)
     top_notas = notas_ganador.drop_duplicates("ruta").head(5)[["titulo", "ruta", "seccion_raw", "vistas"]].to_dict("records")
+    ranking = agg.head(5)[["autor", "notas", "trafico_por_nota"]].to_dict("records")
 
     return dict(
         autor=ganador["autor"], notas=int(ganador["notas"]), trafico=float(ganador["trafico"]),
-        trafico_por_nota=float(ganador["trafico_por_nota"]), top_notas=top_notas,
+        trafico_por_nota=float(ganador["trafico_por_nota"]), top_notas=top_notas, ranking=ranking,
     )
 
 

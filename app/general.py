@@ -346,9 +346,11 @@ def _top_economia():
         st.subheader("💹 Mejor periodista de economía — respaldado en datos")
         st.caption(
             "Enfoque editorial del portal: quién escribe economía/finanzas con más tráfico real por nota, "
-            "no por percepción. Solo cuenta subsecciones verificadas como contenido económico real (se "
-            "excluyó \"money-invest/daily-news\" y \"happening-now\": pese al nombre, son noticia general, "
-            "no economía) — 7 periodos acumulados (jul-2026 censo + histórico ene-jun), mínimo 3 notas."
+            "no por percepción. Solo cuenta subsecciones donde se leyeron los titulares reales uno por uno y "
+            "son consistentemente contenido económico/financiero (\"money-invest/daily-news\", "
+            "\"happening-now\" e \"internacional-economia\" quedaron fuera: pese al nombre, son noticia "
+            "general, rankings de seguridad/corrupción y geopolítica, no economía) — 7 periodos acumulados "
+            "(jul-2026 censo + histórico ene-jun), mínimo 3 notas."
         )
         ganador = dr.top_periodista_tema()
         if not ganador:
@@ -364,6 +366,14 @@ def _top_economia():
                 f"**{ganador['trafico_por_nota']:,.0f}** tráfico/nota promedio &nbsp;·&nbsp; "
                 f"{ganador['notas']} notas de economía/finanzas &nbsp;·&nbsp; "
                 f"{calc.formatear_numero(ganador['trafico'])} tráfico total".replace(",", "."))
+
+        if len(ganador["ranking"]) > 1:
+            st.write("")
+            st.markdown("**Contra quién compite (tráfico/nota, mínimo 3 notas):**")
+            for i, r in enumerate(ganador["ranking"], start=1):
+                marca = "🥇" if i == 1 else f"{i}."
+                st.markdown(f"{marca} {r['autor']} — **{r['trafico_por_nota']:,.0f}** tráfico/nota "
+                            f"({int(r['notas'])} notas)".replace(",", "."))
 
         st.write("")
         st.markdown("**Con qué notas lo demuestra:**")
