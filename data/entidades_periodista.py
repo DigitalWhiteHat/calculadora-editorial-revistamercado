@@ -133,25 +133,38 @@ MIN_NOTAS_PARA_EVALUAR_EVENTO_CONCLUIDO = 5
 UMBRAL_DIAS_SIN_NOTA_NUEVA = 45
 
 # Tercera señal -- pedido de Edwin, 17-ago-2026, viendo "Ganar la Copa del
-# Mundo" seguir como "le rinde" en varios perfiles de economistas. Ni el % ni
-# los días-sin-nota-nueva atrapan un evento de este tamaño: el Mundial 2026
-# cerró el 19-jul-2026, pero el portal siguió publicando cierres/resúmenes
-# hasta el 10-ago (real, verificado en mapa_autor_ruta.csv) -- 22 días de
-# "silencio" no es suficiente para cruzar el umbral de 45. Edwin sugirió
-# cruzar con impresiones de Search Console para "entender las entidades" --
-# se revisó (data/raw_historico/sc_consolidado_2026-08-16.csv, ventana móvil
-# 10-jul a 13-ago): la nota "quién ganará la copa del mundo" de Andrea seguía
-# con 613K impresiones reales de Search en esa ventana, más que casi
-# cualquier otro contenido del sitio. Las impresiones NO sirven de señal acá
-# -- el tráfico residual de un evento grande que ya cerró se queda alto
-# semanas después (la gente sigue buscando "quién ganó" en retrospectiva),
-# así que "sigue generando impresiones reales" no es lo mismo que "sigue
-# siendo un beat vigente para seguir produciendo nota nueva". La única señal
-# que sí distingue esto es la fecha real del evento -- no se puede inferir
-# de los datos del proyecto, hay que saberla y declararla a mano. Por eso
-# esta lista es corta y curada a propósito, no un intento de cubrir todo por
-# fórmula: cada entrada se agrega cuando aparece un caso real confirmado
-# (mismo patrón que "Clásico Mundial de Béisbol" arriba, ahora explícito).
+# Mundo" seguir como "le rinde". Primer intento (fallido): un registro curado
+# a mano con la fecha real del evento (el Mundial 2026 cerró 19-jul-2026, y
+# se revisó -- correcto -- que las impresiones de UNA nota puntual ("quién
+# ganará la copa del mundo", 613K en la ventana móvil) no sirven de señal
+# porque el tráfico residual de un evento grande se queda alto semanas
+# después). Edwin lo rechazó con razón: "hay forma de inferirlo... miras la
+# entidad en Search Console en los últimos meses y miras altas y bajas". La
+# curva mensual completa (no una sola ventana) SÍ distingue los dos casos:
+# - "elecciones en perú" (Andrea): pico 1.45M impresiones en junio -> 3.7K en
+#   agosto (0.3% del pico) -- sube de la nada y cae a pique, coyuntura pura.
+# - "copa del mundo" (Elba) mezclaba notas del Mundial 2026 (concluido) CON
+#   "cuándo empieza el próximo mundial 2030" (evergreen real, sigue subiendo)
+#   -- por eso el registro curado de abajo por sí solo SE EQUIVOCABA con este
+#   grupo (lo marcaba concluido aunque su impresiones seguían creciendo,
+#   100% del pico en agosto). La curva mensual real evita ese falso positivo.
+# Fuente: data/impresiones_mensuales_por_ruta.csv (construido por
+# data/construir_impresiones_mensuales.py desde los exports de GA4/GSC que
+# YA existen en el proyecto -- ene-jun de procesado_historico, jul de
+# procesado_2026-07, agosto parcial de sc_consolidado).
+UMBRAL_RATIO_DECLIVE_GENERAL = 0.15   # cualquier entidad: <15% del pico en el último mes = concluida
+MIN_PICO_IMPRESIONES_EVALUABLE = 3000  # pico mínimo para que la señal sea confiable, no ruido de una entidad chica
+
+# El registro curado de eventos mayores conocidos NO se descarta -- sigue
+# sirviendo para casos donde la fragmentación de texto diluye la caída real
+# (ej. "Mundial" a secas de Elba: 54% del pico en agosto, no cruza el umbral
+# general de 15% porque el bucket mezcla el uso genérico "a nivel mundial"
+# con el torneo real). Pero ya NO fuerza concluido solo por coincidir con la
+# palabra -- ahora exige ADEMÁS que la curva de impresiones esté en declive
+# real (umbral más laxo, 60%, no 15%: ya sabemos que es un evento puntual,
+# solo hace falta confirmar que no está en una racha de crecimiento genuino
+# como el caso de "próximo mundial 2030" de arriba).
+UMBRAL_RATIO_DECLIVE_EVENTO_CONOCIDO = 0.60
 EVENTOS_CONCLUIDOS_CONOCIDOS = {
     "mundial": "2026-07-19",           # Mundial 2026 (fútbol) -- final 19-jul-2026
     "copa del mundo": "2026-07-19",
@@ -324,8 +337,41 @@ def construir_mapa_fusion(grupos: dict) -> dict:
     return {k: find(k) for k in claves}
 
 
+def cargar_impresiones_mensuales() -> dict[str, dict[str, float]]:
+    """{ruta: {mes: impresiones}} desde data/impresiones_mensuales_por_ruta.csv
+    (data/construir_impresiones_mensuales.py). Vacío si el archivo no existe
+    todavía -- la señal de tendencia simplemente no se evalúa, no rompe nada."""
+    try:
+        df = pd.read_csv("data/impresiones_mensuales_por_ruta.csv")
+    except FileNotFoundError:
+        return {}
+    lookup: dict[str, dict[str, float]] = defaultdict(dict)
+    for ruta, mes, impresiones in df[["ruta", "mes", "impresiones"]].itertuples(index=False):
+        lookup[ruta][mes] = lookup[ruta].get(mes, 0.0) + impresiones
+    return lookup
+
+
+def _ratio_declive_impresiones(rutas, impresiones_por_ruta_mes: dict) -> float | None:
+    """último_mes / pico de la serie mensual REAL de impresiones del grupo
+    (suma de todas sus rutas por mes) -- None si no hay dato suficiente para
+    confiar en la señal (pico por debajo de MIN_PICO_IMPRESIONES_EVALUABLE)."""
+    if not impresiones_por_ruta_mes:
+        return None
+    por_mes: dict[str, float] = defaultdict(float)
+    for ruta in rutas:
+        for mes, imp in impresiones_por_ruta_mes.get(ruta, {}).items():
+            por_mes[mes] += imp
+    if not por_mes:
+        return None
+    pico = max(por_mes.values())
+    if pico < MIN_PICO_IMPRESIONES_EVALUABLE:
+        return None
+    ultimo_mes = max(por_mes.keys())
+    return por_mes[ultimo_mes] / pico
+
+
 def procesar_autor(df_autor: pd.DataFrame, stats_globales: dict[str, float],
-                    fecha_corte_reciente=None) -> pd.DataFrame:
+                    fecha_corte_reciente=None, impresiones_por_ruta_mes: dict | None = None) -> pd.DataFrame:
     total_notas = len(df_autor)
     candidatos = []  # (forma_original, tipo, ruta)
     normalizadas_por_ruta = {}
@@ -411,20 +457,34 @@ def procesar_autor(df_autor: pd.DataFrame, stats_globales: dict[str, float],
             dias_desde_ultima = None
         concluido_por_silencio = bool(dias_desde_ultima is not None and dias_desde_ultima > UMBRAL_DIAS_SIN_NOTA_NUEVA)
 
+        ratio_declive = _ratio_declive_impresiones(g["rutas"], impresiones_por_ruta_mes or {})
+        concluido_por_tendencia = bool(ratio_declive is not None and ratio_declive < UMBRAL_RATIO_DECLIVE_GENERAL)
+
         fin_conocido = _fin_evento_conocido(raiz)
-        concluido_por_evento_conocido = bool(
+        vencio_gracia = bool(
             fin_conocido is not None and hoy is not None
             and hoy > pd.Timestamp(fin_conocido) + pd.Timedelta(days=GRACIA_POST_EVENTO_DIAS)
         )
-        es_evento_concluido = concluido_por_volumen or concluido_por_silencio or concluido_por_evento_conocido
+        # El registro curado ya NO fuerza concluido solo por coincidir con la
+        # palabra -- exige además que la curva de impresiones muestre declive
+        # real (umbral más laxo que el general: ya sabemos que es un evento
+        # puntual, solo falta confirmar que no es un caso como "próximo
+        # mundial 2030" que sigue creciendo genuinamente).
+        concluido_por_evento_conocido = bool(
+            vencio_gracia and ratio_declive is not None and ratio_declive < UMBRAL_RATIO_DECLIVE_EVENTO_CONOCIDO
+        )
+        es_evento_concluido = (concluido_por_volumen or concluido_por_silencio
+                                or concluido_por_tendencia or concluido_por_evento_conocido)
 
         filas.append({"forma": forma_final, "tipo": tipo_final, "notas": n_notas,
                       "pct_del_periodista": round(100 * n_notas / total_notas, 1),
                       "rutas": "|".join(sorted(g["rutas"])),
-                      "es_evento_concluido": es_evento_concluido})
+                      "es_evento_concluido": es_evento_concluido,
+                      "ratio_declive_impresiones": round(ratio_declive, 3) if ratio_declive is not None else None})
 
     if not filas:
-        return pd.DataFrame(columns=["forma", "tipo", "notas", "pct_del_periodista", "rutas", "es_evento_concluido"])
+        return pd.DataFrame(columns=["forma", "tipo", "notas", "pct_del_periodista", "rutas",
+                                      "es_evento_concluido", "ratio_declive_impresiones"])
     return pd.DataFrame(filas).sort_values("notas", ascending=False)
 
 
@@ -447,9 +507,13 @@ def main():
     # CONCLUIDO -- ver VENTANA_RECIENTE_DIAS arriba.
     fecha_corte_reciente = pd.Timestamp.now().normalize() - pd.Timedelta(days=VENTANA_RECIENTE_DIAS)
 
+    impresiones_por_ruta_mes = cargar_impresiones_mensuales()
+    print(f"Impresiones mensuales cargadas para {len(impresiones_por_ruta_mes)} rutas "
+          f"(correr data/construir_impresiones_mensuales.py si está vacío/desactualizado)")
+
     resultados = []
     for autor, df_autor in mapa.groupby("autor"):
-        r = procesar_autor(df_autor, stats, fecha_corte_reciente)
+        r = procesar_autor(df_autor, stats, fecha_corte_reciente, impresiones_por_ruta_mes)
         if r.empty:
             continue
         r.insert(0, "autor", autor)
