@@ -23,6 +23,7 @@ Escribe:
 import json
 import sys
 import time
+from datetime import date
 from pathlib import Path
 
 import pandas as pd
@@ -111,18 +112,40 @@ def _ultimo_archivo(patron: str) -> Path:
     return candidatos[0]
 
 
-def cargar_ga4() -> pd.DataFrame:
+def _fraccion_dentro_del_mes(periodo_inicio, periodo_fin, mes: str) -> float:
+    """BUG real encontrado 2026-08-16 (Edwin, cruzando contra su reporte de Looker
+    Studio): tanto el export de GA4 como el de GSC son ventanas MÓVILES de Apps
+    Script que arrancan varios días ANTES del día 1 del mes en curso (ej. GA4
+    30-jul para el corte de agosto, GSC 10-jul) -- sumar el bloque completo como
+    si fuera "agosto acumulado" infla el tráfico real. Ver también
+    app/datos_reales.py:ventana_actual_info(), misma lógica duplicada acá porque
+    este script no importa de app/."""
+    ini = pd.to_datetime(periodo_inicio).date()
+    fin = pd.to_datetime(periodo_fin).date()
+    anio, mes_num = int(mes[:4]), int(mes[5:7])
+    primer_dia_mes = date(anio, mes_num, 1)
+    dias_ventana = (fin - ini).days + 1
+    dias_en_mes = (fin - max(ini, primer_dia_mes)).days + 1
+    return (dias_en_mes / dias_ventana) if dias_ventana else 1.0
+
+
+def cargar_ga4(mes: str) -> pd.DataFrame:
     path = _ultimo_archivo("ga4_pages_screens_periodos_*.csv")
     ga4 = pd.read_csv(path)
     actual = ga4[ga4["periodo"] == "actual"].copy()
     actual["ruta"] = actual["pagePath"].apply(normalizar)
-    return actual.groupby("ruta", as_index=False)["screenPageViews"].sum().rename(
+    agg = actual.groupby("ruta", as_index=False)["screenPageViews"].sum().rename(
         columns={"screenPageViews": "vistas"})
+    if len(actual):
+        frac = _fraccion_dentro_del_mes(actual["periodo_inicio"].iloc[0], actual["periodo_fin"].iloc[0], mes)
+        agg["vistas"] = agg["vistas"] * frac
+    return agg
 
 
-def cargar_gsc() -> pd.DataFrame:
+def cargar_gsc(mes: str) -> pd.DataFrame:
     path = _ultimo_archivo("sc_consolidado_*.csv")
     sc = pd.read_csv(path)
+    frac = _fraccion_dentro_del_mes(sc["periodo_inicio"].iloc[0], sc["periodo_fin"].iloc[0], mes) if len(sc) else 1.0
     sc["ruta"] = sc["pagina"].apply(normalizar)
     pivot = sc.pivot_table(index="ruta", columns="superficie", values="clics", aggfunc="sum", fill_value=0)
     pivot = pivot.reset_index()
@@ -131,16 +154,20 @@ def cargar_gsc() -> pd.DataFrame:
             pivot[col] = 0
     pivot = pivot.rename(columns={"Search": "clics_search", "Discover": "clics_discover", "News": "clics_news"})[
         ["ruta", "clics_search", "clics_discover", "clics_news"]]
+    for col in ["clics_search", "clics_discover", "clics_news"]:
+        pivot[col] = pivot[col] * frac
 
     # Posición e impresiones reales solo existen en la superficie Search de GSC.
+    # posicion es un PROMEDIO -- nunca se prorratea, solo las sumas (impresiones).
     busq = sc[sc["superficie"] == "Search"][["ruta", "posicion", "impresiones"]].dropna(subset=["posicion"])
     busq = busq.groupby("ruta", as_index=False).agg(posicion=("posicion", "mean"), impresiones_search=("impresiones", "sum"))
+    busq["impresiones_search"] = busq["impresiones_search"] * frac
     return pivot.merge(busq, on="ruta", how="left")
 
 
 def main(mes: str, tope_nuevas: int = MAX_NUEVAS_POR_CORRIDA_DEFAULT):
-    ga4 = cargar_ga4()
-    gsc = cargar_gsc()
+    ga4 = cargar_ga4(mes)
+    gsc = cargar_gsc(mes)
     trafico = ga4.merge(gsc, on="ruta", how="outer")
     for col in ["vistas", "clics_search", "clics_discover", "clics_news"]:
         trafico[col] = trafico[col].fillna(0)
