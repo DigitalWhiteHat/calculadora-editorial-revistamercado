@@ -25,13 +25,17 @@ PALABRAS_DEPORTE = (
 )
 PALABRAS_EMPRESARIO = (
     r"entrevista|ceo|presidente|banesco|grupo ramos|meliá|marsh mclennan|copa holdings|escotet|"
-    r"zonas francas|liderazgo|business|sucesores|family values|vp |gerente|fundador|director"
+    r"zonas francas|liderazgo|leadership|líder|business|sucesores|family values|vp |gerente|"
+    r"fundador|director|empresari|conversations|conversatorio|summit"
 )
 PALABRAS_DOC = r"kathleen martínez|cleopatra|taposiris"
 PALABRAS_PODCAST = r"mercado podcast|enrique rojas|isabel rojas"
 
 # Orden de prioridad importa: noticia se evalúa ANTES que deporte para que
 # frases como "comercio mundial"/"mar Rojo" no caigan en deporte por error.
+# "Empresarios/Liderazgo" exige coincidencia de palabra clave -- se probó usar
+# duración >=300s como respaldo y metía cualquier video largo (recetas, videos
+# institucionales genéricos) en la categoría, diluyendo el hallazgo real.
 
 
 def clasificar(titulo: str, duracion_seg: float) -> str:
@@ -44,7 +48,7 @@ def clasificar(titulo: str, duracion_seg: float) -> str:
         return "Noticias breves (geopolítica/actualidad)"
     if re.search(PALABRAS_DEPORTE, t):
         return "Deportes"
-    if re.search(PALABRAS_EMPRESARIO, t) or duracion_seg >= 300:
+    if re.search(PALABRAS_EMPRESARIO, t):
         return "Empresarios / Liderazgo"
     return "Otros / Institucional"
 
