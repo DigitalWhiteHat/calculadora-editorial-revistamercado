@@ -1220,3 +1220,33 @@ def ejemplo_titular_por_autor_y_seccion(autor_original: str, seccion: str, rasgo
         return None
     sub = df[(df["autor"] == autor_original) & (df["seccion"] == seccion)]
     return _ejemplo_real_titular(sub, _campos_positivos_de_rasgos(rasgos))
+
+
+def alertas_tendencia() -> list[dict]:
+    """Alertas de TENDENCIA reales, ahora que sí hay 7 periodos acumulados para medirlas
+    (antes bloqueadas por falta de historial). Regla: racha de periodos SEGUIDOS, terminando
+    en el más reciente con dato, con índice de eficiencia por debajo de 80 (la mediana
+    del equipo ese periodo) -- 3+ periodos = ATENCIÓN, 5+ periodos = CRÍTICO. Es la misma
+    "índice" simple de historial_periodista(), sin ajuste por dificultad de sección."""
+    resultados = []
+    for meta in cargar_periodistas_meta():
+        hist = historial_periodista(meta["autor_original"]).sort_values("mes")
+        hist = hist[hist["indice"].notna()]
+        if hist.empty:
+            continue
+        racha = 0
+        for indice in hist["indice"].iloc[::-1]:
+            if indice < 80:
+                racha += 1
+            else:
+                break
+        if racha < 3:
+            continue
+        severidad = "CRÍTICO" if racha >= 5 else "ATENCIÓN"
+        ultimo_periodo = hist["mes_label"].iloc[-1]
+        resultados.append({
+            "slug": meta["slug"], "periodista": meta["nombre"], "seccion": meta["seccion"],
+            "severidad": severidad,
+            "mensaje": f"{racha} periodos seguidos (hasta {ultimo_periodo}) con eficiencia por debajo de la mediana del equipo.",
+        })
+    return resultados

@@ -1,14 +1,15 @@
 """Vista Alertas — señales de estado actual (SEO, canibalización, CTR, eficiencia)
-que ya se pueden medir con un solo mes de datos. Las alertas de TENDENCIA (ej.
-"4+ semanas con eficiencia baja") siguen bloqueadas hasta acumular varios periodos
-— eso no ha cambiado y se explica en la propia vista."""
+que ya se pueden medir con un solo periodo de datos, más alertas de TENDENCIA con
+los 7 periodos de historial real que ya tenemos (ver dr.alertas_tendencia()) --
+portado de calculadora-periodistas/app/alertas.py (Colombia.com)."""
 
 import streamlit as st
 
+import datos_reales as dr
 from estilos import kpi_card
 
 COLOR_SEVERIDAD = {"CRÍTICO": ("#FEE2E2", "#991B1B", "🔴"), "ATENCIÓN": ("#FEF3C7", "#92400E", "🟡")}
-ICONO_TIPO = {"SEO": "🧭", "Canibalización": "🔁", "CTR": "🎯", "Eficiencia": "📉"}
+ICONO_TIPO = {"SEO": "🧭", "Canibalización": "🔁", "CTR": "🎯", "Eficiencia": "📉", "Tendencia": "📉"}
 
 
 def _kpis(tabla):
@@ -49,13 +50,43 @@ def _tarjeta_periodista(fila):
             )
 
 
+def _tarjeta_alertas_tendencia(a):
+    with st.container(border=True, key=f"alerta_tendencia_{a['slug']}"):
+        col_nombre, col_boton = st.columns([3, 1])
+        col_nombre.markdown(f"**{a['periodista']}** · {a['seccion']}")
+        if col_boton.button("Ver perfil →", key=f"btn_alerta_tendencia_{a['slug']}", width="stretch"):
+            st.session_state.periodista_slug = a["slug"]
+            st.session_state.vista = "individual"
+            st.rerun()
+        bg, fg, icono_sev = COLOR_SEVERIDAD[a["severidad"]]
+        st.markdown(
+            f'<div style="background:{bg};color:{fg};border-radius:8px;padding:8px 12px;'
+            f'margin-top:6px;font-size:0.92rem">{icono_sev} 📉 <b>Tendencia</b> — {a["mensaje"]}</div>',
+            unsafe_allow_html=True,
+        )
+
+
+def _alertas_tendencia():
+    st.subheader("Alertas de tendencia (7 periodos)")
+    st.caption(
+        "Ahora sí medibles: con 7 periodos de historial real (jul-2026 censo + ene-jun histórico), una "
+        "racha de varios periodos seguidos con eficiencia por debajo de la mediana del equipo es una señal "
+        "real de tendencia, no solo un mal mes. 🟡 3-4 periodos seguidos · 🔴 5+ periodos seguidos."
+    )
+    alertas = dr.alertas_tendencia()
+    if not alertas:
+        st.success("Ningún periodista tiene una racha de 3+ periodos con eficiencia baja.")
+        return
+    for a in alertas:
+        _tarjeta_alertas_tendencia(a)
+
+
 def render(tabla):
     st.subheader("Alertas — estado actual del equipo")
     st.info(
         "⚠️ Estas alertas son de **estado actual** (cumplimiento SEO, canibalización, CTR, eficiencia "
-        "relativa al equipo) — todas medibles con los datos de este mes. Las alertas de **tendencia** "
-        "(ej. \"4+ semanas seguidas con eficiencia baja\") siguen bloqueadas hasta que acumulemos varios "
-        "meses de historial — con un solo periodo no hay tendencia que medir.",
+        "relativa al equipo) — todas medibles con los datos de este periodo. Las alertas de **tendencia** "
+        "(7 periodos de historial real) están más abajo.",
         icon="ℹ️",
     )
     _kpis(tabla)
@@ -78,3 +109,7 @@ def render(tabla):
     if not sin_alertas.empty:
         st.write("")
         st.caption("Sin alertas activas: " + ", ".join(sin_alertas["periodista"].tolist()))
+
+    st.write("")
+    with st.container(border=True, key="card_alertas_tendencia"):
+        _alertas_tendencia()
