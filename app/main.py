@@ -6,11 +6,13 @@ import streamlit as st
 
 import alertas as vista_alertas
 import datos_reales as dr
+import diagnostico_seo as vista_diagnostico_seo
 import general
 import individual
 import notas as vista_notas
 import reemplazos as vista_reemplazos
 import secciones as vista_secciones
+import temas_del_dia as vista_temas_del_dia
 from avatares import logo_revistamercado_data_uri
 from estilos import inyectar_css
 from exportar_pdf import generar_pdf_general, generar_pdf_periodista_cacheado
@@ -39,10 +41,12 @@ NAV_ITEMS = [
     ("🗂️", "Secciones", "secciones"),
     ("📝", "Notas", "notas"),
     ("🔔", "Alertas", "alertas"),
+    ("🔍", "Diagnóstico SEO", "diagnostico_seo"),
+    ("🗓️", "Temas del día", "temas_del_dia"),
     ("🔁", "Reemplazos", "reemplazos"),
     ("⚙️", "Configuración", None),
 ]
-VISTAS_PRINCIPALES = {"general", "secciones", "notas", "alertas", "reemplazos"}
+VISTAS_PRINCIPALES = {"general", "secciones", "notas", "alertas", "diagnostico_seo", "temas_del_dia", "reemplazos"}
 
 with st.sidebar:
     st.markdown(
@@ -124,6 +128,10 @@ elif st.session_state.vista == "notas":
     vista_notas.render(df_notas)
 elif st.session_state.vista == "alertas":
     vista_alertas.render(tabla_periodistas)
+elif st.session_state.vista == "diagnostico_seo":
+    vista_diagnostico_seo.render()
+elif st.session_state.vista == "temas_del_dia":
+    vista_temas_del_dia.render()
 elif st.session_state.vista == "reemplazos":
     vista_reemplazos.render(tabla_periodistas)
 else:

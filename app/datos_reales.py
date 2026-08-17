@@ -1278,3 +1278,32 @@ def secciones_por_periodo(periodo: str = PERIODO_DEFAULT) -> pd.DataFrame:
     agg = agg.rename(columns={"seccion_raw": "seccion"})
     agg["eficiencia"] = (agg["trafico"] / agg["notas"]).round(0)
     return agg.sort_values("trafico", ascending=False).reset_index(drop=True)
+
+
+def cargar_cwv_diagnostico() -> pd.DataFrame:
+    """Core Web Vitals reales de revistamercado.do (datos de campo/CrUX vía PageSpeed
+    Insights) -- ver data/medir_core_web_vitals.py. Auditoría puntual, no un pipeline
+    recurrente: se regenera corriendo ese script de nuevo, con PAGESPEED_API_KEY en .env."""
+    try:
+        return pd.read_csv(f"{DATA_DIR}/cwv_diagnostico.csv")
+    except FileNotFoundError:
+        return pd.DataFrame()
+
+
+def cargar_temas_del_dia() -> pd.DataFrame:
+    """Lote de temas del día -- entidades prioritarias del portal (ver
+    data/seleccionar_entidades_prioritarias.py) cruzadas con keywords relacionadas en
+    tendencia y el SERP actual, vía Semrush (no vía API de Claude + búsqueda web --
+    Edwin, 16-ago-2026, mismo criterio ya acordado para colombia.com: nada de pagos
+    adicionales, usar Semrush que ya está conectado sin costo extra). No es un pipeline
+    automático: se regenera bajo pedido a Claude (las consultas a Semrush corren desde
+    el MCP de esta sesión, no desde un script standalone con API key propia como
+    cwv_diagnostico) -- pero, mismo criterio que colombia.com, SÍ debe entrar en la
+    rutina normal de "actualizar la data del mes en curso" cuando exista una (a
+    diferencia de julio/alertas de tendencia, que se quedan ancladas a propósito):
+    son literalmente los temas DEL DÍA, así que refrescarlos es parte esperada de
+    cualquier actualización, no un extra opcional."""
+    try:
+        return pd.read_csv(f"{DATA_DIR}/temas_del_dia.csv")
+    except FileNotFoundError:
+        return pd.DataFrame()

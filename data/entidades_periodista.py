@@ -174,6 +174,51 @@ def extraer_temas_titulo(titulo: str) -> list[str]:
     return temas
 
 
+def construir_mapa_fusion(grupos: dict) -> dict:
+    """Extraído de procesar_autor() (16-ago-2026) para poder reutilizarlo también en
+    construir_temas_recomendados.py, que necesita la MISMA fusión de variantes pero
+    con su propia agregación por mes -- sin duplicar el algoritmo de unión (con su
+    guard de coyunturales, ya corregido y probado). Recibe `grupos` (norma ->
+    {"rutas": set(...), ...}, como ya lo arma procesar_autor) y devuelve
+    {norma: raiz_fusionada} para TODAS las claves de `grupos`."""
+    claves = list(grupos.keys())
+    padre = {k: k for k in claves}
+
+    def find(x):
+        while padre[x] != x:
+            padre[x] = padre[padre[x]]
+            x = padre[x]
+        return x
+
+    def union(a, b):
+        ra, rb = find(a), find(b)
+        if ra != rb:
+            padre[ra] = rb
+
+    claves_ordenadas = sorted(claves, key=len)
+    for idx, a in enumerate(claves_ordenadas):
+        if a in DEGRADAR_A_TEMA_COYUNTURAL:
+            # NO se deja fusionar hacia arriba: si "mundial" se fusionara con
+            # una racha más larga y genuinamente propia que la contiene (ej.
+            # "Clásico Mundial de Béisbol") y esa racha SÍ califica como
+            # entidad, el voto por mayoría de tipo_final la reclasificaría de
+            # vuelta a "entidad" -- justo lo que este término debía evitar.
+            continue
+        palabras_a = set(a.split())
+        for b in claves_ordenadas[idx + 1:]:
+            if a == b or len(a) >= len(b):
+                continue
+            palabras_b = b.split()
+            if not all(pa in palabras_b for pa in palabras_a):
+                continue  # a no es subcadena de PALABRAS completas de b
+            rutas_a, rutas_b = grupos[a]["rutas"], grupos[b]["rutas"]
+            solape = len(rutas_a & rutas_b) / max(1, min(len(rutas_a), len(rutas_b)))
+            if solape >= MIN_NOTAS_FUSION_OVERLAP:
+                union(a, b)
+
+    return {k: find(k) for k in claves}
+
+
 def procesar_autor(df_autor: pd.DataFrame, stats_globales: dict[str, float]) -> pd.DataFrame:
     total_notas = len(df_autor)
     candidatos = []  # (forma_original, tipo, ruta)
@@ -219,48 +264,14 @@ def procesar_autor(df_autor: pd.DataFrame, stats_globales: dict[str, float]) -> 
         g["tipo"][tipo] += 1
         g["rutas"].add(ruta)
 
-    claves = list(grupos.keys())
-    padre = {k: k for k in claves}
-
-    def find(x):
-        while padre[x] != x:
-            padre[x] = padre[padre[x]]
-            x = padre[x]
-        return x
-
-    def union(a, b):
-        ra, rb = find(a), find(b)
-        if ra != rb:
-            padre[ra] = rb
-
-    claves_ordenadas = sorted(claves, key=len)
-    for idx, a in enumerate(claves_ordenadas):
-        if a in DEGRADAR_A_TEMA_COYUNTURAL:
-            # NO se deja fusionar hacia arriba: si "mundial" se fusionara con
-            # una racha más larga y genuinamente propia que la contiene (ej.
-            # "Clásico Mundial de Béisbol") y esa racha SÍ califica como
-            # entidad, el voto por mayoría de tipo_final la reclasificaría de
-            # vuelta a "entidad" -- justo lo que este término debía evitar.
-            continue
-        palabras_a = set(a.split())
-        for b in claves_ordenadas[idx + 1:]:
-            if a == b or len(a) >= len(b):
-                continue
-            palabras_b = b.split()
-            if not all(pa in palabras_b for pa in palabras_a):
-                continue  # a no es subcadena de PALABRAS completas de b
-            rutas_a, rutas_b = grupos[a]["rutas"], grupos[b]["rutas"]
-            solape = len(rutas_a & rutas_b) / max(1, min(len(rutas_a), len(rutas_b)))
-            if solape >= MIN_NOTAS_FUSION_OVERLAP:
-                union(a, b)
-
+    mapa_fusion = construir_mapa_fusion(grupos)
     fusionados = defaultdict(lambda: {"formas": defaultdict(int), "tipo": defaultdict(int), "rutas": set()})
-    for k in claves:
-        raiz = find(k)
-        fusionados[raiz]["rutas"] |= grupos[k]["rutas"]
-        for f, c in grupos[k]["formas"].items():
+    for k, g in grupos.items():
+        raiz = mapa_fusion[k]
+        fusionados[raiz]["rutas"] |= g["rutas"]
+        for f, c in g["formas"].items():
             fusionados[raiz]["formas"][f] += c
-        for t, c in grupos[k]["tipo"].items():
+        for t, c in g["tipo"].items():
             fusionados[raiz]["tipo"][t] += c
 
     filas = []

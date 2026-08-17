@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 .DS_Store
+.env
 *.png
 !assets/**/*.png
 !assets/**/*.jpg
