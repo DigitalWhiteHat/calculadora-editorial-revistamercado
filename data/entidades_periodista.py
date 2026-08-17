@@ -132,10 +132,61 @@ MIN_NOTAS_PARA_EVALUAR_EVENTO_CONCLUIDO = 5
 # la última nota es una señal válida aunque el grupo sea chico).
 UMBRAL_DIAS_SIN_NOTA_NUEVA = 45
 
+# Tercera señal -- pedido de Edwin, 17-ago-2026, viendo "Ganar la Copa del
+# Mundo" seguir como "le rinde" en varios perfiles de economistas. Ni el % ni
+# los días-sin-nota-nueva atrapan un evento de este tamaño: el Mundial 2026
+# cerró el 19-jul-2026, pero el portal siguió publicando cierres/resúmenes
+# hasta el 10-ago (real, verificado en mapa_autor_ruta.csv) -- 22 días de
+# "silencio" no es suficiente para cruzar el umbral de 45. Edwin sugirió
+# cruzar con impresiones de Search Console para "entender las entidades" --
+# se revisó (data/raw_historico/sc_consolidado_2026-08-16.csv, ventana móvil
+# 10-jul a 13-ago): la nota "quién ganará la copa del mundo" de Andrea seguía
+# con 613K impresiones reales de Search en esa ventana, más que casi
+# cualquier otro contenido del sitio. Las impresiones NO sirven de señal acá
+# -- el tráfico residual de un evento grande que ya cerró se queda alto
+# semanas después (la gente sigue buscando "quién ganó" en retrospectiva),
+# así que "sigue generando impresiones reales" no es lo mismo que "sigue
+# siendo un beat vigente para seguir produciendo nota nueva". La única señal
+# que sí distingue esto es la fecha real del evento -- no se puede inferir
+# de los datos del proyecto, hay que saberla y declararla a mano. Por eso
+# esta lista es corta y curada a propósito, no un intento de cubrir todo por
+# fórmula: cada entrada se agrega cuando aparece un caso real confirmado
+# (mismo patrón que "Clásico Mundial de Béisbol" arriba, ahora explícito).
+EVENTOS_CONCLUIDOS_CONOCIDOS = {
+    "mundial": "2026-07-19",           # Mundial 2026 (fútbol) -- final 19-jul-2026
+    "copa del mundo": "2026-07-19",
+    "copa del mundial": "2026-07-19",  # variante de extracción, mismo evento
+    "mundial de futbol": "2026-07-19",
+    "mundial de clubes": "2026-07-19",
+}
+GRACIA_POST_EVENTO_DIAS = 21  # cobertura real de cierre/resumen post-evento, no señal de que sigue vigente
+
 MIN_RATIO_PROPIO = 0.70
 MIN_NOTAS_FUSION_OVERLAP = 0.80
 MIN_NOTAS_CANDIDATO = 2  # 1 sola nota no es un patrón, se descarta directo
 MAX_PCT_BOILERPLATE = 0.50
+
+
+def _fin_evento_conocido(raiz_normalizada: str) -> str | None:
+    """Devuelve la fecha de fin (str) si `raiz_normalizada` coincide con un
+    evento de EVENTOS_CONCLUIDOS_CONOCIDOS. Las entradas de UNA sola palabra
+    ("mundial") exigen coincidencia EXACTA de toda la raíz -- si fuera por
+    palabra suelta, "Banco Mundial"/"récord mundial"/"a nivel mundial"
+    (usos genéricos del adjetivo, nada que ver con el torneo) también
+    calificarían. Las entradas de VARIAS palabras ("copa del mundo") sí
+    matchean por subconjunto de palabras, para atrapar variantes como
+    "segunda copa del mundo" o "inglaterra copa del mundo"."""
+    palabras_raiz = set(raiz_normalizada.split())
+    mejor = None
+    for evento, fecha_fin in EVENTOS_CONCLUIDOS_CONOCIDOS.items():
+        palabras_evento = evento.split()
+        if len(palabras_evento) == 1:
+            coincide = raiz_normalizada == evento
+        else:
+            coincide = all(p in palabras_raiz for p in palabras_evento)
+        if coincide and (mejor is None or len(palabras_evento) > len(mejor[1].split())):
+            mejor = (fecha_fin, evento)
+    return mejor[0] if mejor else None
 
 
 def normalizar(s: str) -> str:
@@ -352,13 +403,20 @@ def procesar_autor(df_autor: pd.DataFrame, stats_globales: dict[str, float],
             and pct_recientes is not None
             and pct_recientes < UMBRAL_NOTAS_RECIENTES_EVENTO_CONCLUIDO
         )
-        if len(fechas_grupo) and fecha_corte_reciente is not None:
-            hoy = fecha_corte_reciente + pd.Timedelta(days=VENTANA_RECIENTE_DIAS)
+        hoy = (fecha_corte_reciente + pd.Timedelta(days=VENTANA_RECIENTE_DIAS)
+               if fecha_corte_reciente is not None else None)
+        if len(fechas_grupo) and hoy is not None:
             dias_desde_ultima = (hoy - fechas_grupo.max()).days
         else:
             dias_desde_ultima = None
         concluido_por_silencio = bool(dias_desde_ultima is not None and dias_desde_ultima > UMBRAL_DIAS_SIN_NOTA_NUEVA)
-        es_evento_concluido = concluido_por_volumen or concluido_por_silencio
+
+        fin_conocido = _fin_evento_conocido(raiz)
+        concluido_por_evento_conocido = bool(
+            fin_conocido is not None and hoy is not None
+            and hoy > pd.Timestamp(fin_conocido) + pd.Timedelta(days=GRACIA_POST_EVENTO_DIAS)
+        )
+        es_evento_concluido = concluido_por_volumen or concluido_por_silencio or concluido_por_evento_conocido
 
         filas.append({"forma": forma_final, "tipo": tipo_final, "notas": n_notas,
                       "pct_del_periodista": round(100 * n_notas / total_notas, 1),
