@@ -156,7 +156,16 @@ def _cargar_impresiones_portal_por_ruta_mes() -> pd.DataFrame:
     hist = hist[["ruta", "mes", "impresiones_search"]].copy()
     hist["mes"] = "2026-" + hist["mes"].astype(int).astype(str).str.zfill(2)
 
-    actual = cargar_gsc()[["ruta", "impresiones_search"]].copy()
+    # cargar_gsc(mes) ahora prorratea por el mes real -- bug real encontrado
+    # 2026-08-17 al re-correr este script tras el fix de ventana móvil
+    # (construir_notas_mes_actual.py, mismo día): cargar_gsc() pasó a exigir
+    # `mes` y este script lo llamaba sin argumentos. El prorrateo es
+    # irrelevante aquí (mismo factor para toda la ventana "actual", así que
+    # se cancela en la razón demanda_reciente_ratio), pero el mes real hace
+    # falta para que la función no truene.
+    archivos_parcial = sorted(glob.glob(str(DIR / "notas_????-??.csv")))
+    mes_parcial_real = Path(archivos_parcial[-1]).stem.replace("notas_", "") if archivos_parcial else "2026-08"
+    actual = cargar_gsc(mes_parcial_real)[["ruta", "impresiones_search"]].copy()
     actual["mes"] = MES_VENTANA_ACTUAL
 
     todas = pd.concat([julio, hist, actual], ignore_index=True)

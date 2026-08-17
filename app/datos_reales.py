@@ -921,6 +921,14 @@ def _trafico_por_entidad(autor_original: str) -> pd.DataFrame:
     df["trafico"] = df["rutas"].apply(
         lambda rutas_str: float(vistas.reindex(str(rutas_str).split("|")).fillna(0).sum()))
     df["trafico_por_nota"] = (df["trafico"] / df["notas"]).round(0)
+    # Eventos ya CONCLUIDOS (ej. "clásico mundial" -- terminó en marzo, no
+    # queda más torneo que cubrir) no son una señal útil de "le rinde/no le
+    # rinde": ni premian ni penalizan al periodista por algo que ya no existe
+    # como oportunidad futura. Ver data/entidades_periodista.py:
+    # es_evento_concluido (marzo 2026, pedido de Edwin: "como le pones a Elba
+    # clásico mundial si fue a inicio de año, ya no hay clásico mundial").
+    if "es_evento_concluido" in df.columns:
+        df = df[~df["es_evento_concluido"].fillna(False)]
     return df
 
 

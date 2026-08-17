@@ -91,6 +91,28 @@ EXCLUIR_ENTIDADES_SITIO = {"republica dominicana", "rd"}
 # periodista, solo que no es una entidad en el sentido estricto de E-E-A-T.
 DEGRADAR_A_TEMA_COYUNTURAL = {"mundial"}
 
+# EVENTO CONCLUIDO -- pedido de Edwin, 17-ago-2026, viendo "clásico mundial"
+# en "le rinde" de Elba con 39K de tráfico total: "como le pones a Elba
+# clásico mundial si fue a inicio de año, ya no hay clásico mundial" -- el
+# guard de arriba (DEGRADAR_A_TEMA_COYUNTURAL) solo degrada el TIPO
+# (entidad->tema) por nombre exacto ("mundial"), no detecta que un evento
+# YA TERMINÓ y no vale como señal de "beat" a seguir asignando. La palabra
+# "mundial" tampoco cubre "Clásico Mundial de Béisbol" (evento DISTINTO).
+#
+# Señal real y verificada (no una lista de palabras, que nunca cubre todos
+# los casos): "Clásico Mundial de Béisbol" tuvo 24 de sus 26 notas
+# publicadas en una ventana de 10 días en marzo, y solo 1.6% de su tráfico
+# TOTAL cayó en jul+ago -- comparado con "precio del dólar" (evergreen real,
+# republicado con URL nueva cada día): 36% de sus notas se publicaron en
+# jul+ago, aunque su tráfico reciente también se ve bajo en proporción
+# (natural: un artículo de dólar de enero ya no genera clics, pero eso NO
+# significa que el TEMA murió, solo que ESA nota puntual sí). La señal que
+# sí distingue ambos casos es "¿siguen publicando notas NUEVAS sobre esto?"
+# -- eso es lo que mide pct_notas_recientes, no el tráfico.
+VENTANA_RECIENTE_DIAS = 60
+UMBRAL_NOTAS_RECIENTES_EVENTO_CONCLUIDO = 0.15
+MIN_NOTAS_PARA_EVALUAR_EVENTO_CONCLUIDO = 5
+
 MIN_RATIO_PROPIO = 0.70
 MIN_NOTAS_FUSION_OVERLAP = 0.80
 MIN_NOTAS_CANDIDATO = 2  # 1 sola nota no es un patrón, se descarta directo
@@ -212,17 +234,32 @@ def construir_mapa_fusion(grupos: dict) -> dict:
             if not all(pa in palabras_b for pa in palabras_a):
                 continue  # a no es subcadena de PALABRAS completas de b
             rutas_a, rutas_b = grupos[a]["rutas"], grupos[b]["rutas"]
-            solape = len(rutas_a & rutas_b) / max(1, min(len(rutas_a), len(rutas_b)))
+            # BUG real encontrado 2026-08-17 (Edwin, viendo "terremoto de
+            # Venezuela" mezclado dentro de "clásico mundial" de Elba):
+            # dividir por el MÍNIMO de los dos grupos es casi siempre 100%
+            # cuando `a` es una sub-frase de `b` -- toda nota que menciona
+            # "terremoto de Venezuela" también extrae "Venezuela" suelto, así
+            # que "Venezuela" (hub genérico, 12 notas de temas distintos:
+            # béisbol Y terremoto) fusionaba con CUALQUIER frase más larga
+            # que la contuviera, sin importar que fueran temas no
+            # relacionados. Jaccard (intersección / unión) exige que AMBOS
+            # grupos se solapen casi por completo, no solo que uno sea
+            # subconjunto del otro -- así "Venezuela" (12 notas de varios
+            # temas) no fusiona con "terremoto de Venezuela" (5 notas, un
+            # tema) aunque las 5 estén incluidas en las 12.
+            solape = len(rutas_a & rutas_b) / max(1, len(rutas_a | rutas_b))
             if solape >= MIN_NOTAS_FUSION_OVERLAP:
                 union(a, b)
 
     return {k: find(k) for k in claves}
 
 
-def procesar_autor(df_autor: pd.DataFrame, stats_globales: dict[str, float]) -> pd.DataFrame:
+def procesar_autor(df_autor: pd.DataFrame, stats_globales: dict[str, float],
+                    fecha_corte_reciente=None) -> pd.DataFrame:
     total_notas = len(df_autor)
     candidatos = []  # (forma_original, tipo, ruta)
     normalizadas_por_ruta = {}
+    fecha_por_ruta = pd.to_datetime(df_autor.set_index("ruta")["fecha"], errors="coerce", utc=True).dt.tz_localize(None)
 
     for _, row in df_autor.iterrows():
         titulo = row["titulo"]
@@ -285,12 +322,25 @@ def procesar_autor(df_autor: pd.DataFrame, stats_globales: dict[str, float]) -> 
             continue
         tipo_final = "entidad" if g["tipo"].get("entidad", 0) > 0 else "tema"
         forma_final = max(g["formas"].items(), key=lambda kv: (kv[1], len(kv[0])))[0]
+
+        fechas_grupo = fecha_por_ruta.reindex(g["rutas"]).dropna()
+        if len(fechas_grupo) and fecha_corte_reciente is not None:
+            pct_recientes = (fechas_grupo >= fecha_corte_reciente).mean()
+        else:
+            pct_recientes = None
+        es_evento_concluido = bool(
+            n_notas >= MIN_NOTAS_PARA_EVALUAR_EVENTO_CONCLUIDO
+            and pct_recientes is not None
+            and pct_recientes < UMBRAL_NOTAS_RECIENTES_EVENTO_CONCLUIDO
+        )
+
         filas.append({"forma": forma_final, "tipo": tipo_final, "notas": n_notas,
                       "pct_del_periodista": round(100 * n_notas / total_notas, 1),
-                      "rutas": "|".join(sorted(g["rutas"]))})
+                      "rutas": "|".join(sorted(g["rutas"])),
+                      "es_evento_concluido": es_evento_concluido})
 
     if not filas:
-        return pd.DataFrame(columns=["forma", "tipo", "notas", "pct_del_periodista", "rutas"])
+        return pd.DataFrame(columns=["forma", "tipo", "notas", "pct_del_periodista", "rutas", "es_evento_concluido"])
     return pd.DataFrame(filas).sort_values("notas", ascending=False)
 
 
@@ -309,9 +359,13 @@ def main():
     stats = construir_estadisticas_propios(mapa["titulo"].dropna().tolist())
     print(f"Palabras con estadística de mayúscula calculada: {len(stats)}")
 
+    # Corte real (hoy - 60 días) para detectar entidades/temas de un evento ya
+    # CONCLUIDO -- ver VENTANA_RECIENTE_DIAS arriba.
+    fecha_corte_reciente = pd.Timestamp.now().normalize() - pd.Timedelta(days=VENTANA_RECIENTE_DIAS)
+
     resultados = []
     for autor, df_autor in mapa.groupby("autor"):
-        r = procesar_autor(df_autor, stats)
+        r = procesar_autor(df_autor, stats, fecha_corte_reciente)
         if r.empty:
             continue
         r.insert(0, "autor", autor)

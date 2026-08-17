@@ -1,70 +1,267 @@
 entidad,tipo,trafico_actual,trafico_anterior,pct_cambio,paginas_actual,paginas_anterior
-avenida luperón,entidad,14.0,898.0,-98.44097995545657,2.0,2.0
-mundial sedes países,tema,73.0,4241.0,-98.27870785192172,2.0,2.0
-hora y dónde ver,tema,40.0,1840.0,-97.82608695652173,2.0,2.0
-monorriel de santo,tema,172.0,4082.0,-95.78637922586967,9.0,9.0
-precio del petróleo,tema,31.0,701.0,-95.57774607703281,3.0,3.0
-novedades y precio,tema,26.0,549.0,-95.26411657559198,2.0,2.0
-Mundial,tema,2083.0,38362.0,-94.57014754183828,129.0,129.0
-balón de oro,entidad,313.0,5278.0,-94.06972338006821,3.0,3.0
-Plaza de la Bandera,entidad,28.0,449.0,-93.76391982182628,6.0,6.0
-JCE,entidad,84.0,1244.0,-93.2475884244373,3.0,3.0
-precio en república dominicana,tema,137.0,1651.0,-91.70199878861297,2.0,2.0
-Equifax,entidad,35.0,342.0,-89.76608187134502,2.0,2.0
-diseñó la ceremonia inaugural,tema,77.0,655.0,-88.2442748091603,2.0,2.0
-inaugural de los juegos,tema,77.0,655.0,-88.2442748091603,2.0,2.0
-ingresos y pérdidas multiplicadas,tema,61.0,514.0,-88.13229571984436,2.0,2.0
-cédula en república dominicana,tema,199.0,1335.0,-85.09363295880149,4.0,4.0
-calendario de los juegos,tema,291.0,1639.0,-82.24527150701647,2.0,2.0
-samsung galaxy,entidad,214.0,1188.0,-81.98653198653199,4.0,4.0
-construcción del monorriel,tema,81.0,414.0,-80.43478260869566,2.0,2.0
-TikTok,entidad,135.0,573.0,-76.43979057591623,5.0,5.0
-calendario lunar,tema,293.0,966.0,-69.66873706004141,6.0,6.0
-Bonarelli,entidad,139.0,401.0,-65.33665835411472,3.0,3.0
-república dominicana enfrenta alto,tema,1073.0,2693.0,-60.15595989602674,2.0,2.0
-ley de residuos,tema,463.0,1106.0,-58.1374321880651,2.0,2.0
-documentos necesitas,entidad,391.0,865.0,-54.797687861271676,5.0,5.0
-lujo más valiosas,tema,494.0,978.0,-49.488752556237216,3.0,3.0
-marcas de lujo,tema,516.0,984.0,-47.5609756097561,6.0,6.0
-García,entidad,255.0,470.0,-45.744680851063826,2.0,2.0
-reforma fiscal,tema,637.0,1092.0,-41.666666666666664,5.0,5.0
-resultados de las loterías,tema,13563.0,21905.0,-38.08262953663547,32.0,32.0
-not set,tema,317.0,506.0,-37.351778656126484,29.0,29.0
-países más ricos,tema,344.0,521.0,-33.97312859884837,6.0,6.0
-precio del dólar,tema,1614.0,2346.0,-31.202046035805626,43.0,43.0
-dólar hoy en república,tema,1598.0,2319.0,-31.090987494609745,38.0,38.0
-fuertes y débiles,tema,559.0,806.0,-30.64516129032258,2.0,2.0
-monedas más fuertes,tema,585.0,831.0,-29.6028880866426,2.0,2.0
-Comparativa,entidad,365.0,516.0,-29.26356589147287,3.0,3.0
-países más endeudados,tema,436.0,599.0,-27.21202003338898,2.0,2.0
-FMI en Latinoamérica,entidad,436.0,599.0,-27.21202003338898,2.0,2.0
-países más caros,tema,404.0,552.0,-26.81159420289855,2.0,2.0
-US,entidad,1587.0,2056.0,-22.811284046692606,72.0,72.0
-domingo,entidad,369.0,462.0,-20.12987012987013,10.0,10.0
-países con la gasolina,tema,266.0,325.0,-18.153846153846153,4.0,4.0
-dominicanos pueden viajar,tema,510.0,617.0,-17.3419773095624,2.0,2.0
-lotería nacional,tema,1324.0,1576.0,-15.98984771573604,47.0,47.0
-lotería quiniela real,entidad,2954.0,3471.0,-14.894842984730625,44.0,44.0
-altos del mundo,tema,304.0,342.0,-11.11111111111111,3.0,3.0
-viajar sin visa,tema,2067.0,2300.0,-10.130434782608695,3.0,3.0
-vivir en república dominicana,tema,434.0,480.0,-9.583333333333334,4.0,4.0
-ranking de los países,tema,611.0,640.0,-4.53125,5.0,5.0
-crédito más exclusivas,tema,678.0,699.0,-3.004291845493562,2.0,2.0
-requisitos y costos,tema,310.0,301.0,2.990033222591362,2.0,2.0
-ciudades más peligrosas,tema,346.0,327.0,5.81039755351682,2.0,2.0
-tarjetas de crédito,tema,1100.0,991.0,10.99899091826438,9.0,9.0
-república dominicana en santo,entidad,1035.0,832.0,24.39903846153846,3.0,3.0
-gasolina más cara,tema,414.0,325.0,27.384615384615383,6.0,6.0
-resultados de la lotería,tema,7326.0,5318.0,37.75855584806318,99.0,99.0
-Leidsa,entidad,24688.0,17822.0,38.52541802266861,30.0,30.0
-EE UU,entidad,1498.0,879.0,70.42093287827076,56.0,56.0
-recibirán por cada medalla,tema,1020.0,595.0,71.42857142857143,2.0,2.0
-cuánto recibirán,tema,1020.0,595.0,71.42857142857143,2.0,2.0
-medalla en santo,tema,1020.0,595.0,71.42857142857143,2.0,2.0
-IA,entidad,1911.0,1003.0,90.5284147557328,57.0,57.0
-Luna,entidad,750.0,390.0,92.3076923076923,10.0,10.0
-Brasil Lula,entidad,940.0,338.0,178.10650887573965,3.0,3.0
-Android,entidad,1835.0,654.0,180.58103975535167,11.0,11.0
-medallas en santo,tema,1612.0,382.0,321.9895287958115,6.0,6.0
-Uber,entidad,2343.0,526.0,345.43726235741445,4.0,4.0
-RD en Santo Domingo,entidad,7632.0,728.0,948.3516483516484,4.0,4.0
+cuánto dinero gana,tema,6,2413,-99.75134687111479,3,3
+autoshow visión emprendedora revista,tema,6,936,-99.35897435897436,2,2
+Inglaterra,entidad,13,964,-98.65145228215768,4,4
+avenida luperón,entidad,14,898,-98.44097995545657,2,2
+gerard piqué,entidad,25,1585,-98.42271293375394,2,2
+medio tiempo,tema,11,695,-98.41726618705036,4,4
+final del mundial,tema,85,5291,-98.39349839349839,21,21
+mundial sedes países,tema,73,4241,-98.27870785192172,2,2
+AutoShow,entidad,6,331,-98.18731117824774,3,3
+españa campeona del mundial,tema,21,1093,-98.0786825251601,4,4
+apuestas revista mercado,tema,8,415,-98.07228915662651,2,2
+mundial cuánto,tema,6,311,-98.07073954983923,2,2
+puerto plata,tema,103,5334,-98.06899137607799,4,4
+Francia,entidad,116,5810,-98.00344234079174,7,7
+hora y dónde ver,tema,40,1840,-97.82608695652173,2,2
+Argentina,entidad,201,8827,-97.72289566103998,22,22
+rey carlos iii,entidad,10,438,-97.71689497716895,3,3
+trump revista,entidad,10,351,-97.15099715099716,5,5
+Tierra,entidad,119,4153,-97.1346014928967,5,5
+transporte público,tema,24,689,-96.5166908563135,5,5
+dominicana está,tema,26,665,-96.09022556390977,2,2
+monorriel de santo,tema,172,4082,-95.78637922586967,9,9
+precio del petróleo,tema,31,701,-95.57774607703281,3,3
+Copa,entidad,67,1493,-95.5123911587408,8,8
+novedades y precio,tema,26,549,-95.26411657559198,2,2
+Argentina Revista Mercado,entidad,31,627,-95.05582137161085,2,2
+España,entidad,994,18977,-94.76208041313168,27,27
+Mundial,tema,2083,38362,-94.57014754183828,129,129
+crisis energética revista mercado,tema,40,707,-94.34229137199434,2,2
+copa del mundo,tema,61,1008,-93.9484126984127,8,8
+crisis económica,tema,25,407,-93.85749385749386,2,2
+Plaza de la Bandera,entidad,28,449,-93.76391982182628,6,6
+crisis energética,tema,46,712,-93.53932584269663,4,4
+dominicana como,tema,23,355,-93.52112676056338,3,3
+república dominicana como,tema,23,355,-93.52112676056338,2,2
+JCE,entidad,84,1244,-93.2475884244373,3,3
+Shakira,entidad,52,686,-92.4198250728863,11,11
+balón de oro,tema,288,3706,-92.2288181327577,2,2
+precio en república dominicana,tema,137,1651,-91.70199878861297,2,2
+estados unidos anuncia aranceles,tema,77,912,-91.55701754385964,2,2
+Apple Revista Mercado,entidad,760,8429,-90.98350931308578,4,4
+delivery en américa latina,tema,92,997,-90.77231695085256,2,2
+mercado del delivery,tema,92,997,-90.77231695085256,2,2
+Odisea,entidad,253,2603,-90.28044563964656,3,3
+Equifax,entidad,35,342,-89.76608187134502,2,2
+años de historia,tema,40,361,-88.9196675900277,2,2
+tiene escena postcréditos,tema,289,2486,-88.37489943684633,2,2
+diseñó la ceremonia inaugural,tema,77,655,-88.2442748091603,2,2
+inaugural de los juegos,tema,77,655,-88.2442748091603,2,2
+ingresos y pérdidas multiplicadas,tema,61,514,-88.13229571984436,2,2
+uber más de ingresos,tema,61,514,-88.13229571984436,2,2
+tiene escena,tema,296,2486,-88.09332260659694,3,3
+Avengers Doomsday,entidad,47,393,-88.04071246819339,4,4
+FIFA,entidad,1721,13019,-86.78085874491128,20,20
+under año,tema,48,355,-86.47887323943662,3,3
+cuánto dinero ganó,tema,76,543,-86.0036832412523,2,2
+mundial fecha,tema,96,683,-85.94436310395315,3,3
+apple cambiaría,tema,106,751,-85.88548601864181,2,2
+Juegos Centroamericanos y del Caribe,entidad,209,1459,-85.67511994516792,3,3
+Éxitos,entidad,48,335,-85.67164179104478,3,3
+cédula en república dominicana,tema,199,1335,-85.09363295880149,4,4
+under año éxitos,tema,48,319,-84.95297805642633,2,2
+samsung galaxy,entidad,194,1158,-83.24697754749569,3,3
+calendario de los juegos,tema,291,1639,-82.24527150701647,2,2
+paso revista mercado,tema,61,337,-81.89910979228486,3,3
+paso a paso revista,tema,61,331,-81.57099697885197,2,2
+pruebas nacionales,tema,64,331,-80.66465256797584,3,3
+construcción del monorriel,tema,81,414,-80.43478260869566,2,2
+reforma policial,tema,181,904,-79.97787610619469,5,5
+terremoto en venezuela,tema,323,1597,-79.77457733249844,10,10
+María,entidad,158,754,-79.04509283819628,2,2
+México,entidad,117,551,-78.76588021778585,7,7
+emprendedora revista,entidad,378,1755,-78.46153846153847,16,16
+centroamericanos y del caribe,tema,388,1715,-77.37609329446065,9,9
+rones premium del mundo,tema,134,588,-77.21088435374149,2,2
+ganando las elecciones,tema,172,748,-77.00534759358288,4,4
+TikTok,entidad,135,573,-76.43979057591623,5,5
+fin de semana,tema,119,487,-75.564681724846,7,7
+emprendimiento revista mercado,tema,133,535,-75.14018691588785,2,2
+new suscribe,entidad,113,454,-75.1101321585903,2,2
+nuevas funciones,tema,81,325,-75.07692307692308,2,2
+cambios trae,tema,154,554,-72.20216606498195,2,2
+Nacionales,entidad,94,335,-71.94029850746269,4,4
+visión emprendedora,tema,613,2140,-71.35514018691589,21,21
+Ormuz,entidad,100,346,-71.09826589595376,13,13
+antes del mundial,tema,1026,3534,-70.96774193548387,2,2
+Venezuela,entidad,816,2800,-70.85714285714286,40,40
+mundial revista,entidad,1443,4886,-70.46663937781416,28,28
+cuánto gana,tema,1090,3668,-70.2835332606325,4,4
+cuánto dinero,tema,1038,3479,-70.16384018396091,17,17
+Mercado AutoShow,entidad,174,583,-70.15437392795883,6,6
+Madrid,entidad,162,535,-69.7196261682243,5,5
+calendario lunar,tema,293,966,-69.66873706004141,6,6
+dominicana,entidad,357,1045,-65.83732057416267,31,31
+Bonarelli,entidad,139,401,-65.33665835411472,3,3
+Gianni Infantino,entidad,1699,4835,-64.86039296794209,9,9
+NASA,entidad,430,1215,-64.60905349794238,11,11
+Brasil,entidad,390,1036,-62.35521235521235,11,11
+filtración del iphone pro,tema,144,363,-60.33057851239669,2,2
+república dominicana enfrenta alto,tema,1073,2693,-60.15595989602674,2,2
+ley de residuos,tema,463,1106,-58.1374321880651,2,2
+Reino Unido,entidad,172,402,-57.21393034825871,6,6
+valiosas en revista mercado,tema,387,872,-55.61926605504587,2,2
+Hollywood,entidad,230,506,-54.54545454545455,5,5
+digital revista mercado,tema,559,1176,-52.465986394557824,13,13
+Trump,entidad,357,727,-50.89408528198074,27,27
+Abinader,entidad,437,889,-50.843644544431946,16,16
+Under,entidad,270,546,-50.54945054945055,12,12
+destruccion revista mercado,tema,211,426,-50.46948356807512,2,2
+lujo más valiosas,tema,494,978,-49.488752556237216,3,3
+marcas de lujo,tema,516,984,-47.5609756097561,6,6
+García,entidad,255,470,-45.744680851063826,2,2
+fifa revista,entidad,192,352,-45.45454545454545,6,6
+documentos necesitas,tema,379,684,-44.590643274853804,3,3
+Japón,entidad,336,598,-43.812709030100336,13,13
+Estados Unidos,entidad,1165,2051,-43.198439785470505,42,42
+requisitos revista mercado,tema,387,675,-42.666666666666664,2,2
+Punta Cana,entidad,690,1201,-42.547876769358865,17,17
+per cápita,tema,312,537,-41.899441340782126,5,5
+reforma fiscal,tema,637,1092,-41.666666666666664,5,5
+ranking países,tema,245,419,-41.527446300715994,6,6
+América Latina Revista Mercado,entidad,887,1506,-41.102257636122175,17,17
+not found revista mercado,entidad,556,933,-40.40728831725616,28,28
+lotería números ganadores,tema,339,562,-39.679715302491104,6,6
+está apareciendo,tema,213,353,-39.6600566572238,2,2
+dominicana revista,entidad,19029,31063,-38.74062389337797,105,105
+resultados de las loterías,tema,13563,21905,-38.08262953663547,32,32
+empresas más admiradas,tema,339,545,-37.79816513761468,18,18
+not set,tema,317,506,-37.351778656126484,29,29
+caribe revista,entidad,539,857,-37.106184364060674,18,18
+cápita en revista mercado,tema,270,426,-36.61971830985915,2,2
+iphone pro max,entidad,10032,15553,-35.49797466726677,10,10
+Latinoamérica Revista Mercado,entidad,379,580,-34.6551724137931,28,28
+países más ricos,tema,344,521,-33.97312859884837,6,6
+mercado,entidad,2674,3991,-32.99924830869456,55,55
+Apple,entidad,6227,9250,-32.68108108108108,31,31
+juegos centroamericanos hora,tema,1243,1840,-32.44565217391305,2,2
+precio del dólar,tema,1614,2346,-31.202046035805626,43,43
+dólar hoy en república,tema,1598,2319,-31.090987494609745,38,38
+Ucrania,entidad,289,417,-30.695443645083934,9,9
+fuertes y débiles,tema,559,806,-30.64516129032258,2,2
+real,entidad,390,558,-30.107526881720432,6,6
+monedas más fuertes,tema,585,831,-29.6028880866426,2,2
+Comparativa,entidad,365,516,-29.26356589147287,3,3
+ricos de latinoamérica,tema,398,556,-28.41726618705036,5,5
+países más endeudados,tema,436,599,-27.21202003338898,2,2
+FMI en Latinoamérica,entidad,436,599,-27.21202003338898,2,2
+vivir en américa latina,tema,270,370,-27.027027027027028,2,2
+caros para vivir,tema,404,552,-26.81159420289855,2,2
+países más caros,tema,404,552,-26.81159420289855,2,2
+mejores hoteles,tema,239,322,-25.77639751552795,8,8
+casa revista mercado,tema,462,609,-24.137931034482758,3,3
+US,entidad,1587,2056,-22.811284046692606,72,72
+salud revista mercado,tema,272,348,-21.839080459770116,6,6
+tus conversaciones de whatsapp,tema,840,1066,-21.20075046904315,2,2
+tus conversaciones,tema,884,1110,-20.36036036036036,3,3
+domingo,entidad,369,462,-20.12987012987013,10,10
+Latinoamérica,entidad,2388,2949,-19.023397761953206,51,51
+república dominicana salarios,tema,269,331,-18.731117824773413,2,2
+países con la gasolina,tema,266,325,-18.153846153846153,4,4
+república dominicana en revista,entidad,323,394,-18.02030456852792,5,5
+visa en revista mercado,tema,510,617,-17.3419773095624,2,2
+dominicanos pueden viajar,tema,510,617,-17.3419773095624,2,2
+dominicana en revista,entidad,336,403,-16.62531017369727,7,7
+Coca Cola,entidad,757,906,-16.445916114790286,10,10
+Juegos Centroamericanos,entidad,8640,10321,-16.287181474663306,30,30
+lotería nacional,tema,1324,1576,-15.98984771573604,47,47
+terremoto de venezuela,tema,274,325,-15.692307692307692,5,5
+IA Revista Mercado,entidad,270,319,-15.360501567398119,22,22
+lotería quiniela real,entidad,2954,3471,-14.894842984730625,44,44
+andrea mercedes archives,entidad,332,390,-14.871794871794872,6,6
+Niño,entidad,311,362,-14.088397790055248,13,13
+whatsapp revista,entidad,1310,1517,-13.645352669742914,8,8
+seguridad revista mercado,tema,343,395,-13.164556962025317,3,3
+China,entidad,711,804,-11.567164179104477,27,27
+PIB,entidad,538,606,-11.221122112211221,10,10
+altos del mundo,tema,304,342,-11.11111111111111,3,3
+Trabajar,entidad,393,442,-11.085972850678733,17,17
+mejores restaurantes en santo,tema,363,408,-11.029411764705882,2,2
+global revista mercado,tema,445,499,-10.821643286573146,12,12
+viajar sin visa,tema,2067,2300,-10.130434782608695,3,3
+ranking los países,tema,895,993,-9.86908358509567,8,8
+vivir en república dominicana,tema,434,480,-9.583333333333334,4,4
+inteligencia artificial,tema,916,1006,-8.946322067594433,39,39
+York,entidad,407,446,-8.74439461883408,10,10
+Latinoamérica en Revista Mercado,entidad,717,775,-7.483870967741935,13,13
+valiosas del mundo,tema,436,468,-6.837606837606837,14,14
+mejores empresas para trabajar,tema,1110,1189,-6.644238856181666,42,42
+Código,entidad,3849,4068,-5.383480825958702,5,5
+ranking de los países,tema,611,640,-4.53125,5,5
+fútbol globalizado revista mercado,tema,476,498,-4.417670682730924,2,2
+exclusivas del mundo,tema,717,747,-4.016064257028113,4,4
+mercado newsletter,tema,536,557,-3.770197486535009,2,2
+Europa,entidad,396,411,-3.6496350364963503,14,14
+lista completa,tema,3850,3979,-3.2420206081930134,3,3
+crédito más exclusivas,tema,678,699,-3.004291845493562,2,2
+código postal,tema,3822,3922,-2.5497195308516063,2,2
+Caribe,entidad,795,809,-1.73053152039555,7,7
+mejores restaurantes,tema,676,681,-0.7342143906020558,8,8
+mundo en revista mercado,tema,820,809,1.3597033374536465,25,25
+ranking revista mercado,tema,802,788,1.7766497461928934,11,11
+requisitos y costos,tema,310,301,2.990033222591362,2,2
+países donde,tema,529,513,3.1189083820662766,10,10
+Rankings,entidad,356,341,4.39882697947214,2,2
+ciudades más peligrosas,tema,346,327,5.81039755351682,2,2
+mundo revista mercado,tema,2964,2791,6.198495163024006,52,52
+whatsapp sin dejar,tema,629,582,8.075601374570446,2,2
+tripadvisor revista,entidad,371,340,9.117647058823529,7,7
+mercado laboral,tema,333,304,9.539473684210526,11,11
+América Latina,entidad,6706,6114,9.682695453058555,94,94
+globales revista mercado,tema,384,347,10.662824207492795,4,4
+Daily News Archives Revista Mercado,entidad,369,330,11.818181818181818,2,2
+tarjetas de crédito,tema,1012,904,11.946902654867257,6,6
+mercado events,entidad,346,307,12.703583061889251,4,4
+Rusia,entidad,410,355,15.492957746478874,8,8
+ranking global,tema,509,440,15.681818181818182,7,7
+mejores películas,tema,469,404,16.08910891089109,4,4
+imdb revista,entidad,395,337,17.2106824925816,2,2
+bloquearon en whatsapp,tema,2738,2318,18.1190681622088,2,2
+Summit,entidad,552,444,24.324324324324323,10,10
+república dominicana en santo,tema,1035,832,24.39903846153846,3,3
+WhatsApp,entidad,10625,8501,24.98529584754735,62,62
+iphone pro,tema,22877,18219,25.566716065645753,37,37
+gasolina más cara,tema,414,325,27.384615384615383,6,6
+Quiniela Real del domingo,entidad,844,660,27.87878787878788,10,10
+Messi,entidad,903,685,31.824817518248175,9,9
+cuánto cuesta,tema,611,445,37.30337078651685,10,10
+región norte,tema,754,549,37.34061930783242,21,21
+resultados de la lotería,tema,7326,5318,37.75855584806318,99,99
+norte revista,entidad,569,411,38.442822384428226,10,10
+Leidsa,entidad,24688,17822,38.52541802266861,30,30
+finanzas revista mercado,tema,439,316,38.924050632911396,3,3
+guía completa,tema,824,592,39.189189189189186,6,6
+Perú,entidad,2287,1633,40.048989589712185,13,13
+business archives revista,entidad,545,381,43.044619422572175,5,5
+RD Revista Mercado,entidad,1714,1184,44.763513513513516,47,47
+market brief,entidad,765,521,46.83301343570058,3,3
+Santo Domingo,entidad,19978,13130,52.15536938309216,68,68
+calidad de vida,tema,937,605,54.87603305785124,7,7
+paso a paso,tema,1715,1087,57.7736890524379,7,7
+números ganadores,tema,959,604,58.77483443708609,11,11
+República Dominicana en Santo Domingo,entidad,996,625,59.36,2,2
+Netflix,entidad,521,325,60.30769230769231,14,14
+EE UU,entidad,1498,879,70.42093287827076,56,56
+medalla en santo,tema,1020,595,71.42857142857143,2,2
+cuánto recibirán,tema,1020,595,71.42857142857143,2,2
+recibirán por cada medalla,tema,1020,595,71.42857142857143,2,2
+mercado región,tema,539,304,77.30263157894737,4,4
+archives revista,entidad,21303,11960,78.11872909698997,210,210
+IA,entidad,1911,1003,90.5284147557328,57,57
+Luna,entidad,750,390,92.3076923076923,10,10
+dejará de funcionar,tema,672,303,121.78217821782178,10,10
+países de américa latina,tema,1018,452,125.22123893805309,14,14
+bono madre,tema,1174,518,126.64092664092664,9,9
+cuánto costará,tema,1774,690,157.1014492753623,10,10
+Brasil Lula,entidad,940,338,178.10650887573965,3,3
+Android,entidad,1835,654,180.58103975535167,11,11
+Código Penal,entidad,3815,1202,217.38768718801995,9,9
+Elon Musk,entidad,984,304,223.68421052631578,13,13
+Pro,entidad,9224,2764,233.7192474674385,24,24
+medallas en santo,tema,1612,382,321.9895287958115,6,6
+Uber,entidad,2343,526,345.43726235741445,4,4
+Bono,entidad,2553,536,376.3059701492537,13,13
+festival presidente,tema,4078,472,763.9830508474577,5,5
+RD en Santo Domingo,entidad,7632,728,948.3516483516484,4,4
+Lionel Messi,entidad,5730,383,1396.083550913838,14,14

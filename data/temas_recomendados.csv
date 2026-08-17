@@ -1,517 +1,792 @@
 autor,entidad,tipo,notas,confianza,meses_activos,mes_primero,mes_reciente,demanda_reciente_ratio,es_coyuntural,es_recurrente
-Ana Sosa,inteligencia artificial,tema,5,media,2,2026-04,2026-07,1.4570241794463707,False,False
-Ana Sosa,US,entidad,2,baja,2,2026-04,2026-07,0.8387467958166616,False,False
+Ana Sosa,inteligencia artificial,tema,9,media,3,2026-04,2026-08,1.4755489532951531,False,True
+Ana Sosa,US,entidad,3,media,3,2026-04,2026-08,0.8387467958166613,False,True
+Ana Sosa,Apple,entidad,2,baja,2,2026-04,2026-08,14.912910229825876,False,False
+Ana Sosa,China,entidad,5,media,2,2026-07,2026-08,0.056848255845031774,True,False
+Ana Sosa,EE UU,entidad,2,baja,2,2026-04,2026-08,0.814887045978482,False,False
+Ana Sosa,Elon Musk,entidad,5,media,2,2026-07,2026-08,1.090440777091006,False,False
+Ana Sosa,Estados Unidos,entidad,5,media,2,2026-07,2026-08,0.9051287635440136,False,False
+Ana Sosa,GLP,entidad,2,baja,2,2026-07,2026-08,0.012921694024846414,False,False
+Ana Sosa,IA,entidad,6,media,2,2026-07,2026-08,0.5692418842579268,False,False
+Ana Sosa,Mundial,tema,8,media,2,2026-07,2026-08,0.4266779194332002,True,False
+Ana Sosa,Ormuz,entidad,3,media,2,2026-04,2026-08,0.4406198970377092,False,False
+Ana Sosa,pone a prueba,tema,2,baja,2,2026-07,2026-08,0.10254035149761472,False,False
+Ana Sosa,Trump,entidad,2,baja,2,2026-04,2026-08,0.7279409731852396,False,False
 Ana Sosa,Argentina,entidad,4,media,1,2026-07,2026-07,0.793270903336526,True,False
-Ana Sosa,China,entidad,3,media,1,2026-07,2026-07,0.05684825584503178,True,False
-Ana Sosa,copa del mundo,tema,2,baja,1,2026-07,2026-07,0.6301333866002994,True,False
-Ana Sosa,Donald Trump,entidad,2,baja,1,2026-07,2026-07,0.12382214415533996,False,False
-Ana Sosa,Elon Musk,entidad,3,media,1,2026-07,2026-07,1.0904407770910063,False,False
+Ana Sosa,continúa la crisis,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Ana Sosa,copa del mundo,tema,2,baja,1,2026-07,2026-07,0.6301333866002993,True,False
+Ana Sosa,Donald Trump,entidad,2,baja,1,2026-07,2026-07,0.12382214415533993,False,False
 Ana Sosa,España,entidad,2,baja,1,2026-07,2026-07,0.7773899286285936,True,False
-Ana Sosa,Estados Unidos,entidad,2,baja,1,2026-07,2026-07,0.9051287635440137,False,False
+Ana Sosa,estrecho de ormuz,tema,2,baja,1,2026-08,2026-08,0.14319862674410425,False,False
 Ana Sosa,FIFA,entidad,2,baja,1,2026-07,2026-07,0.5900068083825333,True,False
-Ana Sosa,Francia,entidad,2,baja,1,2026-07,2026-07,0.7268228895128002,False,False
+Ana Sosa,Francia,entidad,2,baja,1,2026-07,2026-07,0.7268228895128,False,False
+Ana Sosa,inflación global,tema,2,baja,1,2026-08,2026-08,0.0,False,False
 Ana Sosa,Hollywood,entidad,2,baja,1,2026-07,2026-07,1.0449210458152336,False,False
-Ana Sosa,IA,entidad,3,media,1,2026-07,2026-07,0.5692418842579269,False,False
 Ana Sosa,IBM,entidad,2,baja,1,2026-07,2026-07,0.06126534325102927,False,False
-Ana Sosa,Mundial,tema,7,media,1,2026-07,2026-07,0.4266779194332002,True,False
 Ana Sosa,SpaceX,entidad,3,media,1,2026-07,2026-07,0.11336973067090252,False,False
 Ana Sosa,Wimbledon,entidad,2,baja,1,2026-07,2026-07,0.041464952339228145,False,False
-Andrea Mercedes,Santo Domingo,entidad,18,alta,5,2026-03,2026-08,0.4579804277756875,False,True
-Andrea Mercedes,Trump,entidad,10,alta,5,2026-03,2026-07,0.7279409731852398,False,True
-Andrea Mercedes,Cuba,entidad,5,media,4,2026-03,2026-07,2.0659975763945675,False,True
+Andrea Mercedes,Trump,entidad,11,alta,6,2026-03,2026-08,0.7279409731852396,False,True
+Andrea Mercedes,Cuba,entidad,6,media,5,2026-03,2026-08,2.0659975763945675,False,True
+Andrea Mercedes,Santo Domingo,entidad,19,alta,5,2026-03,2026-08,0.4579804277756874,False,True
+Andrea Mercedes,EE UU,entidad,21,alta,4,2026-03,2026-08,0.814887045978482,False,True
+Andrea Mercedes,Estados Unidos,entidad,7,media,4,2026-05,2026-08,0.9051287635440136,False,True
+Andrea Mercedes,Irán,entidad,7,media,4,2026-03,2026-07,0.1510398438422927,False,True
 Andrea Mercedes,monorriel de santo,tema,10,alta,4,2026-03,2026-07,0.2838457495506038,False,True
+Andrea Mercedes,Abinader,entidad,11,alta,3,2026-03,2026-07,0.8045920736445704,False,True
 Andrea Mercedes,Leidsa,entidad,22,alta,3,2026-05,2026-08,0.5128414342348055,False,True
-Andrea Mercedes,Perú,entidad,26,alta,4,2026-04,2026-07,0.0,True,False
-Andrea Mercedes,Irán,entidad,7,media,4,2026-03,2026-07,0.058321544793202916,False,False
+Andrea Mercedes,US,entidad,7,media,3,2026-03,2026-08,0.8387467958166613,False,True
+Andrea Mercedes,elecciones en perú,tema,9,media,4,2026-04,2026-07,0.0032187077655740255,True,False
+Andrea Mercedes,elecciones perú,tema,13,alta,4,2026-04,2026-07,0.01613136603180707,True,False
 Andrea Mercedes,Mundial,tema,24,alta,4,2026-03,2026-07,0.4266779194332002,True,False
-Andrea Mercedes,Colombia,entidad,20,alta,4,2026-04,2026-08,0.009682388490972901,True,False
-Andrea Mercedes,Abinader,entidad,11,alta,3,2026-03,2026-07,0.0,False,False
+Andrea Mercedes,Perú,entidad,21,alta,4,2026-04,2026-07,0.008361069104948257,True,False
+Andrea Mercedes,Abelardo de la Espriella,entidad,3,media,3,2026-05,2026-08,0.2567219828464016,True,False
+Andrea Mercedes,América Latina,entidad,6,media,3,2026-05,2026-08,0.16595093194120816,True,False
 Andrea Mercedes,bancos y remesedoras,tema,9,media,3,2026-04,2026-06,0.05407580388010952,False,False
-Andrea Mercedes,dólar en bancos,tema,10,alta,3,2026-04,2026-06,0.05435484672992781,False,False
-Andrea Mercedes,EE UU,entidad,14,alta,3,2026-03,2026-07,0.814887045978482,True,False
-Andrea Mercedes,Estados Unidos,entidad,3,media,3,2026-05,2026-07,0.9051287635440137,False,False
-Andrea Mercedes,Japón,entidad,4,media,3,2026-03,2026-07,0.4845257605340776,True,False
-Andrea Mercedes,Keiko Fujimori y Roberto Sánchez,entidad,8,media,3,2026-05,2026-07,0.03112271463440125,True,False
-Andrea Mercedes,impactante terremoto,tema,3,media,3,2026-04,2026-08,1.3824904321712437,True,False
-Andrea Mercedes,tasas de cambio,tema,10,alta,3,2026-04,2026-06,0.05435484672992781,False,False
-Andrea Mercedes,terremoto de que sacudió,tema,3,media,3,2026-04,2026-08,1.3813892848736162,True,False
-Andrea Mercedes,abelardo de la espriella,entidad,2,baja,2,2026-05,2026-06,0.2567219828464016,True,False
-Andrea Mercedes,América Latina,entidad,4,media,2,2026-05,2026-07,0.16595093194120816,True,False
-Andrea Mercedes,Artemis II,entidad,3,media,2,2026-04,2026-05,0.07511241367614946,False,False
-Andrea Mercedes,Brasil,entidad,2,baja,2,2026-04,2026-07,1.084061574201566,True,False
-Andrea Mercedes,casa blanca,tema,2,baja,2,2026-06,2026-07,0.6084172248686264,False,False
+Andrea Mercedes,Brasil,entidad,3,media,3,2026-04,2026-08,1.084061574201566,True,False
+Andrea Mercedes,casa blanca,tema,3,media,3,2026-06,2026-08,0.6084172248686264,False,False
+Andrea Mercedes,Colombia,entidad,19,alta,3,2026-05,2026-08,0.1714909706339068,True,False
+Andrea Mercedes,cuánto dinero,tema,3,media,3,2026-03,2026-08,0.5353073484733945,True,False
+Andrea Mercedes,dólar en bancos,tema,10,alta,3,2026-04,2026-06,0.0543548467299278,False,False
+Andrea Mercedes,España,entidad,5,media,3,2026-03,2026-08,0.7773899286285936,True,False
+Andrea Mercedes,Japón,entidad,4,media,3,2026-03,2026-07,0.48452576053407753,True,False
+Andrea Mercedes,keiko fujimori,entidad,6,media,3,2026-05,2026-07,0.051126835748514086,True,False
+Andrea Mercedes,impactante terremoto,tema,3,media,3,2026-04,2026-08,1.3824904321712435,True,False
+Andrea Mercedes,Niño,entidad,5,media,3,2026-06,2026-08,0.8886287993035366,True,False
+Andrea Mercedes,roberto sánchez,entidad,4,media,3,2026-05,2026-07,0.052631042054039734,True,False
+Andrea Mercedes,tasas de cambio,tema,10,alta,3,2026-04,2026-06,0.0543548467299278,False,False
+Andrea Mercedes,terremoto de que sacudió,tema,3,media,3,2026-04,2026-08,1.381389284873616,True,False
+Andrea Mercedes,Venezuela,entidad,28,alta,3,2026-06,2026-08,0.22103844237364392,True,False
+Andrea Mercedes,alerta sanitaria,tema,2,baja,2,2026-07,2026-08,0.22720197358904884,True,False
+Andrea Mercedes,Artemis II,entidad,3,media,2,2026-04,2026-05,0.07511241367614944,False,False
+Andrea Mercedes,Blanca,entidad,2,baja,2,2026-06,2026-08,0.6536413821571475,False,False
+Andrea Mercedes,Caribe,entidad,4,media,2,2026-07,2026-08,0.790198860467522,False,False
 Andrea Mercedes,Cedulación en RD,entidad,2,baja,2,2026-03,2026-07,0.09909644380584814,False,False
-Andrea Mercedes,China,entidad,2,baja,2,2026-03,2026-07,0.05684825584503178,False,False
-Andrea Mercedes,Penal,entidad,5,media,2,2026-07,2026-08,3.362815894860719,False,False
+Andrea Mercedes,Ceuta,entidad,2,baja,2,2026-07,2026-08,1.4282113479909286,False,False
+Andrea Mercedes,China,entidad,2,baja,2,2026-03,2026-07,0.056848255845031774,False,False
+Andrea Mercedes,Penal,entidad,6,media,2,2026-07,2026-08,3.3628158948607183,False,False
 Andrea Mercedes,Colombia Petro,entidad,2,baja,2,2026-06,2026-07,0.0023713112753254825,True,False
-Andrea Mercedes,Copa,entidad,5,media,2,2026-06,2026-07,0.6210543989855993,True,False
-Andrea Mercedes,cuánto dinero,tema,2,baja,2,2026-03,2026-07,0.5353073484733946,True,False
-Andrea Mercedes,Delcy Rodríguez,entidad,2,baja,2,2026-05,2026-07,0.030104193767550767,True,False
-Andrea Mercedes,elecciones colombia,tema,5,media,2,2026-05,2026-06,0.0041401317463685815,True,False
+Andrea Mercedes,Copa,entidad,5,media,2,2026-06,2026-07,0.6210543989855992,True,False
+Andrea Mercedes,cuánto cuesta,tema,2,baja,2,2026-07,2026-08,1.089814108980471,False,False
+Andrea Mercedes,Delcy Rodríguez,entidad,2,baja,2,2026-05,2026-07,0.03010419376755076,True,False
+Andrea Mercedes,dominicana,entidad,5,media,2,2026-07,2026-08,0.43847482050342557,False,False
+Andrea Mercedes,Donald Trump,entidad,4,media,2,2026-07,2026-08,0.06741350549486912,True,False
+Andrea Mercedes,eclipse solar,tema,4,media,2,2026-04,2026-08,6.952083086953962,True,False
+Andrea Mercedes,elecciones colombia,tema,5,media,2,2026-05,2026-06,0.004140131746368581,True,False
 Andrea Mercedes,elecciones en colombia,tema,5,media,2,2026-05,2026-06,0.004244485231640097,True,False
+Andrea Mercedes,perú quién,tema,2,baja,2,2026-04,2026-05,0.0049938590286329335,True,False
 Andrea Mercedes,elecciones presidenciales,tema,3,media,2,2026-05,2026-07,0.4210060172682692,True,False
-Andrea Mercedes,España,entidad,4,media,2,2026-03,2026-07,0.7773899286285936,True,False
+Andrea Mercedes,Espriella,entidad,3,media,2,2026-06,2026-08,0.1577690419811462,False,False
 Andrea Mercedes,fuera del sistema,tema,2,baja,2,2026-04,2026-07,0.10592578696162373,True,False
-Andrea Mercedes,Fujimori,entidad,3,media,2,2026-06,2026-07,0.01660312774130995,True,False
+Andrea Mercedes,Fujimori,entidad,3,media,2,2026-06,2026-07,0.016603127741309943,True,False
 Andrea Mercedes,ganando las elecciones,tema,2,baja,2,2026-05,2026-06,0.00653850695969283,True,False
-Andrea Mercedes,Gobierno,entidad,7,media,2,2026-03,2026-07,0.2448638568717762,True,False
-Andrea Mercedes,green card,entidad,2,baja,2,2026-05,2026-06,0.13755390034961668,False,False
+Andrea Mercedes,Gobierno,entidad,7,media,2,2026-03,2026-07,0.24486385687177617,True,False
+Andrea Mercedes,green card,entidad,2,baja,2,2026-05,2026-06,0.1375539003496167,False,False
+Andrea Mercedes,guerra en irán,tema,3,media,2,2026-03,2026-05,0.0594831155603342,False,False
 Andrea Mercedes,horario especial,tema,2,baja,2,2026-03,2026-07,0.009567649455588802,True,False
-Andrea Mercedes,Israel,entidad,2,baja,2,2026-03,2026-07,0.02497606876654907,False,False
+Andrea Mercedes,IA,entidad,2,baja,2,2026-06,2026-08,0.5692418842579268,True,False
+Andrea Mercedes,Israel,entidad,2,baja,2,2026-03,2026-07,0.024976068766549068,False,False
+Andrea Mercedes,Keiko Fujimori y Roberto Sánchez,entidad,2,baja,2,2026-05,2026-07,0.07293356080327851,True,False
 Andrea Mercedes,LATAM,entidad,2,baja,2,2026-05,2026-07,0.031049791049282235,True,False
+Andrea Mercedes,Luis Abinader,entidad,4,media,2,2026-07,2026-08,1.475987679806,False,False
+Andrea Mercedes,Luna,entidad,2,baja,2,2026-05,2026-08,0.16878481784790833,False,False
 Andrea Mercedes,Oriente,entidad,2,baja,2,2026-03,2026-07,0.1796117828292173,True,False
-Andrea Mercedes,metro de santo,tema,2,baja,2,2026-04,2026-08,0.8734898147363125,False,False
+Andrea Mercedes,Metro de Santo Domingo,entidad,2,baja,2,2026-04,2026-08,0.8734898147363124,False,False
+Andrea Mercedes,NASA,entidad,3,media,2,2026-07,2026-08,0.7769403402613702,True,False
 Andrea Mercedes,necesitas cita,tema,2,baja,2,2026-04,2026-07,0.07540562952500977,False,False
 Andrea Mercedes,Ormuz,entidad,2,baja,2,2026-03,2026-07,0.434363200545477,False,False
 Andrea Mercedes,OVNIs,entidad,2,baja,2,2026-04,2026-05,0.014661159315461286,False,False
-Andrea Mercedes,quién ganará,tema,3,media,2,2026-05,2026-06,0.007707953706074044,True,False
+Andrea Mercedes,papa león,tema,4,media,2,2026-06,2026-08,0.2526901139840812,True,False
+Andrea Mercedes,presidencia de colombia,tema,2,baja,2,2026-05,2026-06,0.03557415837193526,True,False
+Andrea Mercedes,primer país,tema,2,baja,2,2026-07,2026-08,0.999048396042029,False,False
+Andrea Mercedes,quién ganará,tema,3,media,2,2026-05,2026-06,0.7672133386526728,True,False
+Andrea Mercedes,ganará las elecciones,tema,2,baja,2,2026-05,2026-06,0.008908400175056517,True,False
 Andrea Mercedes,quién ganó,tema,3,media,2,2026-06,2026-07,0.002558129133301083,True,False
-Andrea Mercedes,sismo de magnitud,tema,2,baja,2,2026-07,2026-08,32.35400166116408,True,False
-Andrea Mercedes,terremoto de venezuela,entidad,28,alta,2,2026-06,2026-07,0.09496576960669126,True,False
+Andrea Mercedes,redes sociales,tema,2,baja,2,2026-03,2026-08,0.9094850129288027,False,False
+Andrea Mercedes,Schengen,entidad,2,baja,2,2026-07,2026-08,0.6893414914999958,False,False
+Andrea Mercedes,segunda vuelta,tema,8,media,2,2026-04,2026-06,0.0033968270397940386,True,False
+Andrea Mercedes,sismo de magnitud,tema,2,baja,2,2026-07,2026-08,32.35400166116407,True,False
 Andrea Mercedes,terremoto en venezuela,tema,8,media,2,2026-06,2026-07,0.03282554927559395,True,False
-Andrea Mercedes,US,entidad,4,media,2,2026-03,2026-07,0.8387467958166616,False,False
-Andrea Mercedes,vida extraterrestre,tema,2,baja,2,2026-04,2026-05,0.010929227853343867,False,False
+Andrea Mercedes,vida extraterrestre,tema,2,baja,2,2026-04,2026-05,0.010929227853343866,False,False
+Andrea Mercedes,York,entidad,2,baja,2,2026-03,2026-08,1.0903654869179884,False,False
+Andrea Mercedes,abinader confirma la entrega,tema,2,baja,1,2026-07,2026-07,0.0,False,False
 Andrea Mercedes,adiós al tapón,tema,2,baja,1,2026-07,2026-07,0.0,False,False
 Andrea Mercedes,Anadegas,entidad,2,baja,1,2026-07,2026-07,0.07242501920536983,False,False
 Andrea Mercedes,Argentina,entidad,4,media,1,2026-07,2026-07,0.7921144267521024,True,False
-Andrea Mercedes,Bono a Mil,entidad,2,baja,1,2026-08,2026-08,0.0,False,False
+Andrea Mercedes,Washington,entidad,2,baja,1,2026-08,2026-08,0.0,False,False
+Andrea Mercedes,Atlántico,entidad,2,baja,1,2026-08,2026-08,0.0,False,False
+Andrea Mercedes,Bogotá,entidad,2,baja,1,2026-08,2026-08,0.0,False,False
+Andrea Mercedes,Bono a Mil,entidad,3,media,1,2026-08,2026-08,0.0,False,False
 Andrea Mercedes,bono madre,tema,2,baja,1,2026-05,2026-05,0.050436040966382815,False,False
-Andrea Mercedes,Bukele,entidad,2,baja,1,2026-07,2026-07,0.48817625161495704,True,False
-Andrea Mercedes,C,entidad,2,baja,1,2026-07,2026-07,0.9792303854457826,False,False
-Andrea Mercedes,Panamá,entidad,2,baja,1,2026-07,2026-07,2.564420412460735,False,False
-Andrea Mercedes,Caribe,entidad,2,baja,1,2026-07,2026-07,0.790198860467522,False,False
-Andrea Mercedes,Cepeda,entidad,2,baja,1,2026-06,2026-06,0.018274221071889703,True,False
-Andrea Mercedes,cierres viales,tema,2,baja,1,2026-07,2026-07,0.275176939401845,False,False
+Andrea Mercedes,Bukele,entidad,2,baja,1,2026-07,2026-07,0.488176251614957,True,False
+Andrea Mercedes,C,entidad,2,baja,1,2026-07,2026-07,0.9792303854457824,False,False
+Andrea Mercedes,Canal de Panamá,entidad,2,baja,1,2026-07,2026-07,2.564420412460735,False,False
+Andrea Mercedes,capital y las provincias,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Andrea Mercedes,caribe santo,tema,3,media,1,2026-07,2026-07,0.558302540634411,True,False
+Andrea Mercedes,centroamericanos y del caribe,tema,4,media,1,2026-07,2026-07,0.491739746636339,True,False
+Andrea Mercedes,Cepeda,entidad,2,baja,1,2026-06,2026-06,0.0182742210718897,True,False
+Andrea Mercedes,cierres viales,tema,2,baja,1,2026-07,2026-07,0.27517693940184496,False,False
 Andrea Mercedes,Clásico Mundial,entidad,2,baja,1,2026-03,2026-03,0.0057218142946716755,True,False
-Andrea Mercedes,Colombia De la Espriella,entidad,2,baja,1,2026-06,2026-06,0.01709277364204011,True,False
-Andrea Mercedes,Congreso,entidad,3,media,1,2026-07,2026-07,0.37620315948560107,False,False
-Andrea Mercedes,Daniel Ortega,entidad,3,media,1,2026-07,2026-07,0.7752695443204288,True,False
-Andrea Mercedes,dominicana,entidad,2,baja,1,2026-07,2026-07,0.43847482050342557,False,False
-Andrea Mercedes,Donald Trump,entidad,2,baja,1,2026-07,2026-07,0.06741350549486914,True,False
-Andrea Mercedes,elecciones de perú,tema,3,media,1,2026-06,2026-06,0.012585125048616815,True,False
+Andrea Mercedes,Colombia De la Espriella,entidad,2,baja,1,2026-06,2026-06,0.017092773642040107,True,False
+Andrea Mercedes,como punto,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Andrea Mercedes,Congreso,entidad,3,media,1,2026-07,2026-07,0.37620315948560096,False,False
+Andrea Mercedes,Daniel Ortega,entidad,3,media,1,2026-07,2026-07,0.7752695443204287,True,False
+Andrea Mercedes,deuda pública,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Andrea Mercedes,divide la población,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Andrea Mercedes,elecciones de perú,tema,3,media,1,2026-06,2026-06,0.012585125048616813,True,False
+Andrea Mercedes,Brasil Lula,entidad,2,baja,1,2026-08,2026-08,0.0,True,False
+Andrea Mercedes,elecciones perú fujimori,tema,2,baja,1,2026-06,2026-06,0.0,True,False
 Andrea Mercedes,esperado túnel,tema,2,baja,1,2026-07,2026-07,0.0,False,False
-Andrea Mercedes,está pasando,tema,2,baja,1,2026-07,2026-07,0.8811597421655738,False,False
+Andrea Mercedes,está pasando,tema,2,baja,1,2026-07,2026-07,0.8811597421655737,False,False
+Andrea Mercedes,estabilidad del peso,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Andrea Mercedes,están en la lista,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Andrea Mercedes,Europa,entidad,2,baja,1,2026-08,2026-08,0.3126536418720157,False,False
 Andrea Mercedes,exigen la renuncia,tema,2,baja,1,2026-07,2026-07,0.0,True,False
 Andrea Mercedes,famosa actriz,tema,2,baja,1,2026-07,2026-07,0.020650823104317872,True,False
 Andrea Mercedes,FIFA,entidad,3,media,1,2026-07,2026-07,0.5900068083825333,True,False
 Andrea Mercedes,final del mundial,tema,5,media,1,2026-07,2026-07,0.5079291364037558,True,False
-Andrea Mercedes,ganando en colombia,tema,2,baja,1,2026-06,2026-06,0.014077348727096577,True,False
-Andrea Mercedes,Iván Cepeda,entidad,2,baja,1,2026-05,2026-05,0.0008986300276098008,True,False
-Andrea Mercedes,Juegos Centroamericanos y del Caribe Santo Domingo,entidad,8,media,1,2026-07,2026-07,0.19092601850865132,True,False
-Andrea Mercedes,Ley,entidad,5,media,1,2026-07,2026-07,1.0932030106527548,True,False
-Andrea Mercedes,ley de residuos,entidad,2,baja,1,2026-07,2026-07,0.012291884367702033,False,False
-Andrea Mercedes,Luis Abinader,entidad,2,baja,1,2026-07,2026-07,1.4759876798060003,False,False
+Andrea Mercedes,ganando en colombia,tema,2,baja,1,2026-06,2026-06,0.014077348727096576,True,False
+Andrea Mercedes,Gobierno en Colombia,entidad,2,baja,1,2026-08,2026-08,0.0,False,False
+Andrea Mercedes,Iván Cepeda,entidad,2,baja,1,2026-05,2026-05,0.0008986300276098006,True,False
+Andrea Mercedes,juegos centroamericanos,entidad,8,media,1,2026-07,2026-07,1.975170394657063,True,False
+Andrea Mercedes,Juegos Centroamericanos Santo Domingo,entidad,2,baja,1,2026-07,2026-07,1.7762512294043848,True,False
+Andrea Mercedes,Juegos Centroamericanos y del Caribe Santo Domingo,entidad,2,baja,1,2026-07,2026-07,0.5993723648726349,True,False
+Andrea Mercedes,ley de residuos,tema,2,baja,1,2026-07,2026-07,0.012291884367702033,False,False
 Andrea Mercedes,Maduro,entidad,2,baja,1,2026-03,2026-03,0.012753908991114367,False,False
-Andrea Mercedes,Malvinas,entidad,2,baja,1,2026-07,2026-07,0.7098139482062704,False,False
-Andrea Mercedes,María Corina Machado,entidad,2,baja,1,2026-05,2026-05,0.012332660346034021,False,False
-Andrea Mercedes,mes deberán,tema,2,baja,1,2026-03,2026-03,0.03611930984859453,False,False
-Andrea Mercedes,México,entidad,2,baja,1,2026-07,2026-07,0.4913780078922327,True,False
-Andrea Mercedes,NASA,entidad,2,baja,1,2026-07,2026-07,0.7769403402613703,True,False
+Andrea Mercedes,Malvinas,entidad,2,baja,1,2026-07,2026-07,0.7098139482062702,False,False
+Andrea Mercedes,María Corina Machado,entidad,2,baja,1,2026-05,2026-05,0.01233266034603402,False,False
+Andrea Mercedes,mayoría de los dominicanos,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Andrea Mercedes,mes deberán,tema,2,baja,1,2026-03,2026-03,0.03611930984859452,False,False
+Andrea Mercedes,México,entidad,2,baja,1,2026-07,2026-07,0.49137800789223257,True,False
+Andrea Mercedes,mil cómo consultar,tema,2,baja,1,2026-08,2026-08,0.0,False,False
 Andrea Mercedes,OnlyFans,entidad,2,baja,1,2026-03,2026-03,0.05684480410259464,False,False
-Andrea Mercedes,ONPE,entidad,2,baja,1,2026-06,2026-06,0.021047373303594435,True,False
+Andrea Mercedes,ONPE,entidad,2,baja,1,2026-06,2026-06,0.021047373303594432,True,False
 Andrea Mercedes,OTAN,entidad,3,media,1,2026-07,2026-07,1.1547478136425111,False,False
-Andrea Mercedes,León XIV,entidad,3,media,1,2026-06,2026-06,0.13303391295044276,True,False
-Andrea Mercedes,Plaza de la Bandera,entidad,6,media,1,2026-07,2026-07,0.03407869710184722,False,False
+Andrea Mercedes,León XIV,entidad,3,media,1,2026-06,2026-06,0.13303391295044273,True,False
+Andrea Mercedes,pasará en colombia,tema,2,baja,1,2026-06,2026-06,0.02210380284531286,True,False
+Andrea Mercedes,Perú Fujimori,entidad,3,media,1,2026-06,2026-06,0.0,True,False
+Andrea Mercedes,Perú Keiko Fujimori,entidad,2,baja,1,2026-06,2026-06,0.003717795752778476,True,False
+Andrea Mercedes,Plaza de la Bandera,entidad,6,media,1,2026-07,2026-07,0.03407869710184721,False,False
+Andrea Mercedes,población entre la capital,tema,2,baja,1,2026-08,2026-08,0.0,False,False
 Andrea Mercedes,primera vuelta,tema,2,baja,1,2026-06,2026-06,0.004814842740590969,True,False
-Andrea Mercedes,Nacionales,entidad,2,baja,1,2026-07,2026-07,0.5870602256805167,False,False
-Andrea Mercedes,puerto,entidad,2,baja,1,2026-03,2026-03,0.3302276158201253,False,False
+Andrea Mercedes,Nacionales,entidad,2,baja,1,2026-07,2026-07,0.5870602256805166,False,False
+Andrea Mercedes,puerto,entidad,2,baja,1,2026-03,2026-03,0.3302276158201252,False,False
 Andrea Mercedes,RD del Bono,entidad,2,baja,1,2026-05,2026-05,0.0,False,False
 Andrea Mercedes,real,entidad,2,baja,1,2026-07,2026-07,0.45147480113408506,False,False
-Andrea Mercedes,reforma fiscal,tema,2,baja,1,2026-07,2026-07,0.33859633827124375,False,False
+Andrea Mercedes,reforma fiscal,tema,2,baja,1,2026-07,2026-07,0.3385963382712437,False,False
 Andrea Mercedes,Gianni Infantino,entidad,2,baja,1,2026-07,2026-07,0.0,True,False
 Andrea Mercedes,resultado final,tema,3,media,1,2026-06,2026-06,0.005889284688148353,True,False
-Andrea Mercedes,rutas alternas,tema,2,baja,1,2026-07,2026-07,0.275176939401845,False,False
-Andrea Mercedes,Salvador,entidad,2,baja,1,2026-07,2026-07,0.8963357024738013,True,False
-Andrea Mercedes,Sánchez,entidad,4,media,1,2026-06,2026-06,0.012686992299561094,True,False
+Andrea Mercedes,rutas alternas,tema,2,baja,1,2026-07,2026-07,0.27517693940184496,False,False
+Andrea Mercedes,Salvador,entidad,2,baja,1,2026-07,2026-07,0.8963357024738012,True,False
+Andrea Mercedes,Sánchez,entidad,4,media,1,2026-06,2026-06,0.012686992299561092,True,False
+Andrea Mercedes,vuelta presidencial,tema,3,media,1,2026-06,2026-06,0.012402362423807156,True,False
 Andrea Mercedes,Santa,entidad,2,baja,1,2026-03,2026-03,0.035141100943799936,False,False
-Andrea Mercedes,será más caro,tema,2,baja,1,2026-07,2026-07,0.46169967984378946,False,False
+Andrea Mercedes,será más caro,tema,2,baja,1,2026-07,2026-07,0.4616996798437894,False,False
+Andrea Mercedes,siete meses,tema,2,baja,1,2026-08,2026-08,0.0,False,False
 Andrea Mercedes,tarifas del transporte,tema,2,baja,1,2026-07,2026-07,0.05516328708818418,False,False
+Andrea Mercedes,terremoto de venezuela,tema,6,media,1,2026-07,2026-07,0.22991856613460476,True,False
 Andrea Mercedes,terremotos en venezuela,tema,2,baja,1,2026-07,2026-07,0.01574191187730648,True,False
-Andrea Mercedes,transporte público,tema,2,baja,1,2026-07,2026-07,0.5489223892050233,False,False
-Andrea Mercedes,Constitucional,entidad,2,baja,1,2026-07,2026-07,1.3553453215837798,False,False
+Andrea Mercedes,productos chinos,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Andrea Mercedes,transporte público,tema,2,baja,1,2026-07,2026-07,0.5489223892050232,False,False
+Andrea Mercedes,Constitucional,entidad,2,baja,1,2026-07,2026-07,1.3553453215837796,False,False
 Andrea Mercedes,túnel de la plaza,tema,4,media,1,2026-07,2026-07,0.06849797873273414,False,False
-Andrea Mercedes,últimas encuestas,tema,2,baja,1,2026-06,2026-06,0.01610615277792597,True,False
-Andrea Mercedes,Viva Dominicus Beach,entidad,2,baja,1,2026-06,2026-06,0.003771162955780788,False,False
+Andrea Mercedes,tus hijos,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Andrea Mercedes,últimas encuestas,tema,2,baja,1,2026-06,2026-06,0.016106152777925965,True,False
+Andrea Mercedes,única sede,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Andrea Mercedes,Viva Dominicus Beach,entidad,2,baja,1,2026-06,2026-06,0.003771162955780787,False,False
+Andrea Mercedes,vive la mayoría,tema,2,baja,1,2026-08,2026-08,0.0,False,False
 Andrea Mercedes,votos del extranjero,tema,2,baja,1,2026-06,2026-06,0.0020241531994629226,True,False
-Darling Gil,IA,entidad,3,media,1,2026-07,2026-07,0.5692418842579269,False,False
-Edwin Lozada,Colombia,entidad,5,media,4,2026-05,2026-08,0.17149097063390684,True,False
-Edwin Lozada,Abelardo de la Espriella,entidad,2,baja,2,2026-06,2026-07,0.009394831517822295,True,False
+Andrea Mercedes,presidencial en colombia,tema,2,baja,1,2026-06,2026-06,0.012928651656433188,True,False
+Darling Gil,CLERHP,entidad,2,baja,2,2026-07,2026-08,0.0,False,False
+Darling Gil,ciencia innovación,tema,2,baja,2,2026-07,2026-08,0.0,False,False
+Darling Gil,IA,entidad,3,media,1,2026-07,2026-07,0.5692418842579268,False,False
+Edwin Lozada,Colombia,entidad,5,media,4,2026-05,2026-08,0.1714909706339068,True,False
+Edwin Lozada,Abelardo de la Espriella,entidad,2,baja,2,2026-06,2026-07,0.009394831517822293,True,False
 Edwin Lozada,alerta de tsunami,tema,2,baja,2,2026-07,2026-08,0.0593997493605716,True,False
-Edwin Lozada,dominicana y dónde verlo,tema,6,media,2,2026-06,2026-07,0.021459363756121938,False,False
-Edwin Lozada,hora juega,tema,6,media,2,2026-06,2026-07,0.0,False,False
-Edwin Lozada,juegos centroamericanos,tema,3,media,2,2026-07,2026-08,1.9751703946570631,True,False
-Edwin Lozada,medallero santo,tema,2,baja,2,2026-07,2026-08,1.6139586823751124,False,False
+Edwin Lozada,dominicana y dónde verlo,tema,6,media,2,2026-06,2026-07,0.021459363756121935,False,False
+Edwin Lozada,hora juega,tema,6,media,2,2026-06,2026-07,0.04264818586125897,False,False
+Edwin Lozada,juegos centroamericanos,entidad,5,media,2,2026-07,2026-08,1.9869819039321626,True,False
+Edwin Lozada,medallero santo,tema,2,baja,2,2026-07,2026-08,1.6139586823751122,False,False
 Edwin Lozada,Mundial,tema,8,media,2,2026-06,2026-07,0.4266779194332002,True,False
-Edwin Lozada,Santo Domingo,entidad,6,media,2,2026-07,2026-08,1.3051466784320118,True,False
-Edwin Lozada,verlo en vivo,tema,4,media,2,2026-06,2026-07,0.06839287323180653,False,False
-Edwin Lozada,Abinader,entidad,2,baja,1,2026-02,2026-02,0.8045920736445705,False,False
+Edwin Lozada,Santo Domingo,entidad,7,media,2,2026-07,2026-08,0.596007522654774,True,False
+Edwin Lozada,santo domingo en vivo,tema,3,media,2,2026-07,2026-08,1.619582489395958,False,False
+Edwin Lozada,verlo en vivo,tema,4,media,2,2026-06,2026-07,0.06839287323180651,False,False
+Edwin Lozada,Abinader,entidad,2,baja,1,2026-02,2026-02,0.8045920736445704,False,False
+Edwin Lozada,Argentina,entidad,4,media,1,2026-07,2026-07,0.7539469845449117,True,False
 Edwin Lozada,clásico mundial,tema,2,baja,1,2026-03,2026-03,0.0057218142946716755,True,False
 Edwin Lozada,corona campeona,tema,2,baja,1,2026-07,2026-07,0.0,True,False
-Edwin Lozada,desfile militar,tema,2,baja,1,2026-02,2026-02,0.02256846575898804,False,False
+Edwin Lozada,desfile militar,tema,2,baja,1,2026-02,2026-02,0.022568465758988035,False,False
+Edwin Lozada,elecciones perú,tema,4,media,1,2026-06,2026-06,0.012208042265129176,True,False
 Edwin Lozada,empate técnico,tema,2,baja,1,2026-06,2026-06,0.0,True,False
 Edwin Lozada,España,entidad,6,media,1,2026-07,2026-07,0.7773899286285936,True,False
-Edwin Lozada,Keiko Fujimori,entidad,4,media,1,2026-06,2026-06,0.0,True,False
+Edwin Lozada,Perú Keiko Fujimori,entidad,2,baja,1,2026-06,2026-06,0.0,True,False
 Edwin Lozada,Jorge Messi,entidad,2,baja,1,2026-08,2026-08,0.0,True,False
-Edwin Lozada,Lionel Messi,entidad,5,media,1,2026-08,2026-08,5.282720631002416,True,False
+Edwin Lozada,juega en república,tema,3,media,1,2026-06,2026-06,0.0,False,False
+Edwin Lozada,keiko fujimori,entidad,3,media,1,2026-06,2026-06,0.051126835748514086,True,False
+Edwin Lozada,Lionel Messi,entidad,7,media,1,2026-08,2026-08,5.282720631002416,True,False
 Edwin Lozada,Meta RD,entidad,2,baja,1,2026-02,2026-02,0.0,False,False
 Edwin Lozada,mundial tras vencer,tema,2,baja,1,2026-07,2026-07,0.0,True,False
+Edwin Lozada,República Dominicana en los Juegos Centroamericanos,entidad,2,baja,1,2026-08,2026-08,0.0,True,False
 Edwin Lozada,sánchez toma,tema,2,baja,1,2026-06,2026-06,0.0,True,False
 Edwin Lozada,sismo de magnitud,tema,2,baja,1,2026-08,2026-08,0.0,True,False
-Edwin Lozada,Argentina,entidad,4,media,1,2026-07,2026-07,0.09118377801781431,True,False
-Elba Reyes,dólar hoy en república,tema,75,alta,7,2026-01,2026-07,0.6905152507048973,False,True
-Elba Reyes,precio del dólar,tema,101,alta,7,2026-01,2026-07,0.5696224043040528,False,True
-Elba Reyes,América Latina,entidad,6,media,5,2026-01,2026-07,0.1741351696836301,False,True
-Elba Reyes,calendario lunar,tema,7,media,4,2026-03,2026-07,0.1293296809453355,False,True
+Edwin Lozada,vencer a argentina,tema,3,media,1,2026-07,2026-07,0.0944328551655755,True,False
+Elba Reyes,dólar hoy en república,tema,85,alta,8,2026-01,2026-08,0.6905152507048973,False,True
+Elba Reyes,precio del dólar,tema,111,alta,8,2026-01,2026-08,0.5696224043040526,False,True
+Elba Reyes,América Latina,entidad,7,media,5,2026-01,2026-07,0.16595093194120816,False,True
+Elba Reyes,calendario lunar,tema,8,media,5,2026-02,2026-07,0.1293296809453355,False,True
 Elba Reyes,Juan Soto,entidad,5,media,4,2026-04,2026-07,0.8446688263246732,False,True
-Elba Reyes,punta cana,entidad,8,media,4,2026-03,2026-07,0.12288481201680991,False,True
-Elba Reyes,Santo Domingo,entidad,14,alta,4,2026-04,2026-08,0.4579804277756875,False,True
-Elba Reyes,caras del mundo,tema,3,media,3,2026-01,2026-07,0.34851602562934747,False,True
+Elba Reyes,Quiniela Real,entidad,56,alta,4,2026-05,2026-08,0.29547279909865193,False,True
+Elba Reyes,Punta Cana,entidad,7,media,4,2026-03,2026-08,1.2331525394559768,False,True
+Elba Reyes,Quiniela Real del domingo,entidad,14,alta,4,2026-05,2026-08,0.17525714056044936,False,True
+Elba Reyes,Santo Domingo,entidad,15,alta,4,2026-04,2026-08,0.4579804277756874,False,True
+Elba Reyes,Tripadvisor,entidad,7,media,4,2026-03,2026-07,0.4902625281506635,False,True
+Elba Reyes,Bono,entidad,8,media,3,2026-01,2026-07,0.5612249310537161,False,True
+Elba Reyes,caras del mundo,tema,3,media,3,2026-01,2026-07,0.3485160256293474,False,True
 Elba Reyes,cédula en república,tema,3,media,3,2026-01,2026-07,0.5739899950233266,False,True
-Elba Reyes,Clinic,entidad,4,media,3,2026-02,2026-06,1.6113940113480565,False,True
-Elba Reyes,mejores hoteles,tema,5,media,3,2026-03,2026-07,0.2829347153391576,False,True
-Elba Reyes,Netflix,entidad,3,media,3,2026-02,2026-07,0.3774250409956942,False,True
-Elba Reyes,Mundial,tema,60,alta,6,2026-02,2026-07,0.4266779194332002,True,False
-Elba Reyes,resultados de la lotería,tema,51,alta,5,2026-03,2026-08,0.06040402063269841,False,False
-Elba Reyes,eclipse solar,tema,5,media,4,2026-04,2026-08,6.952083086953964,True,False
+Elba Reyes,ciudades de américa,tema,3,media,3,2026-02,2026-07,0.21575533273425979,False,True
+Elba Reyes,Clinic,entidad,4,media,3,2026-02,2026-06,1.6113940113480563,False,True
+Elba Reyes,fin de semana,tema,6,media,3,2026-04,2026-08,0.8827168518483978,False,True
+Elba Reyes,Luna,entidad,3,media,3,2026-04,2026-07,0.16878481784790833,False,True
+Elba Reyes,mejores ciudades,tema,4,media,3,2026-03,2026-08,0.2283527929221325,False,True
+Elba Reyes,mejores hoteles,tema,5,media,3,2026-03,2026-07,0.28293471533915754,False,True
+Elba Reyes,Miami,entidad,3,media,3,2026-01,2026-08,0.28972304525232806,False,True
+Elba Reyes,Netflix,entidad,3,media,3,2026-02,2026-07,0.3774250409956941,False,True
+Elba Reyes,ranking global,tema,4,media,3,2026-02,2026-07,0.5385578603380506,False,True
+Elba Reyes,récord histórico,tema,3,media,3,2026-05,2026-08,0.30445242399108313,False,True
+Elba Reyes,Mundial,tema,61,alta,7,2026-02,2026-08,0.4266779194332002,True,False
+Elba Reyes,Latinoamérica,entidad,10,alta,5,2026-02,2026-08,0.06278715747955704,False,False
+Elba Reyes,resultados de la lotería,tema,57,alta,5,2026-03,2026-08,0.06040402063269841,False,False
+Elba Reyes,eclipse solar,tema,10,alta,4,2026-04,2026-08,6.952083086953962,True,False
+Elba Reyes,Estados Unidos,entidad,6,media,4,2026-02,2026-08,0.9051287635440136,True,False
 Elba Reyes,inteligencia artificial,tema,4,media,4,2026-01,2026-07,1.4570241794463707,True,False
-Elba Reyes,Latinoamérica,entidad,9,media,4,2026-02,2026-07,0.06278715747955706,False,False
-Elba Reyes,Quiniela Real del domingo,entidad,50,alta,4,2026-05,2026-08,0.05044472907809733,False,False
-Elba Reyes,dólar en república,tema,10,alta,3,2026-02,2026-04,0.02663574384293211,False,False
-Elba Reyes,Estados Unidos,entidad,4,media,3,2026-02,2026-07,0.9051287635440137,True,False
-Elba Reyes,Bono,entidad,8,media,3,2026-01,2026-07,0.0,False,False
-Elba Reyes,quién ganará,tema,7,media,3,2026-03,2026-07,0.7672133386526729,True,False
-Elba Reyes,años de qué murió,tema,2,baja,2,2026-06,2026-07,0.05222527456663668,True,False
-Elba Reyes,Apple,entidad,8,media,2,2026-07,2026-08,14.91291022982588,False,False
+Elba Reyes,cuánto dinero,tema,8,media,3,2026-05,2026-08,0.5466296018058779,True,False
+Elba Reyes,dólar en república,tema,10,alta,3,2026-02,2026-04,0.026635743842932106,False,False
+Elba Reyes,España,entidad,6,media,3,2026-01,2026-08,0.7773899286285936,True,False
+Elba Reyes,IA,entidad,3,media,3,2026-04,2026-08,0.5692418842579268,True,False
+Elba Reyes,quién ganará,tema,7,media,3,2026-03,2026-07,0.7672133386526728,True,False
+Elba Reyes,Venezuela,entidad,8,media,3,2026-03,2026-08,0.22103844237364392,True,False
+Elba Reyes,años de qué murió,tema,2,baja,2,2026-06,2026-07,0.05222527456663667,True,False
+Elba Reyes,apertura y cierre,tema,2,baja,2,2026-02,2026-07,0.8422442877966322,False,False
+Elba Reyes,Apple,entidad,12,alta,2,2026-07,2026-08,14.912910229825876,False,False
+Elba Reyes,artistas confirmados,tema,3,media,2,2026-06,2026-08,0.3408773963565085,True,False
 Elba Reyes,Banco Central,entidad,2,baja,2,2026-01,2026-02,0.058694765265000524,False,False
-Elba Reyes,cambio de la cédula,tema,2,baja,2,2026-01,2026-07,0.8152249319842793,False,False
+Elba Reyes,bono madre,tema,6,media,2,2026-05,2026-07,0.050436040966382815,False,False
+Elba Reyes,lunar para cortarse,tema,2,baja,2,2026-02,2026-07,0.14816053859365272,False,False
+Elba Reyes,cambio de la cédula,tema,2,baja,2,2026-01,2026-07,0.8152249319842791,False,False
 Elba Reyes,Caribe,entidad,3,media,2,2026-01,2026-07,0.8009996659435004,False,False
+Elba Reyes,centroamericanos y del caribe,tema,3,media,2,2026-07,2026-08,1.549893802122525,True,False
 Elba Reyes,ceremonia inaugural,tema,2,baja,2,2026-06,2026-07,0.09340790381501586,True,False
-Elba Reyes,WhatsApp,entidad,32,alta,2,2026-07,2026-08,0.0,False,False
-Elba Reyes,Copa,entidad,12,alta,2,2026-06,2026-07,0.00836528823716452,True,False
+Elba Reyes,cierre del sistema,tema,2,baja,2,2026-02,2026-07,0.8422442877966322,False,False
+Elba Reyes,ciudades más pobladas,tema,2,baja,2,2026-02,2026-07,0.589023527142818,False,False
+Elba Reyes,Copa,entidad,7,media,2,2026-06,2026-07,0.6301333866002993,True,False
+Elba Reyes,mundo fifa,tema,2,baja,2,2026-06,2026-07,0.03519524725711414,False,False
+Elba Reyes,crezca rápido,tema,2,baja,2,2026-02,2026-07,0.14816053859365272,False,False
+Elba Reyes,Cristiano Ronaldo,entidad,4,media,2,2026-07,2026-08,0.24559562097057433,True,False
 Elba Reyes,cuánto cuesta,tema,4,media,2,2026-04,2026-07,1.089814108980471,True,False
-Elba Reyes,cuánto dinero,tema,5,media,2,2026-05,2026-07,0.11884641544297245,True,False
+Elba Reyes,cuánto recaudó,tema,2,baja,2,2026-07,2026-08,1.2214042939971632,False,False
 Elba Reyes,cuartos de final,tema,3,media,2,2026-03,2026-07,0.23736608726107739,True,False
-Elba Reyes,días que debes evitar,tema,3,media,2,2026-03,2026-04,0.027835831556613892,False,False
+Elba Reyes,dejará de funcionar,tema,3,media,2,2026-07,2026-08,0.0,False,False
+Elba Reyes,días que debes evitar,tema,3,media,2,2026-03,2026-04,0.02783583155661389,False,False
 Elba Reyes,dieciseisavos de final,tema,2,baja,2,2026-06,2026-07,0.04093603225236821,True,False
 Elba Reyes,dominicana,entidad,3,media,2,2026-04,2026-07,0.43847482050342557,True,False
-Elba Reyes,escena post,tema,2,baja,2,2026-06,2026-07,1.1421402908821388,False,False
-Elba Reyes,España,entidad,4,media,2,2026-01,2026-07,0.7773899286285936,True,False
+Elba Reyes,solar total,tema,2,baja,2,2026-05,2026-08,4.615529000162086,True,False
+Elba Reyes,escena post,tema,2,baja,2,2026-06,2026-07,1.1421402908821385,False,False
 Elba Reyes,espectáculo de clausura,tema,2,baja,2,2026-07,2026-08,1.4443723465771383,True,False
-Elba Reyes,estudios científicos,tema,3,media,2,2026-02,2026-07,0.7162212803466235,False,False
-Elba Reyes,Europa,entidad,2,baja,2,2026-01,2026-07,0.3126536418720158,False,False
-Elba Reyes,evitar para cortarte,tema,3,media,2,2026-03,2026-04,0.027835831556613892,False,False
+Elba Reyes,estudios científicos,tema,3,media,2,2026-02,2026-07,0.7162212803466232,False,False
+Elba Reyes,Europa,entidad,2,baja,2,2026-01,2026-07,0.3126536418720157,False,False
+Elba Reyes,evitar para cortarte,tema,3,media,2,2026-03,2026-04,0.02783583155661389,False,False
+Elba Reyes,explicación científica,tema,2,baja,2,2026-07,2026-08,0.6131626059040267,True,False
 Elba Reyes,famoso del fútbol,tema,2,baja,2,2026-06,2026-07,0.03519524725711414,False,False
 Elba Reyes,fecha de lanzamiento,tema,2,baja,2,2026-07,2026-08,0.0,False,False
-Elba Reyes,fin de semana,tema,5,media,2,2026-04,2026-07,0.882716851848398,False,False
+Elba Reyes,fechas para que crezca,tema,2,baja,2,2026-02,2026-07,0.14816053859365272,False,False
+Elba Reyes,FIFA,entidad,7,media,2,2026-06,2026-07,0.587928712733226,True,False
+Elba Reyes,fifa de qué está,tema,2,baja,2,2026-06,2026-07,0.0,False,False
 Elba Reyes,final del mundial,tema,10,alta,2,2026-06,2026-07,0.5807937586953942,True,False
-Elba Reyes,Cristiano Ronaldo,entidad,3,media,2,2026-07,2026-08,0.2536971210349511,True,False
-Elba Reyes,cuántas medallas,tema,2,baja,2,2026-07,2026-08,11.23094678839402,True,False
-Elba Reyes,Google,entidad,3,media,2,2026-02,2026-07,27.74159337891348,True,False
-Elba Reyes,guía paso,tema,6,media,2,2026-07,2026-08,1.8601889789777022,False,False
-Elba Reyes,Harvard,entidad,2,baja,2,2026-02,2026-06,0.5215239375637544,False,False
+Elba Reyes,fortuna de cristiano,tema,2,baja,2,2026-07,2026-08,0.37168794790717224,False,False
+Elba Reyes,cuántas medallas,tema,2,baja,2,2026-07,2026-08,11.230946788394018,True,False
+Elba Reyes,Google,entidad,3,media,2,2026-02,2026-07,27.741593378913475,True,False
+Elba Reyes,Harvard,entidad,2,baja,2,2026-02,2026-06,0.5215239375637543,False,False
 Elba Reyes,está hecha,tema,2,baja,2,2026-06,2026-07,0.03519524725711414,False,False
-Elba Reyes,hora verla,tema,2,baja,2,2026-04,2026-07,0.22262943605361363,False,False
-Elba Reyes,horóscopo chino,tema,3,media,2,2026-02,2026-05,0.05242369389983922,False,False
-Elba Reyes,IA,entidad,2,baja,2,2026-04,2026-07,0.5692418842579269,True,False
+Elba Reyes,hora verla,tema,2,baja,2,2026-04,2026-07,0.2226294360536136,False,False
+Elba Reyes,horario del metro,tema,2,baja,2,2026-02,2026-07,0.8422442877966322,False,False
+Elba Reyes,horóscopo chino,tema,3,media,2,2026-02,2026-05,0.05242369389983921,False,False
 Elba Reyes,IMDb,entidad,2,baja,2,2026-02,2026-07,0.4883460321626538,False,False
-Elba Reyes,Pro,entidad,12,alta,2,2026-07,2026-08,0.0,False,False
-Elba Reyes,juego de estrellas,tema,3,media,2,2026-06,2026-07,0.29961883115779436,False,False
-Elba Reyes,Juegos Centroamericanos y del Caribe Santo Domingo,entidad,18,alta,2,2026-07,2026-08,2.158573233568401,True,False
+Elba Reyes,iphone pro,tema,13,alta,2,2026-07,2026-08,0.0,False,False
+Elba Reyes,Pro Max,entidad,7,media,2,2026-07,2026-08,0.0,False,False
+Elba Reyes,juego de estrellas,tema,3,media,2,2026-06,2026-07,0.2996188311577943,False,False
+Elba Reyes,juegos,entidad,3,media,2,2026-03,2026-08,2.00733531352682,True,False
+Elba Reyes,juegos centroamericanos,entidad,20,alta,2,2026-07,2026-08,1.975170394657063,True,False
+Elba Reyes,Juegos Centroamericanos Santo Domingo,entidad,13,alta,2,2026-07,2026-08,1.7762512294043848,True,False
+Elba Reyes,Juegos Centroamericanos y del Caribe Santo Domingo,entidad,2,baja,2,2026-07,2026-08,1.463247884520429,True,False
+Elba Reyes,liberar espacio,tema,2,baja,2,2026-07,2026-08,0.0,False,False
 Elba Reyes,lista completa,tema,2,baja,2,2026-01,2026-03,0.13813192957581974,True,False
-Elba Reyes,lujosos del mundo,tema,2,baja,2,2026-01,2026-04,0.08525230674886505,False,False
-Elba Reyes,mejores ciudades,tema,3,media,2,2026-03,2026-07,0.39186384463729995,False,False
-Elba Reyes,mejores playas,tema,2,baja,2,2026-01,2026-07,0.04912598391638303,True,False
-Elba Reyes,mejores restaurantes,tema,3,media,2,2026-05,2026-07,0.2713349894715675,False,False
-Elba Reyes,melissa núñez,entidad,2,baja,2,2026-07,2026-08,3.4406692227099107,True,False
-Elba Reyes,Miami,entidad,2,baja,2,2026-01,2026-05,0.28972304525232806,False,False
+Elba Reyes,lujosos del mundo,tema,2,baja,2,2026-01,2026-04,0.08525230674886504,False,False
+Elba Reyes,medalla de oro,tema,2,baja,2,2026-07,2026-08,1.5479126186836727,True,False
+Elba Reyes,ciudades del mundo,tema,2,baja,2,2026-03,2026-07,0.39186384463730006,False,False
+Elba Reyes,mejores playas,tema,2,baja,2,2026-01,2026-07,0.04912598391638302,True,False
+Elba Reyes,mejores restaurantes,tema,3,media,2,2026-05,2026-07,0.27133498947156737,False,False
+Elba Reyes,melissa núñez,entidad,2,baja,2,2026-07,2026-08,3.4406692227099103,True,False
+Elba Reyes,mercado de valores,tema,2,baja,2,2026-02,2026-08,0.6417200151147185,False,False
+Elba Reyes,Metro de Santo Domingo,entidad,2,baja,2,2026-02,2026-07,0.8734898147363124,False,False
 Elba Reyes,mujeres más ricas,tema,2,baja,2,2026-01,2026-02,0.027867967424646277,False,False
+Elba Reyes,ranking actualizado,tema,2,baja,2,2026-02,2026-07,0.589023527142818,False,False
 Elba Reyes,mundo para viajar,tema,2,baja,2,2026-01,2026-02,0.06034268206288026,False,False
 Elba Reyes,Nacionales,entidad,2,baja,2,2026-02,2026-07,0.6207768371012758,False,False
-Elba Reyes,Oscar,entidad,2,baja,2,2026-01,2026-03,0.0333372430621392,False,False
+Elba Reyes,ranking nueve,tema,2,baja,2,2026-02,2026-07,0.1999945873901449,False,False
+Elba Reyes,Olímpico,entidad,3,media,2,2026-07,2026-08,1.9798535342841912,False,False
+Elba Reyes,Oscar,entidad,2,baja,2,2026-01,2026-03,0.03333724306213919,False,False
+Elba Reyes,pagados del mundo,tema,2,baja,2,2026-02,2026-07,0.31823031186781614,False,False
 Elba Reyes,pasaporte electrónico,tema,2,baja,2,2026-01,2026-07,0.3182050130631841,False,False
-Elba Reyes,Tim Burton,entidad,2,baja,2,2026-02,2026-07,1.2124335114814995,False,False
+Elba Reyes,paso a paso,tema,7,media,2,2026-07,2026-08,13.397615029101503,False,False
+Elba Reyes,Tim Burton,entidad,2,baja,2,2026-02,2026-07,1.2124335114814992,False,False
 Elba Reyes,películas más esperadas,tema,2,baja,2,2026-01,2026-06,0.012762610067309438,False,False
-Elba Reyes,podrá ver,tema,2,baja,2,2026-05,2026-08,7.6950684629573685,True,False
+Elba Reyes,pelo en fechas,tema,2,baja,2,2026-02,2026-07,0.14816053859365272,False,False
+Elba Reyes,pobladas del mundo,tema,2,baja,2,2026-02,2026-07,0.589023527142818,False,False
+Elba Reyes,podrá ver,tema,2,baja,2,2026-05,2026-08,7.695068462957367,True,False
 Elba Reyes,precio estimado,tema,3,media,2,2026-07,2026-08,0.0,False,False
-Elba Reyes,primer dominicano,tema,2,baja,2,2026-05,2026-07,0.3014204995321066,False,False
-Elba Reyes,primeros artistas,tema,3,media,2,2026-06,2026-08,0.3078159146114569,True,False
-Elba Reyes,ranking global,tema,3,media,2,2026-03,2026-07,0.5385578603380508,False,False
-Elba Reyes,ranking mundial,tema,2,baja,2,2026-03,2026-07,0.20727544711398851,True,False
-Elba Reyes,ranking países,tema,2,baja,2,2026-04,2026-07,0.02465710062159669,False,False
-Elba Reyes,récord histórico,tema,2,baja,2,2026-05,2026-07,0.30445242399108313,False,False
-Elba Reyes,dominicana lidera,tema,2,baja,2,2026-03,2026-07,0.061605860512596554,True,False
+Elba Reyes,primer dominicano,tema,2,baja,2,2026-05,2026-07,0.3014204995321065,False,False
+Elba Reyes,Pro,entidad,7,media,2,2026-07,2026-08,1.4127871353013806,False,False
+Elba Reyes,cana según tripadvisor,tema,3,media,2,2026-03,2026-04,0.1398843401318629,False,False
+Elba Reyes,global los trabajos,tema,2,baja,2,2026-02,2026-07,0.7165976846105802,False,False
+Elba Reyes,ranking mundial,tema,2,baja,2,2026-03,2026-07,0.2072754471139885,True,False
+Elba Reyes,ranking países,tema,2,baja,2,2026-04,2026-07,0.024657100621596685,False,False
+Elba Reyes,dominicana lidera,tema,2,baja,2,2026-03,2026-07,0.06160586051259654,True,False
 Elba Reyes,dominicana lluvias,tema,2,baja,2,2026-03,2026-04,0.022695629326054012,False,False
 Elba Reyes,Leidsa,entidad,4,media,2,2026-07,2026-08,0.5128414342348055,False,False
-Elba Reyes,Shakira,entidad,4,media,2,2026-05,2026-07,0.2325987725682881,True,False
-Elba Reyes,Supergirl,entidad,3,media,2,2026-06,2026-07,0.055153386778981094,False,False
+Elba Reyes,santo domingo apertura,tema,2,baja,2,2026-02,2026-07,0.8422442877966322,False,False
+Elba Reyes,Shakira,entidad,4,media,2,2026-05,2026-07,0.23259877256828804,True,False
+Elba Reyes,Spider Man,entidad,2,baja,2,2026-07,2026-08,1.2140354414313848,False,False
+Elba Reyes,Supergirl,entidad,3,media,2,2026-06,2026-07,0.05515338677898108,False,False
 Elba Reyes,tarjeta de crédito,tema,2,baja,2,2026-03,2026-07,0.835094389268468,False,False
-Elba Reyes,Venezuela,entidad,7,media,2,2026-03,2026-07,0.0699409015321136,True,False
 Elba Reyes,Tierra,entidad,2,baja,2,2026-04,2026-07,0.8191080940943068,True,False
-Elba Reyes,Toy Story,entidad,2,baja,2,2026-06,2026-07,0.045144030813273436,False,False
+Elba Reyes,Toy Story,entidad,2,baja,2,2026-06,2026-07,0.04514403081327343,False,False
+Elba Reyes,trabajos mejor pagados,tema,2,baja,2,2026-02,2026-07,0.26325120476619357,False,False
 Elba Reyes,trofeo más famoso,tema,2,baja,2,2026-06,2026-07,0.03519524725711414,False,False
-Elba Reyes,US,entidad,4,media,2,2026-02,2026-03,0.8387467958166616,False,False
-Elba Reyes,valiosas del mundo,tema,4,media,2,2026-02,2026-07,0.06530409919054912,False,False
-Elba Reyes,viajar sin visa,tema,4,media,2,2026-04,2026-07,0.44797124352135326,False,False
-Elba Reyes,visa desde república,tema,2,baja,2,2026-04,2026-07,1.6583160785060385,False,False
-Elba Reyes,YouTube,entidad,3,media,2,2026-02,2026-07,1.4695795008615025,True,False
+Elba Reyes,US,entidad,4,media,2,2026-02,2026-03,0.8387467958166613,False,False
+Elba Reyes,valiosas del mundo,tema,4,media,2,2026-02,2026-07,0.06530409919054911,False,False
+Elba Reyes,viajar sin visa,tema,4,media,2,2026-04,2026-07,0.4479712435213532,False,False
+Elba Reyes,violentas del mundo,tema,2,baja,2,2026-02,2026-07,0.1999945873901449,False,False
+Elba Reyes,visa desde república,tema,2,baja,2,2026-04,2026-07,1.658316078506038,False,False
+Elba Reyes,WhatsApp,entidad,34,alta,2,2026-07,2026-08,0.0,False,False
+Elba Reyes,YouTube,entidad,3,media,2,2026-02,2026-07,1.4695795008615022,True,False
+Elba Reyes,zoe saldaña,entidad,2,baja,2,2026-01,2026-08,0.1471797650455025,False,False
+Elba Reyes,altamar los cruceros,tema,2,baja,1,2026-01,2026-01,0.0036368453883777563,False,False
 Elba Reyes,Android,entidad,2,baja,1,2026-07,2026-07,0.0,True,False
-Elba Reyes,antes de salir,tema,2,baja,1,2026-07,2026-07,1.1901008992377704,False,False
+Elba Reyes,antes de salir,tema,2,baja,1,2026-07,2026-07,1.1901008992377702,False,False
 Elba Reyes,Argentina,entidad,3,media,1,2026-07,2026-07,0.793270903336526,True,False
-Elba Reyes,asume la presidencia,tema,2,baja,1,2026-02,2026-02,0.34119312163249077,True,False
-Elba Reyes,Avengers Doomsday,entidad,2,baja,1,2026-07,2026-07,0.8590582991658526,False,False
+Elba Reyes,asume la presidencia,tema,2,baja,1,2026-02,2026-02,0.3411931216324907,True,False
+Elba Reyes,Avengers Doomsday,entidad,2,baja,1,2026-07,2026-07,0.8590582991658525,False,False
 Elba Reyes,avos de final,tema,3,media,1,2026-07,2026-07,0.031826408877661916,True,False
-Elba Reyes,Bad Bunny,entidad,4,media,1,2026-02,2026-02,0.017100997892302492,True,False
+Elba Reyes,Bad Bunny,entidad,4,media,1,2026-02,2026-02,0.01710099789230249,True,False
 Elba Reyes,cabello y depilarte,tema,2,baja,1,2026-04,2026-04,0.0035422060048219757,False,False
-Elba Reyes,calidad de vida,tema,3,media,1,2026-07,2026-07,0.11299309126342227,False,False
+Elba Reyes,calidad de vida,tema,3,media,1,2026-07,2026-07,0.11299309126342226,False,False
+Elba Reyes,Centroamericanos,entidad,2,baja,1,2026-08,2026-08,1.9976447331379212,True,False
+Elba Reyes,santo domingo agenda,tema,7,media,1,2026-08,2026-08,0.0,True,False
+Elba Reyes,santo domingo dominicanos,tema,3,media,1,2026-07,2026-07,0.0,True,False
 Elba Reyes,chatear con alguien,tema,2,baja,1,2026-07,2026-07,0.0,False,False
 Elba Reyes,ciudades más peligrosas,tema,2,baja,1,2026-07,2026-07,0.0829890276383061,False,False
-Elba Reyes,Clásico Mundial de Béisbol República Dominicana,entidad,17,alta,1,2026-03,2026-03,0.0,True,False
+Elba Reyes,Clásico Mundial de Béisbol,entidad,17,alta,1,2026-03,2026-03,0.004041764295794788,True,False
+Elba Reyes,Clásico Mundial de Béisbol República Dominicana,entidad,4,media,1,2026-03,2026-03,0.0,True,False
+Elba Reyes,clausura de los juegos,tema,2,baja,1,2026-08,2026-08,0.0,True,False
 Elba Reyes,clausura del mundial,tema,2,baja,1,2026-07,2026-07,0.7738095285632742,True,False
 Elba Reyes,clima en república,tema,2,baja,1,2026-04,2026-04,0.015689523101222128,False,False
-Elba Reyes,clima hoy en santo,tema,4,media,1,2026-04,2026-04,0.0016380313676378168,False,False
+Elba Reyes,clima hoy en santo,tema,4,media,1,2026-04,2026-04,0.0016380313676378165,False,False
 Elba Reyes,conciertos en república,tema,2,baja,1,2026-07,2026-07,0.0,False,False
-Elba Reyes,confirmados de los octavos,tema,2,baja,1,2026-07,2026-07,0.0054729625004479605,True,False
-Elba Reyes,mundial conoce,tema,3,media,1,2026-07,2026-07,0.005206564021531492,True,False
+Elba Reyes,confirmados de los octavos,tema,2,baja,1,2026-07,2026-07,0.005472962500447961,True,False
+Elba Reyes,mundial conoce,tema,2,baja,1,2026-07,2026-07,0.005472962500447961,True,False
+Elba Reyes,conversaciones de whatsapp,tema,2,baja,1,2026-07,2026-07,0.0,False,False
+Elba Reyes,corina machado,entidad,3,media,1,2026-01,2026-01,0.005783825560438055,False,False
+Elba Reyes,Cristiano Ronaldo y Georgina Rodríguez,entidad,2,baja,1,2026-08,2026-08,0.0,False,False
+Elba Reyes,cruceros más esperados,tema,2,baja,1,2026-01,2026-01,0.0036368453883777563,False,False
+Elba Reyes,cruces confirmados,tema,3,media,1,2026-07,2026-07,0.018418525775699437,True,False
 Elba Reyes,fechas confirmadas,tema,2,baja,1,2026-07,2026-07,0.0337312406306658,True,False
-Elba Reyes,dejará de funcionar,tema,2,baja,1,2026-07,2026-07,0.0,False,False
-Elba Reyes,dominicanos que compiten,tema,3,media,1,2026-07,2026-07,0.9770854301812185,True,False
+Elba Reyes,dinero tiene,tema,2,baja,1,2026-07,2026-07,0.3263991114806986,False,False
+Elba Reyes,dinero genera,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Elba Reyes,dominicanos que compiten,tema,3,media,1,2026-07,2026-07,0.9770854301812186,True,False
 Elba Reyes,donde verlo,tema,2,baja,1,2026-03,2026-03,0.010250224907924202,True,False
-Elba Reyes,fechas y horarios,tema,2,baja,1,2026-07,2026-07,1.2890209407410762,True,False
-Elba Reyes,Festival,entidad,3,media,1,2026-08,2026-08,4.730571539611917,False,False
+Elba Reyes,estadio olímpico,tema,2,baja,1,2026-08,2026-08,2.100667321304181,False,False
+Elba Reyes,fechas y horarios,tema,2,baja,1,2026-07,2026-07,1.289020940741076,True,False
+Elba Reyes,Festival,entidad,4,media,1,2026-08,2026-08,4.730571539611916,False,False
 Elba Reyes,final tras los partidos,tema,2,baja,1,2026-07,2026-07,0.005280252553249089,True,False
-Elba Reyes,Halftime,entidad,2,baja,1,2026-02,2026-02,0.021035082007070566,False,False
+Elba Reyes,guía paso,tema,2,baja,1,2026-07,2026-07,0.8415976959882162,False,False
+Elba Reyes,Halftime,entidad,2,baja,1,2026-02,2026-02,0.021035082007070563,False,False
+Elba Reyes,juan luis,entidad,2,baja,1,2026-08,2026-08,4.218332430618446,True,False
 Elba Reyes,juega república,tema,2,baja,1,2026-03,2026-03,0.005643724511845306,True,False
-Elba Reyes,juegos,entidad,2,baja,1,2026-03,2026-03,2.0073353135268204,True,False
 Elba Reyes,lista oficial,tema,2,baja,1,2026-07,2026-07,0.0,False,False
-Elba Reyes,María Corina Machado,entidad,3,media,1,2026-01,2026-01,0.006149306562109908,False,False
-Elba Reyes,mejores películas,tema,2,baja,1,2026-07,2026-07,0.47786880335858056,False,False
-Elba Reyes,Belice,entidad,2,baja,1,2026-02,2026-02,0.02384363472379098,False,False
-Elba Reyes,mercado laboral,tema,3,media,1,2026-07,2026-07,0.6363939989943349,False,False
+Elba Reyes,lujo en altamar,tema,2,baja,1,2026-01,2026-01,0.0036368453883777563,False,False
+Elba Reyes,madre en república,tema,2,baja,1,2026-05,2026-05,0.0,False,False
+Elba Reyes,María Corina Machado,entidad,2,baja,1,2026-01,2026-01,0.008652023906982434,False,False
+Elba Reyes,Marileidy Paulino,entidad,2,baja,1,2026-08,2026-08,2.0175618781560543,True,False
+Elba Reyes,mejores películas,tema,2,baja,1,2026-07,2026-07,0.4778688033585805,False,False
+Elba Reyes,Belice,entidad,2,baja,1,2026-02,2026-02,0.023843634723790978,False,False
+Elba Reyes,mercado laboral,tema,3,media,1,2026-07,2026-07,0.6363939989943348,False,False
 Elba Reyes,Mets,entidad,2,baja,1,2026-04,2026-04,0.07190133354247381,False,False
-Elba Reyes,Miss República Dominicana,entidad,2,baja,1,2026-07,2026-07,0.8684441986365916,True,False
+Elba Reyes,Miss República Dominicana,entidad,2,baja,1,2026-07,2026-07,0.8684441986365915,True,False
 Elba Reyes,MLB,entidad,3,media,1,2026-07,2026-07,0.23451075284746864,False,False
 Elba Reyes,mundial así quedó,tema,2,baja,1,2026-07,2026-07,0.0,True,False
 Elba Reyes,mundial cruces,tema,2,baja,1,2026-07,2026-07,0.0,True,False
 Elba Reyes,mundial cuánto,tema,2,baja,1,2026-07,2026-07,0.0,True,False
 Elba Reyes,mundo para vivir,tema,2,baja,1,2026-07,2026-07,0.5109453467774406,False,False
-Elba Reyes,Nobel,entidad,3,media,1,2026-01,2026-01,0.0002100498689461043,False,False
+Elba Reyes,Nobel,entidad,3,media,1,2026-01,2026-01,0.01188282115752247,False,False
+Elba Reyes,nobel de la paz,tema,2,baja,1,2026-01,2026-01,0.0017521076250909674,False,False
 Elba Reyes,nombre de usuario,tema,2,baja,1,2026-07,2026-07,0.0,False,False
-Elba Reyes,Numbeo,entidad,2,baja,1,2026-07,2026-07,0.04655180910487658,False,False
-Elba Reyes,octavos de final,tema,5,media,1,2026-07,2026-07,0.026225635708908547,True,False
+Elba Reyes,Numbeo,entidad,2,baja,1,2026-07,2026-07,0.046551809104876565,False,False
+Elba Reyes,octavos de final,tema,5,media,1,2026-07,2026-07,0.02622563570890854,True,False
 Elba Reyes,Odisea,entidad,2,baja,1,2026-07,2026-07,1.110794844700881,False,False
-Elba Reyes,Pantera Negra,entidad,2,baja,1,2026-07,2026-07,0.8178043365157772,False,False
+Elba Reyes,Pantera Negra,entidad,2,baja,1,2026-07,2026-07,0.817804336515777,False,False
 Elba Reyes,partidos del mundial,tema,2,baja,1,2026-07,2026-07,0.09545737913273449,True,False
 Elba Reyes,pasaporte dominicano,tema,2,baja,1,2026-07,2026-07,0.9467963688036896,False,False
 Elba Reyes,pena comprar,tema,2,baja,1,2026-07,2026-07,0.0,False,False
 Elba Reyes,presidente revelan los primeros,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Elba Reyes,primeros artistas,tema,2,baja,1,2026-08,2026-08,0.0,False,False
 Elba Reyes,próximo mundial,tema,2,baja,1,2026-07,2026-07,0.9007344017444546,True,False
+Elba Reyes,pruebas de atletismo,tema,2,baja,1,2026-08,2026-08,0.0,False,False
 Elba Reyes,quién lidera,tema,2,baja,1,2026-07,2026-07,0.07901993258074688,True,False
-Elba Reyes,dominicana requisitos,tema,2,baja,1,2026-05,2026-05,0.006391093397861498,False,False
+Elba Reyes,redes sociales,tema,2,baja,1,2026-08,2026-08,0.9094850129288027,False,False
+Elba Reyes,dominicana requisitos,tema,2,baja,1,2026-05,2026-05,0.006391093397861496,False,False
 Elba Reyes,dominicana vaguada,tema,3,media,1,2026-04,2026-04,0.0011654217850719424,False,False
-Elba Reyes,rones del mundo,tema,2,baja,1,2026-07,2026-07,0.9443994341950239,False,False
+Elba Reyes,boletas gratuitas,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Elba Reyes,rones del mundo,tema,2,baja,1,2026-07,2026-07,0.9443994341950238,False,False
 Elba Reyes,Samsung,entidad,2,baja,1,2026-07,2026-07,1.0628286852629283,False,False
 Elba Reyes,sedes confirmadas,tema,2,baja,1,2026-07,2026-07,0.7831255679107827,True,False
 Elba Reyes,semana santa,entidad,5,media,1,2026-03,2026-03,0.035141100943799936,False,False
-Elba Reyes,Super Bowl,entidad,3,media,1,2026-02,2026-02,0.01064467739514305,True,False
-Elba Reyes,tormentas eléctricas,tema,2,baja,1,2026-04,2026-04,0.011957460194814104,False,False
-Elba Reyes,Francas Summit,entidad,2,baja,1,2026-04,2026-04,0.18806006921891083,False,False
+Elba Reyes,Super Bowl,entidad,3,media,1,2026-02,2026-02,0.010644677395143047,True,False
+Elba Reyes,terremoto de venezuela,tema,2,baja,1,2026-07,2026-07,0.24915230756206222,True,False
+Elba Reyes,tormentas eléctricas,tema,2,baja,1,2026-04,2026-04,0.011957460194814102,False,False
+Elba Reyes,Francas Summit,entidad,2,baja,1,2026-04,2026-04,0.1880600692189108,False,False
 Elba Reyes,ultra lujo,tema,2,baja,1,2026-07,2026-07,2.2056749874745614,False,False
-Elba Reyes,vaguada mantiene,tema,2,baja,1,2026-04,2026-04,0.00664769020869692,False,False
+Elba Reyes,usuario en whatsapp,tema,2,baja,1,2026-07,2026-07,0.0,False,False
+Elba Reyes,vaguada mantiene,tema,2,baja,1,2026-04,2026-04,0.006647690208696919,False,False
 Elba Reyes,vale la pena,tema,2,baja,1,2026-07,2026-07,16.53954979830377,False,False
+Elba Reyes,ver las pruebas,tema,2,baja,1,2026-08,2026-08,0.0,False,False
 Elba Reyes,ver los partidos,tema,2,baja,1,2026-07,2026-07,0.008081713070942338,True,False
-Elba Reyes,vivir en república,tema,2,baja,1,2026-07,2026-07,1.8772658106147553,False,False
-Elba Reyes,vivir y trabajar,tema,2,baja,1,2026-07,2026-07,0.8448700731968978,False,False
-Gabriel Rico Albarrán,Norte,entidad,8,media,3,2026-01,2026-07,0.23429665070780312,False,True
+Elba Reyes,papa españa,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Elba Reyes,vivir en república,tema,2,baja,1,2026-07,2026-07,1.877265810614755,False,False
+Elba Reyes,vivir y trabajar,tema,2,baja,1,2026-07,2026-07,0.8448700731968979,False,False
+Elba Reyes,whatsapp cómo funciona,tema,2,baja,1,2026-07,2026-07,0.0,False,False
+Gabriel Rico Albarrán,Ucrania,entidad,4,media,3,2026-01,2026-08,0.49690663949038155,False,True
+Gabriel Rico Albarrán,Mundial,tema,8,media,3,2026-06,2026-08,0.4266779194332002,True,False
 Gabriel Rico Albarrán,EE UU,entidad,4,media,2,2026-03,2026-07,0.814887045978482,True,False
-Gabriel Rico Albarrán,Estados Unidos,entidad,2,baja,2,2026-02,2026-06,0.9051287635440137,True,False
-Gabriel Rico Albarrán,Francia,entidad,3,media,2,2026-06,2026-07,0.7268228895128002,True,False
+Gabriel Rico Albarrán,Estados Unidos,entidad,2,baja,2,2026-02,2026-06,0.9051287635440136,True,False
+Gabriel Rico Albarrán,Francia,entidad,3,media,2,2026-06,2026-07,0.7268228895128,True,False
 Gabriel Rico Albarrán,frank rainieri,tema,2,baja,2,2026-01,2026-03,0.040623602390621454,False,False
+Gabriel Rico Albarrán,IA,entidad,3,media,2,2026-07,2026-08,0.5692418842579268,False,False
+Gabriel Rico Albarrán,Japón,entidad,2,baja,2,2026-07,2026-08,0.48452576053407753,True,False
+Gabriel Rico Albarrán,Luna,entidad,2,baja,2,2026-01,2026-08,0.16878481784790833,False,False
+Gabriel Rico Albarrán,mejores empresas,tema,6,media,2,2026-01,2026-07,0.23429665070780306,False,False
 Gabriel Rico Albarrán,Media Network,entidad,2,baja,2,2026-02,2026-07,0.26620635201082454,False,False
-Gabriel Rico Albarrán,Mundial,tema,7,media,2,2026-06,2026-07,0.4266779194332002,True,False
-Gabriel Rico Albarrán,Ucrania,entidad,3,media,2,2026-01,2026-07,0.4969066394903816,False,False
-Gabriel Rico Albarrán,vivo mercado,tema,2,baja,2,2026-03,2026-07,0.826860522627354,False,False
-Gabriel Rico Albarrán,Business Forum Dominicana,entidad,2,baja,1,2026-02,2026-02,0.025790585395903603,False,False
-Gabriel Rico Albarrán,futuro del trabajo,tema,2,baja,1,2026-07,2026-07,0.23507921736777684,False,False
-Gabriel Rico Albarrán,AutoShow,entidad,4,media,1,2026-07,2026-07,0.6694292966029778,False,False
+Gabriel Rico Albarrán,Norte,entidad,4,media,2,2026-02,2026-07,0.38174311321393456,False,False
+Gabriel Rico Albarrán,Rusia,entidad,3,media,2,2026-07,2026-08,1.1901295210515261,False,False
+Gabriel Rico Albarrán,Taiwán,entidad,3,media,2,2026-07,2026-08,1.3342767106723779,False,False
+Gabriel Rico Albarrán,US,entidad,3,media,2,2026-03,2026-08,0.8387467958166613,True,False
+Gabriel Rico Albarrán,vivo mercado,tema,2,baja,2,2026-03,2026-07,0.8268605226273539,False,False
+Gabriel Rico Albarrán,York,entidad,2,baja,2,2026-07,2026-08,1.0903654869179884,False,False
+Gabriel Rico Albarrán,AutoShow,entidad,3,media,1,2026-07,2026-07,1.2828758246608103,False,False
+Gabriel Rico Albarrán,Canal de Panamá,entidad,2,baja,1,2026-08,2026-08,2.564420412460735,False,False
+Gabriel Rico Albarrán,China,entidad,4,media,1,2026-08,2026-08,0.056848255845031774,False,False
+Gabriel Rico Albarrán,DR,entidad,2,baja,1,2026-08,2026-08,0.768116977938384,False,False
+Gabriel Rico Albarrán,Admiradas,entidad,2,baja,1,2026-02,2026-02,0.20111269955022495,False,False
+Gabriel Rico Albarrán,trabajar región,tema,2,baja,1,2026-07,2026-07,0.49803938522060975,False,False
+Gabriel Rico Albarrán,Summit,entidad,2,baja,1,2026-07,2026-07,0.30698710769296417,False,False
+Gabriel Rico Albarrán,FIFA,entidad,2,baja,1,2026-08,2026-08,0.5900068083825333,False,False
+Gabriel Rico Albarrán,Business Forum Dominicana,entidad,2,baja,1,2026-02,2026-02,0.0257905853959036,False,False
+Gabriel Rico Albarrán,futuro del trabajo,tema,2,baja,1,2026-07,2026-07,0.2350792173677768,False,False
+Gabriel Rico Albarrán,maniobras militares,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Gabriel Rico Albarrán,mercado autoshow,tema,2,baja,1,2026-07,2026-07,1.0182634213836859,False,False
 Gabriel Rico Albarrán,Power Women Summit,entidad,4,media,1,2026-03,2026-03,0.10129488775270747,False,False
-Gabriel Rico Albarrán,sector privado,tema,2,baja,1,2026-01,2026-01,0.03315946600483454,False,False
-Gabriel Rico Albarrán,sectores económicos,tema,2,baja,1,2026-01,2026-01,0.05009346332632598,False,False
+Gabriel Rico Albarrán,Ormuz,entidad,2,baja,1,2026-08,2026-08,0.434363200545477,False,False
+Gabriel Rico Albarrán,sector privado,tema,2,baja,1,2026-01,2026-01,0.033159466004834534,False,False
+Gabriel Rico Albarrán,sectores económicos,tema,2,baja,1,2026-01,2026-01,0.05009346332632597,False,False
+Gabriel Rico Albarrán,The Best,entidad,2,baja,1,2026-08,2026-08,3.778682667648618,False,False
 Gabriel Rico Albarrán,Venezuela,entidad,2,baja,1,2026-07,2026-07,0.22103844237364392,True,False
+Gabriel Rico Albarrán,Emprendedora,entidad,4,media,1,2026-07,2026-07,8.295623163232245,False,False
+Gabriel Rico Albarrán,vivo mejores,tema,2,baja,1,2026-07,2026-07,0.32427538504974207,False,False
+Jhojhanni Fiorini,América Latina,entidad,43,alta,7,2026-01,2026-08,0.16595093194120816,False,True
+Jhojhanni Fiorini,ver fútbol,tema,48,alta,7,2026-02,2026-08,0.1127573355111945,False,True
 Jhojhanni Fiorini,domingo,entidad,11,alta,5,2026-02,2026-07,0.22454037415994826,False,True
-Jhojhanni Fiorini,resultados de las loterías,tema,37,alta,5,2026-02,2026-08,0.43930559888424003,False,True
-Jhojhanni Fiorini,US,entidad,11,alta,4,2026-01,2026-07,0.8387467958166616,False,True
-Jhojhanni Fiorini,Apple,entidad,13,alta,3,2026-01,2026-07,14.91291022982588,False,True
+Jhojhanni Fiorini,Estados Unidos,entidad,10,alta,5,2026-01,2026-08,0.9051287635440136,False,True
+Jhojhanni Fiorini,resultados de las loterías,tema,37,alta,5,2026-02,2026-08,0.4393055988842399,False,True
+Jhojhanni Fiorini,riesgo país,tema,6,media,5,2026-01,2026-08,0.11519951412767697,False,True
+Jhojhanni Fiorini,Venezuela,entidad,15,alta,5,2026-01,2026-07,0.22103844237364392,False,True
+Jhojhanni Fiorini,Apple,entidad,14,alta,4,2026-01,2026-08,14.912910229825876,False,True
+Jhojhanni Fiorini,EE UU,entidad,11,alta,4,2026-01,2026-08,0.35439944247563104,False,True
+Jhojhanni Fiorini,IA,entidad,8,media,4,2026-01,2026-08,0.5692418842579268,False,True
+Jhojhanni Fiorini,mejores países,tema,5,media,4,2026-03,2026-08,0.5898773216616416,False,True
+Jhojhanni Fiorini,mejores universidades,tema,13,alta,4,2026-01,2026-07,0.21056657545683222,False,True
+Jhojhanni Fiorini,países de américa,tema,11,alta,4,2026-01,2026-08,0.17660341323916345,False,True
+Jhojhanni Fiorini,ranking de los países,tema,6,media,4,2026-02,2026-08,0.23398020094029645,False,True
+Jhojhanni Fiorini,universidades del mundo,tema,4,media,4,2026-02,2026-07,0.2715527646668299,False,True
+Jhojhanni Fiorini,US,entidad,11,alta,4,2026-01,2026-07,0.8387467958166613,False,True
+Jhojhanni Fiorini,Caribe,entidad,6,media,3,2026-01,2026-08,0.8009996659435004,False,True
+Jhojhanni Fiorini,dominicana,entidad,7,media,3,2026-01,2026-07,0.43847482050342557,False,True
+Jhojhanni Fiorini,Donald Trump,entidad,3,media,3,2026-01,2026-08,0.12382214415533993,False,True
+Jhojhanni Fiorini,FMI,entidad,3,media,3,2026-01,2026-08,0.3884877186548533,False,True
+Jhojhanni Fiorini,horarios canales,tema,6,media,3,2026-05,2026-08,0.10460580077829636,False,True
 Jhojhanni Fiorini,horarios y dónde ver,tema,10,alta,3,2026-03,2026-07,0.14325645638366072,False,True
-Jhojhanni Fiorini,IA,entidad,6,media,3,2026-01,2026-07,0.5692418842579269,False,True
-Jhojhanni Fiorini,mejores países,tema,4,media,3,2026-03,2026-07,0.5898773216616416,False,True
-Jhojhanni Fiorini,mejores restaurantes,tema,3,media,3,2026-01,2026-07,0.2713349894715675,False,True
+Jhojhanni Fiorini,mejores restaurantes,tema,3,media,3,2026-01,2026-07,0.27133498947156737,False,True
+Jhojhanni Fiorini,mejores universidades del mundo,tema,3,media,3,2026-02,2026-07,0.21535644438320117,False,True
+Jhojhanni Fiorini,Nvidia,entidad,4,media,3,2026-01,2026-08,1.1594964048530618,False,True
+Jhojhanni Fiorini,per cápita,tema,3,media,3,2026-01,2026-07,0.2712685901867147,False,True
 Jhojhanni Fiorini,QS World University Rankings,entidad,8,media,3,2026-02,2026-07,0.1778263457530673,False,True
-Jhojhanni Fiorini,ranking de los países,tema,5,media,3,2026-02,2026-07,0.1869886681561513,False,True
 Jhojhanni Fiorini,real,entidad,4,media,3,2026-02,2026-07,0.45147480113408506,False,True
-Jhojhanni Fiorini,ricos del mundo,tema,3,media,3,2026-01,2026-07,0.20696156556284268,False,True
+Jhojhanni Fiorini,ricos de latinoamérica,tema,4,media,3,2026-01,2026-07,0.3498309554814321,False,True
+Jhojhanni Fiorini,ricos del mundo,tema,3,media,3,2026-01,2026-07,0.20696156556284265,False,True
 Jhojhanni Fiorini,Tripadvisor,entidad,3,media,3,2026-02,2026-07,0.4902625281506635,False,True
-Jhojhanni Fiorini,Trump,entidad,7,media,3,2026-01,2026-07,0.7279409731852398,False,True
-Jhojhanni Fiorini,ver fútbol,tema,43,alta,6,2026-02,2026-07,0.0019764474969145096,False,False
-Jhojhanni Fiorini,riesgo país,entidad,31,alta,6,2026-01,2026-07,0.010367610366405072,False,False
-Jhojhanni Fiorini,vivo horarios,tema,24,alta,6,2026-02,2026-07,0.0011781529421456141,False,False
-Jhojhanni Fiorini,mejores universidades,tema,14,alta,5,2026-01,2026-07,0.05050965013336625,False,False
-Jhojhanni Fiorini,Mundial,tema,33,alta,5,2026-01,2026-07,0.4266779194332002,True,False
+Jhojhanni Fiorini,Trump,entidad,7,media,3,2026-01,2026-07,0.7279409731852396,False,True
+Jhojhanni Fiorini,Wall Street,entidad,6,media,3,2026-01,2026-08,0.47295596756331887,False,True
+Jhojhanni Fiorini,Mundial,tema,34,alta,6,2026-01,2026-08,0.4266779194332002,True,False
+Jhojhanni Fiorini,fútbol en vivo,tema,32,alta,6,2026-03,2026-08,0.06361438673863737,False,False
+Jhojhanni Fiorini,canales para ver,tema,19,alta,5,2026-02,2026-06,0.0020821066061959574,False,False
+Jhojhanni Fiorini,horarios y canales,tema,21,alta,5,2026-02,2026-06,0.0021634624359604883,False,False
+Jhojhanni Fiorini,Latinoamérica,entidad,53,alta,5,2026-01,2026-08,0.06278715747955704,False,False
+Jhojhanni Fiorini,lotería nacional,tema,68,alta,5,2026-02,2026-07,0.003545039284738511,False,False
 Jhojhanni Fiorini,resultados de la lotería,tema,76,alta,5,2026-02,2026-07,0.06039880566360518,False,False
-Jhojhanni Fiorini,lotería nacional,tema,68,alta,5,2026-02,2026-07,3.067075220682122e-05,False,False
-Jhojhanni Fiorini,Venezuela,entidad,16,alta,5,2026-01,2026-07,0.0006871426074647567,False,False
+Jhojhanni Fiorini,salario mínimo,tema,6,media,5,2026-01,2026-08,0.024756411818971813,False,False
+Jhojhanni Fiorini,TV,entidad,15,alta,5,2026-04,2026-08,0.09001734351158125,True,False
 Jhojhanni Fiorini,Argentina,entidad,4,media,4,2026-01,2026-07,0.793270903336526,True,False
-Jhojhanni Fiorini,Irán,entidad,5,media,4,2026-01,2026-07,0.15103984384229274,True,False
-Jhojhanni Fiorini,Latinoamérica,entidad,57,alta,4,2026-01,2026-07,0.0005133304580198467,False,False
-Jhojhanni Fiorini,TV,entidad,13,alta,4,2026-04,2026-07,0.09001734351158125,True,False
+Jhojhanni Fiorini,China,entidad,4,media,4,2026-02,2026-08,0.056848255845031774,False,False
+Jhojhanni Fiorini,España,entidad,4,media,4,2026-02,2026-08,0.7773899286285936,True,False
+Jhojhanni Fiorini,Irán,entidad,5,media,4,2026-01,2026-07,0.1510398438422927,True,False
 Jhojhanni Fiorini,Barcelona,entidad,4,media,3,2026-01,2026-05,0.05843698368252132,True,False
-Jhojhanni Fiorini,Bill Gates,entidad,5,media,3,2026-01,2026-05,0.08941827163114222,False,False
-Jhojhanni Fiorini,China,entidad,3,media,3,2026-02,2026-07,0.05684825584503178,False,False
-Jhojhanni Fiorini,dominicana,entidad,7,media,3,2026-01,2026-07,0.012291702112592314,False,False
-Jhojhanni Fiorini,EE UU,entidad,7,media,3,2026-01,2026-03,0.35439944247563104,False,False
+Jhojhanni Fiorini,Bill Gates,entidad,5,media,3,2026-01,2026-05,0.0894182716311422,False,False
+Jhojhanni Fiorini,Colombia,entidad,5,media,3,2026-02,2026-08,0.1714909706339068,True,False
+Jhojhanni Fiorini,cuánto costará,tema,5,media,3,2026-06,2026-08,1.0302152716152824,True,False
+Jhojhanni Fiorini,cuánto gana,tema,4,media,3,2026-04,2026-07,0.3445787171852348,True,False
 Jhojhanni Fiorini,empresas más valiosas,tema,3,media,3,2026-01,2026-07,0.04007998182928623,False,False
-Jhojhanni Fiorini,España,entidad,3,media,3,2026-02,2026-07,0.7773899286285936,True,False
+Jhojhanni Fiorini,frente al dólar,tema,4,media,3,2026-01,2026-08,0.09908542748368718,False,False
 Jhojhanni Fiorini,Latam,entidad,3,media,3,2026-01,2026-07,0.031049791049282235,False,False
-Jhojhanni Fiorini,México,entidad,3,media,3,2026-02,2026-07,0.4913780078922327,True,False
-Jhojhanni Fiorini,países más ricos,tema,3,media,3,2026-01,2026-07,0.06525742304368036,False,False
-Jhojhanni Fiorini,PIB,entidad,7,media,3,2026-01,2026-07,0.07380028607360983,False,False
+Jhojhanni Fiorini,México,entidad,3,media,3,2026-02,2026-07,0.49137800789223257,True,False
+Jhojhanni Fiorini,países más ricos,tema,3,media,3,2026-01,2026-07,0.06525742304368035,False,False
+Jhojhanni Fiorini,PIB,entidad,8,media,3,2026-01,2026-08,0.10794938204169732,True,False
+Jhojhanni Fiorini,precio de la gasolina,tema,5,media,3,2026-03,2026-08,0.08784062121562433,False,False
 Jhojhanni Fiorini,QS,entidad,4,media,3,2026-02,2026-04,0.17756465811662453,False,False
 Jhojhanni Fiorini,récord histórico,tema,3,media,3,2026-01,2026-07,0.30445242399108313,True,False
-Jhojhanni Fiorini,cuánto gana,tema,4,media,3,2026-04,2026-07,0.0015663845569693104,True,False
+Jhojhanni Fiorini,ricas del mundo,tema,3,media,3,2026-01,2026-08,0.050402016871558375,False,False
+Jhojhanni Fiorini,mínimo en venezuela,tema,3,media,3,2026-01,2026-05,0.008128074688749189,False,False
 Jhojhanni Fiorini,valiosas del mundo,tema,4,media,3,2026-01,2026-07,0.06723650239215336,False,False
-Jhojhanni Fiorini,Abinader,entidad,2,baja,2,2026-01,2026-03,0.8045920736445705,False,False
-Jhojhanni Fiorini,Arsenal,entidad,3,media,2,2026-04,2026-05,0.006096082519608746,True,False
+Jhojhanni Fiorini,vivo horarios,tema,16,alta,3,2026-02,2026-07,0.0011781529421456141,False,False
+Jhojhanni Fiorini,Abinader,entidad,2,baja,2,2026-01,2026-03,0.8045920736445704,False,False
+Jhojhanni Fiorini,latina al cierre,tema,2,baja,2,2026-03,2026-07,0.10285806879714653,False,False
+Jhojhanni Fiorini,latina frente,tema,2,baja,2,2026-07,2026-08,0.0346208284727865,True,False
+Jhojhanni Fiorini,Arsenal,entidad,3,media,2,2026-04,2026-05,0.006096082519608745,True,False
 Jhojhanni Fiorini,Atlético Madrid,entidad,2,baja,2,2026-04,2026-05,0.003064799092566981,False,False
-Jhojhanni Fiorini,Bad Bunny,entidad,4,media,2,2026-01,2026-02,0.017100997892302492,False,False
-Jhojhanni Fiorini,Banco Mundial,entidad,2,baja,2,2026-01,2026-07,0.09376510540663245,True,False
+Jhojhanni Fiorini,Bad Bunny,entidad,4,media,2,2026-01,2026-02,0.01710099789230249,False,False
+Jhojhanni Fiorini,Banco Central,entidad,3,media,2,2026-07,2026-08,0.058694765265000524,False,False
+Jhojhanni Fiorini,Banco Mundial,entidad,2,baja,2,2026-01,2026-07,0.09376510540663244,True,False
 Jhojhanni Fiorini,calendario completo,tema,2,baja,2,2026-01,2026-06,0.000856178012672217,True,False
 Jhojhanni Fiorini,calendario lunar,tema,3,media,2,2026-03,2026-07,0.1293296809453355,False,False
+Jhojhanni Fiorini,calidad de vida,tema,4,media,2,2026-07,2026-08,0.11299309126342226,False,False
 Jhojhanni Fiorini,cambios trae,tema,2,baja,2,2026-02,2026-07,1.5601543859667588,False,False
-Jhojhanni Fiorini,Caribe,entidad,2,baja,2,2026-01,2026-07,0.8009996659435004,False,False
-Jhojhanni Fiorini,Coca Cola,entidad,4,media,2,2026-06,2026-07,0.9845575005309116,True,False
-Jhojhanni Fiorini,Colombia,entidad,2,baja,2,2026-02,2026-06,0.17149097063390684,True,False
-Jhojhanni Fiorini,Corina Machado,entidad,2,baja,2,2026-01,2026-03,0.0072253520967663735,False,False
-Jhojhanni Fiorini,cuánto costará,tema,2,baja,2,2026-06,2026-07,1.0302152716152824,False,False
-Jhojhanni Fiorini,deja atrás,tema,3,media,2,2026-02,2026-07,0.8883551593580408,False,False
-Jhojhanni Fiorini,Donald Trump,entidad,2,baja,2,2026-01,2026-05,0.12382214415533996,False,False
+Jhojhanni Fiorini,canales y dónde ver,tema,2,baja,2,2026-05,2026-08,0.09358883447736416,False,False
+Jhojhanni Fiorini,canasta básica,tema,2,baja,2,2026-07,2026-08,1.2127077908599813,False,False
+Jhojhanni Fiorini,Carlos Durán,entidad,2,baja,2,2026-01,2026-07,0.07205407705185816,False,False
+Jhojhanni Fiorini,Centroamérica,entidad,2,baja,2,2026-03,2026-08,2.010664984185334,False,False
+Jhojhanni Fiorini,Coca Cola,entidad,4,media,2,2026-06,2026-07,0.9845575005309115,True,False
+Jhojhanni Fiorini,Corina Machado,entidad,2,baja,2,2026-01,2026-03,0.007225352096766372,False,False
+Jhojhanni Fiorini,deja atrás,tema,3,media,2,2026-02,2026-07,0.8883551593580407,False,False
+Jhojhanni Fiorini,economía dominicana,tema,2,baja,2,2026-01,2026-03,0.030687446770893734,False,False
 Jhojhanni Fiorini,EEUU,entidad,2,baja,2,2026-01,2026-07,0.08391725932476715,False,False
-Jhojhanni Fiorini,Elon Musk,entidad,2,baja,2,2026-01,2026-07,1.0904407770910063,False,False
-Jhojhanni Fiorini,Europa,entidad,2,baja,2,2026-02,2026-07,0.3126536418720158,False,False
+Jhojhanni Fiorini,Elon Musk,entidad,2,baja,2,2026-01,2026-07,1.090440777091006,False,False
+Jhojhanni Fiorini,Europa,entidad,2,baja,2,2026-02,2026-07,0.3126536418720157,False,False
+Jhojhanni Fiorini,extranjero en los países,tema,2,baja,2,2026-02,2026-07,0.47272134929666304,False,False
 Jhojhanni Fiorini,FIFA,entidad,4,media,2,2026-04,2026-07,0.5900068083825333,True,False
-Jhojhanni Fiorini,FMI,entidad,2,baja,2,2026-01,2026-02,0.3884877186548533,False,False
-Jhojhanni Fiorini,frente al dólar,tema,2,baja,2,2026-01,2026-07,0.09908542748368719,False,False
-Jhojhanni Fiorini,gana hoy cada trabajador,tema,2,baja,2,2026-04,2026-05,0.07910487197656034,False,False
-Jhojhanni Fiorini,gasto militar,tema,2,baja,2,2026-01,2026-03,0.014319752690465986,True,False
-Jhojhanni Fiorini,horarios canales,tema,5,media,2,2026-05,2026-06,0.10460580077829637,False,False
-Jhojhanni Fiorini,impacto económico,tema,2,baja,2,2026-01,2026-07,0.6099652485270107,False,False
+Jhojhanni Fiorini,gana hoy cada trabajador,tema,2,baja,2,2026-04,2026-05,0.07910487197656031,False,False
+Jhojhanni Fiorini,gasto militar,tema,2,baja,2,2026-01,2026-03,0.014319752690465985,True,False
+Jhojhanni Fiorini,Google,entidad,5,media,2,2026-02,2026-08,27.741593378913475,False,False
+Jhojhanni Fiorini,guía completa,tema,2,baja,2,2026-07,2026-08,0.3856351433838996,False,False
+Jhojhanni Fiorini,hora juegan,tema,2,baja,2,2026-05,2026-08,0.491822684108421,False,False
+Jhojhanni Fiorini,impacto económico,tema,2,baja,2,2026-01,2026-07,0.6099652485270106,False,False
 Jhojhanni Fiorini,inteligencia artificial,tema,2,baja,2,2026-06,2026-07,1.4570241794463707,False,False
-Jhojhanni Fiorini,inversión extranjera,tema,3,media,2,2026-02,2026-07,0.15030607619027656,False,False
-Jhojhanni Fiorini,JPMorgan,entidad,2,baja,2,2026-01,2026-02,0.03369295643722274,False,False
-Jhojhanni Fiorini,jugaron ayer,tema,2,baja,2,2026-02,2026-03,0.0006015398552617945,False,False
-Jhojhanni Fiorini,RD Loto Pool,entidad,2,baja,2,2026-02,2026-03,0.0006015398552617945,False,False
-Jhojhanni Fiorini,mercado laboral,tema,2,baja,2,2026-02,2026-07,0.6363939989943349,False,False
-Jhojhanni Fiorini,Netflix,entidad,2,baja,2,2026-02,2026-07,0.3774250409956942,False,False
-Jhojhanni Fiorini,nike adidas,tema,2,baja,2,2026-06,2026-07,0.3044936224074082,True,False
-Jhojhanni Fiorini,números ganadores,tema,3,media,2,2026-02,2026-03,0.0007407179153125166,True,False
-Jhojhanni Fiorini,Nvidia,entidad,3,media,2,2026-01,2026-07,1.1594964048530618,False,False
-Jhojhanni Fiorini,ONU,entidad,2,baja,2,2026-01,2026-07,0.6177841333826115,True,False
-Jhojhanni Fiorini,oro y plata,tema,2,baja,2,2026-01,2026-02,0.009232105631548667,False,False
+Jhojhanni Fiorini,inversión extranjera,tema,3,media,2,2026-02,2026-07,0.16497337710469556,False,False
+Jhojhanni Fiorini,extranjera directa,tema,2,baja,2,2026-02,2026-07,0.15030607619027653,False,False
+Jhojhanni Fiorini,JPMorgan,entidad,2,baja,2,2026-01,2026-02,0.03369295643722273,False,False
+Jhojhanni Fiorini,jugaron ayer,tema,2,baja,2,2026-02,2026-03,0.0006015398552617944,False,False
+Jhojhanni Fiorini,RD Loto Pool,entidad,2,baja,2,2026-02,2026-03,0.0006015398552617944,False,False
+Jhojhanni Fiorini,mayores productores,tema,2,baja,2,2026-01,2026-08,0.025467350092676096,False,False
+Jhojhanni Fiorini,mercado laboral,tema,2,baja,2,2026-02,2026-07,0.6363939989943348,False,False
+Jhojhanni Fiorini,Messi,entidad,3,media,2,2026-06,2026-07,1.4631698053968774,True,False
+Jhojhanni Fiorini,Meta,entidad,3,media,2,2026-07,2026-08,0.26268188710831086,False,False
+Jhojhanni Fiorini,Netflix,entidad,2,baja,2,2026-02,2026-07,0.3774250409956941,False,False
+Jhojhanni Fiorini,nike adidas,tema,2,baja,2,2026-06,2026-07,0.30449362240740807,True,False
+Jhojhanni Fiorini,números ganadores,tema,3,media,2,2026-02,2026-03,0.0007407179153125165,True,False
+Jhojhanni Fiorini,ONU,entidad,2,baja,2,2026-01,2026-07,0.6177841333826116,True,False
+Jhojhanni Fiorini,oro y plata,tema,2,baja,2,2026-01,2026-02,0.009232105631548663,False,False
+Jhojhanni Fiorini,mejores salarios,tema,2,baja,2,2026-02,2026-07,0.47272134929666304,False,False
+Jhojhanni Fiorini,países de latinoamérica,tema,8,media,2,2026-01,2026-03,0.025166285755964177,False,False
 Jhojhanni Fiorini,países más seguros,tema,2,baja,2,2026-01,2026-03,0.07122992877945232,True,False
-Jhojhanni Fiorini,partidos clave,tema,2,baja,2,2026-03,2026-06,0.029903891742737,True,False
+Jhojhanni Fiorini,partidos clave,tema,2,baja,2,2026-03,2026-06,0.029903891742736995,True,False
 Jhojhanni Fiorini,partidos de fútbol,tema,12,alta,2,2026-02,2026-03,0.0007789235942143168,False,False
 Jhojhanni Fiorini,partidos del mundial,tema,8,media,2,2026-06,2026-07,0.09545737913273449,True,False
-Jhojhanni Fiorini,precio de la gasolina,tema,4,media,2,2026-03,2026-07,0.08784062121562435,False,False
+Jhojhanni Fiorini,personas más ricas,tema,2,baja,2,2026-02,2026-08,0.32409432725685555,False,False
+Jhojhanni Fiorini,peso dominicano,tema,3,media,2,2026-01,2026-08,0.33658987371877763,False,False
+Jhojhanni Fiorini,pib per,tema,2,baja,2,2026-01,2026-07,0.33688040802383357,False,False
+Jhojhanni Fiorini,poderosos del mundo,tema,2,baja,2,2026-07,2026-08,0.5052598243588634,False,False
 Jhojhanni Fiorini,quién lidera,tema,2,baja,2,2026-03,2026-07,0.08147161284641158,False,False
+Jhojhanni Fiorini,ranking del salario,tema,2,baja,2,2026-01,2026-07,0.006011307262849597,False,False
+Jhojhanni Fiorini,ranking global,tema,4,media,2,2026-07,2026-08,0.5385578603380506,False,False
 Jhojhanni Fiorini,RD en República Dominicana,entidad,2,baja,2,2026-02,2026-03,0.0,False,False
 Jhojhanni Fiorini,récords históricos,tema,3,media,2,2026-01,2026-02,0.002872558965839656,False,False
-Jhojhanni Fiorini,resultados de loterías,tema,13,alta,2,2026-02,2026-03,0.0004937905466863676,False,False
-Jhojhanni Fiorini,ricas del mundo,tema,2,baja,2,2026-01,2026-02,0.05040201687155838,False,False
+Jhojhanni Fiorini,redes sociales,tema,2,baja,2,2026-02,2026-08,0.9094850129288027,False,False
+Jhojhanni Fiorini,dominicana cuánto,tema,2,baja,2,2026-04,2026-05,0.07910487197656031,False,False
+Jhojhanni Fiorini,resultados de loterías,tema,13,alta,2,2026-02,2026-03,0.0004937905466863675,False,False
+Jhojhanni Fiorini,resultados lotería,tema,2,baja,2,2026-02,2026-03,0.00016061062530698213,True,False
+Jhojhanni Fiorini,mínimo en latinoamérica,tema,2,baja,2,2026-01,2026-07,0.006011307262849597,False,False
 Jhojhanni Fiorini,santo,entidad,3,media,2,2026-03,2026-04,0.458232535138639,False,False
-Jhojhanni Fiorini,Santo Domingo,entidad,4,media,2,2026-01,2026-07,0.4579804277756875,False,False
+Jhojhanni Fiorini,Santo Domingo,entidad,4,media,2,2026-01,2026-07,0.4579804277756874,False,False
 Jhojhanni Fiorini,segundo país,tema,2,baja,2,2026-01,2026-03,0.23867798614793725,False,False
-Jhojhanni Fiorini,Messi,entidad,3,media,2,2026-06,2026-07,0.0121588843966889,True,False
+Jhojhanni Fiorini,Shein,entidad,3,media,2,2026-07,2026-08,0.0,False,False
 Jhojhanni Fiorini,top países,tema,2,baja,2,2026-01,2026-02,0.07045689877548249,False,False
 Jhojhanni Fiorini,vale la pena,tema,2,baja,2,2026-02,2026-07,16.53954979830377,False,False
-Jhojhanni Fiorini,Wall Street,entidad,3,media,2,2026-01,2026-02,0.4729559675633189,False,False
-Jhojhanni Fiorini,Warren Buffett,entidad,2,baja,2,2026-02,2026-05,0.21477116782586617,False,False
+Jhojhanni Fiorini,Warren Buffett,entidad,2,baja,2,2026-02,2026-05,0.21477116782586614,False,False
+Jhojhanni Fiorini,emprendedor visionario,tema,2,baja,2,2026-01,2026-07,0.07205407705185816,False,False
+Jhojhanni Fiorini,Z,entidad,2,baja,2,2026-02,2026-08,0.1296060489807461,False,False
+Jhojhanni Fiorini,abultado saldo,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Jhojhanni Fiorini,alertas de los economistas,tema,2,baja,1,2026-08,2026-08,0.0,False,False
 Jhojhanni Fiorini,Amazon,entidad,2,baja,1,2026-07,2026-07,0.5135061420553033,False,False
-Jhojhanni Fiorini,Maduro,entidad,5,media,1,2026-01,2026-01,0.00017304416843646984,False,False
-Jhojhanni Fiorini,calidad de vida,tema,3,media,1,2026-07,2026-07,0.11299309126342227,False,False
-Jhojhanni Fiorini,cara y barata,tema,2,baja,1,2026-07,2026-07,0.2626588800994871,False,False
-Jhojhanni Fiorini,caros para vivir,tema,2,baja,1,2026-07,2026-07,0.8755608528824618,False,False
+Jhojhanni Fiorini,avanzados en tecnología,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Jhojhanni Fiorini,balance comercial,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Jhojhanni Fiorini,barata de latinoamérica,tema,2,baja,1,2026-07,2026-07,0.26265888009948707,False,False
+Jhojhanni Fiorini,cables submarinos,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Jhojhanni Fiorini,caída de maduro,tema,2,baja,1,2026-01,2026-01,0.00031255578005566216,False,False
+Jhojhanni Fiorini,cara y barata,tema,2,baja,1,2026-07,2026-07,0.26265888009948707,False,False
+Jhojhanni Fiorini,caribe la red,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Jhojhanni Fiorini,caros para vivir,tema,2,baja,1,2026-07,2026-07,0.8755608528824617,False,False
 Jhojhanni Fiorini,carreras mejor pagadas,tema,2,baja,1,2026-07,2026-07,0.46095479765606473,False,False
+Jhojhanni Fiorini,central atribuye,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Jhojhanni Fiorini,citadas por los algoritmos,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Jhojhanni Fiorini,colombia así impactaría,tema,2,baja,1,2026-08,2026-08,0.0,True,False
 Jhojhanni Fiorini,completo del mundial,tema,2,baja,1,2026-06,2026-06,0.007011565669352818,True,False
+Jhojhanni Fiorini,conectividad en república,tema,2,baja,1,2026-08,2026-08,0.0,False,False
 Jhojhanni Fiorini,conviene comprar,tema,2,baja,1,2026-07,2026-07,10.706389105993685,False,False
-Jhojhanni Fiorini,cuánto dinero,tema,3,media,1,2026-07,2026-07,0.49908293799391734,True,False
+Jhojhanni Fiorini,crédito y las alertas,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Jhojhanni Fiorini,cuánto dinero,tema,3,media,1,2026-07,2026-07,0.5462653204246734,True,False
+Jhojhanni Fiorini,dinero gana,tema,2,baja,1,2026-07,2026-07,0.5243915867019374,True,False
+Jhojhanni Fiorini,deben los dominicanos,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Jhojhanni Fiorini,Upwork,entidad,2,baja,1,2026-02,2026-02,0.0,False,False
 Jhojhanni Fiorini,días feriados,tema,2,baja,1,2026-01,2026-01,0.002019480577719393,False,False
+Jhojhanni Fiorini,Disney,entidad,2,baja,1,2026-08,2026-08,1.1798748976747202,False,False
 Jhojhanni Fiorini,dominicana y dónde ver,tema,2,baja,1,2026-06,2026-06,0.05809360714969777,True,False
+Jhojhanni Fiorini,ingreso récord,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Jhojhanni Fiorini,dominicanos en tarjetas,tema,2,baja,1,2026-08,2026-08,0.0,False,False
 Jhojhanni Fiorini,EE UU en Venezuela,entidad,2,baja,1,2026-01,2026-01,0.0001451799611280131,False,False
-Jhojhanni Fiorini,escasez de dólares,tema,2,baja,1,2026-03,2026-03,0.020291876100921074,False,False
+Jhojhanni Fiorini,escasez de dólares,tema,2,baja,1,2026-03,2026-03,0.02029187610092107,False,False
+Jhojhanni Fiorini,exporta américa,tema,2,baja,1,2026-08,2026-08,0.0,False,False
 Jhojhanni Fiorini,feriados en república,tema,2,baja,1,2026-01,2026-01,0.020299755869846538,False,False
 Jhojhanni Fiorini,final del mundial,tema,4,media,1,2026-07,2026-07,0.5807937586953942,True,False
-Jhojhanni Fiorini,FMI en Latinoamérica,entidad,2,baja,1,2026-07,2026-07,0.7230347910730965,False,False
-Jhojhanni Fiorini,gasolina más cara,tema,3,media,1,2026-07,2026-07,0.7897008526912881,False,False
-Jhojhanni Fiorini,Google,entidad,3,media,1,2026-02,2026-02,27.74159337891348,False,False
-Jhojhanni Fiorini,Harvard,entidad,2,baja,1,2026-02,2026-02,0.5215239375637544,False,False
+Jhojhanni Fiorini,firmeza del peso,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Jhojhanni Fiorini,FMI en Latinoamérica,entidad,2,baja,1,2026-07,2026-07,0.7230347910730964,False,False
+Jhojhanni Fiorini,fortaleza económica,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Jhojhanni Fiorini,gasolina más cara,tema,3,media,1,2026-07,2026-07,0.789700852691288,False,False
+Jhojhanni Fiorini,grandes fortunas,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Jhojhanni Fiorini,habilidades profesionales,tema,2,baja,1,2026-02,2026-02,0.0,False,False
+Jhojhanni Fiorini,Harvard,entidad,2,baja,1,2026-02,2026-02,0.5215239375637543,False,False
 Jhojhanni Fiorini,horarios en república,tema,3,media,1,2026-06,2026-06,0.04285109719949901,True,False
-Jhojhanni Fiorini,Pro,entidad,10,alta,1,2026-07,2026-07,0.0,False,False
-Jhojhanni Fiorini,Luis Velutini,entidad,2,baja,1,2026-01,2026-01,0.1855856492645994,False,False
-Jhojhanni Fiorini,mejores empresas,tema,2,baja,1,2026-03,2026-03,0.23429665070780312,False,False
-Jhojhanni Fiorini,mejores hospitales,tema,2,baja,1,2026-01,2026-01,0.06602456390350521,False,False
-Jhojhanni Fiorini,Meta,entidad,2,baja,1,2026-07,2026-07,0.2626818871083109,False,False
-Jhojhanni Fiorini,Milei,entidad,2,baja,1,2026-01,2026-01,0.013923179762386183,False,False
+Jhojhanni Fiorini,impactaría al pib,tema,2,baja,1,2026-08,2026-08,0.0,True,False
+Jhojhanni Fiorini,Big Mac,entidad,2,baja,1,2026-08,2026-08,0.0,False,False
+Jhojhanni Fiorini,iphone pro,tema,10,alta,1,2026-07,2026-07,0.0,False,False
+Jhojhanni Fiorini,Pro Max,entidad,2,baja,1,2026-07,2026-07,0.0,False,False
+Jhojhanni Fiorini,latinoamérica intervenidos,tema,2,baja,1,2026-01,2026-01,0.018424014591205323,False,False
+Jhojhanni Fiorini,Luis Velutini,entidad,2,baja,1,2026-01,2026-01,0.18558564926459936,False,False
+Jhojhanni Fiorini,Maduro,entidad,5,media,1,2026-01,2026-01,0.012753908991114367,False,False
+Jhojhanni Fiorini,Central Romana,entidad,2,baja,1,2026-08,2026-08,0.0,False,False
+Jhojhanni Fiorini,marcas gigantes,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Jhojhanni Fiorini,mayores reservas,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Jhojhanni Fiorini,megaproyecto de google,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Jhojhanni Fiorini,mejores empresas,tema,2,baja,1,2026-03,2026-03,0.23429665070780306,False,False
+Jhojhanni Fiorini,mejores hospitales,tema,2,baja,1,2026-01,2026-01,0.0660245639035052,False,False
+Jhojhanni Fiorini,Milei,entidad,2,baja,1,2026-01,2026-01,0.01392317976238618,False,False
 Jhojhanni Fiorini,monedas más fuertes,tema,2,baja,1,2026-07,2026-07,0.9132372914313455,False,False
+Jhojhanni Fiorini,Alfonso Fanjul,entidad,2,baja,1,2026-08,2026-08,0.0,False,False
 Jhojhanni Fiorini,nuevos colores,tema,2,baja,1,2026-07,2026-07,0.0,False,False
 Jhojhanni Fiorini,OpenAI,entidad,2,baja,1,2026-07,2026-07,1.6491048683785734,False,False
-Jhojhanni Fiorini,países con la gasolina,tema,3,media,1,2026-07,2026-07,0.318146377598463,False,False
+Jhojhanni Fiorini,oro del mundo,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Jhojhanni Fiorini,país está,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Jhojhanni Fiorini,países con la gasolina,tema,3,media,1,2026-07,2026-07,0.3181463775984629,False,False
+Jhojhanni Fiorini,países con las mayores,tema,2,baja,1,2026-08,2026-08,0.0,False,False
 Jhojhanni Fiorini,países con mayor porcentaje,tema,2,baja,1,2026-07,2026-07,0.4836898378766941,False,False
-Jhojhanni Fiorini,países latinoamericanos,tema,2,baja,1,2026-01,2026-01,0.01456758649498589,False,False
-Jhojhanni Fiorini,países más caros,tema,2,baja,1,2026-07,2026-07,0.990159930161231,False,False
+Jhojhanni Fiorini,países latinoamericanos,tema,2,baja,1,2026-01,2026-01,0.014567586494985886,False,False
+Jhojhanni Fiorini,países más avanzados,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Jhojhanni Fiorini,países más caros,tema,2,baja,1,2026-07,2026-07,0.9901599301612309,False,False
 Jhojhanni Fiorini,países más endeudados,tema,3,media,1,2026-07,2026-07,0.723208460254317,False,False
-Jhojhanni Fiorini,Puerto Rico,entidad,2,baja,1,2026-01,2026-01,0.07382835540848756,False,False
-Jhojhanni Fiorini,ranking global,tema,3,media,1,2026-07,2026-07,0.5385578603380508,False,False
-Jhojhanni Fiorini,RepCore Nations,entidad,2,baja,1,2026-07,2026-07,0.34260472186921,False,False
+Jhojhanni Fiorini,pib la inflación,tema,2,baja,1,2026-08,2026-08,0.0,True,False
+Jhojhanni Fiorini,principales mercados,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Jhojhanni Fiorini,Pro,entidad,7,media,1,2026-07,2026-07,1.4127871353013806,False,False
+Jhojhanni Fiorini,profesionales con mayor demanda,tema,2,baja,1,2026-02,2026-02,0.0,False,False
+Jhojhanni Fiorini,Puerto Rico,entidad,2,baja,1,2026-01,2026-01,0.07382835540848755,False,False
+Jhojhanni Fiorini,ranking de la fortaleza,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Jhojhanni Fiorini,RepCore Nations,entidad,2,baja,1,2026-07,2026-07,0.3426047218692099,False,False
 Jhojhanni Fiorini,dominicana salarios,tema,2,baja,1,2026-07,2026-07,0.5301583625705548,False,False
-Jhojhanni Fiorini,Samsung Galaxy,entidad,2,baja,1,2026-07,2026-07,0.6943975157461894,False,False
-Jhojhanni Fiorini,Super Bowl,entidad,3,media,1,2026-02,2026-02,0.01064467739514305,False,False
-Jhojhanni Fiorini,tres países,tema,2,baja,1,2026-01,2026-01,0.022568974821898593,False,False
+Jhojhanni Fiorini,Samsung Galaxy,entidad,2,baja,1,2026-07,2026-07,0.6943975157461892,False,False
+Jhojhanni Fiorini,sismo en colombia,tema,2,baja,1,2026-08,2026-08,0.0,True,False
+Jhojhanni Fiorini,subvalorada frente,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Jhojhanni Fiorini,Super Bowl,entidad,3,media,1,2026-02,2026-02,0.010644677395143047,False,False
+Jhojhanni Fiorini,tarjetas de crédito,tema,3,media,1,2026-08,2026-08,0.1313818622595417,False,False
+Jhojhanni Fiorini,tiene messi,tema,2,baja,1,2026-06,2026-06,0.013052896004542302,True,False
+Jhojhanni Fiorini,transformará la conectividad,tema,2,baja,1,2026-08,2026-08,0.0,False,False
+Jhojhanni Fiorini,tres países,tema,2,baja,1,2026-01,2026-01,0.02256897482189859,False,False
+Jhojhanni Fiorini,valiosas de latinoamérica,tema,2,baja,1,2026-01,2026-01,0.0474193850993166,False,False
 Jhojhanni Fiorini,ver en vivo,tema,2,baja,1,2026-06,2026-06,0.05478362198811555,True,False
-Jhojhanni Fiorini,Emprendedora,entidad,2,baja,1,2026-07,2026-07,8.295623163232246,False,False
+Jhojhanni Fiorini,Emprendedora,entidad,2,baja,1,2026-07,2026-07,8.295623163232245,False,False
 Jhojhanni Fiorini,WhatsApp,entidad,6,media,1,2026-07,2026-07,0.0,False,False
+Karime Rivas,US,entidad,3,media,3,2026-05,2026-08,0.8385945241848755,False,True
 Karime Rivas,dominicana,entidad,5,media,5,2026-01,2026-07,0.4384434150038675,True,False
-Karime Rivas,Shakira,entidad,3,media,3,2026-05,2026-07,0.2325987725682881,True,False
-Karime Rivas,Descubre,entidad,3,media,2,2026-01,2026-06,0.09490999146825897,False,False
+Karime Rivas,Shakira,entidad,3,media,3,2026-05,2026-07,0.23259877256828804,True,False
+Karime Rivas,Descubre,entidad,3,media,2,2026-01,2026-06,0.09490999146825893,False,False
+Karime Rivas,dos mujeres,tema,2,baja,2,2026-04,2026-08,0.04815175035476549,True,False
 Karime Rivas,FIFA,entidad,3,media,2,2026-04,2026-07,0.5755879946135738,True,False
-Karime Rivas,Inditex,entidad,2,baja,2,2026-01,2026-07,0.7917090843272996,False,False
-Karime Rivas,Latinoamérica,entidad,2,baja,2,2026-01,2026-07,0.06268617947523389,False,False
+Karime Rivas,Inditex,entidad,2,baja,2,2026-01,2026-07,0.7917090843272995,False,False
+Karime Rivas,Juegos Centroamericanos y del Caribe,entidad,2,baja,2,2026-07,2026-08,1.5136238947656255,True,False
+Karime Rivas,Latinoamérica,entidad,2,baja,2,2026-01,2026-07,0.06268617947523387,False,False
+Karime Rivas,Marileidy Paulino,entidad,2,baja,2,2026-07,2026-08,2.0175618781560543,False,False
 Karime Rivas,mundial,tema,4,media,2,2026-01,2026-07,0.42646401050279753,True,False
-Karime Rivas,Ortega,entidad,2,baja,2,2026-05,2026-07,0.9305878897346868,False,False
-Karime Rivas,sufragio femenino,tema,2,baja,2,2026-01,2026-08,1.9987231446229758,False,False
-Karime Rivas,US,entidad,2,baja,2,2026-05,2026-07,0.8383822707674046,False,False
-Karime Rivas,rita abinader,tema,2,baja,1,2026-07,2026-07,0.986080141928344,False,False
-Miguel Vega,Rusia,entidad,3,media,2,2026-06,2026-07,1.1901295210515264,False,False
-Miguel Vega,Ucrania,entidad,3,media,2,2026-06,2026-07,0.4969066394903816,False,False
-Miguel Vega,España,entidad,3,media,1,2026-07,2026-07,0.7773899286285936,True,False
-Miguel Vega,Inglaterra,entidad,2,baja,1,2026-07,2026-07,0.7642822642951013,True,False
-Miguel Vega,Japón,entidad,2,baja,1,2026-07,2026-07,0.4845257605340776,True,False
+Karime Rivas,Ortega,entidad,2,baja,2,2026-05,2026-07,0.9305878897346866,False,False
+Karime Rivas,sufragio femenino,tema,2,baja,2,2026-01,2026-08,1.9987231446229756,False,False
+Karime Rivas,Estados Unidos,entidad,2,baja,1,2026-08,2026-08,0.9580031922577351,False,False
+Karime Rivas,rita abinader,tema,2,baja,1,2026-07,2026-07,0.9860801419283439,False,False
+Miguel Vega,Rusia,entidad,4,media,3,2026-06,2026-08,1.1901295210515261,False,False
+Miguel Vega,Ucrania,entidad,4,media,3,2026-06,2026-08,0.49690663949038155,False,False
+Miguel Vega,Ceuta,entidad,2,baja,2,2026-07,2026-08,1.4282113479909286,True,False
+Miguel Vega,EE UU,entidad,2,baja,2,2026-07,2026-08,0.814887045978482,False,False
+Miguel Vega,entrada masiva,tema,2,baja,2,2026-07,2026-08,1.4283268365264683,True,False
+Miguel Vega,España,entidad,4,media,2,2026-07,2026-08,0.7773899286285936,True,False
+Miguel Vega,Don Héctor Rizek Llabaly,entidad,2,baja,1,2026-03,2026-03,0.34666125135722115,False,False
+Miguel Vega,Inglaterra,entidad,2,baja,1,2026-07,2026-07,0.7642822642951012,True,False
+Miguel Vega,Irán,entidad,2,baja,1,2026-08,2026-08,0.1510398438422927,False,False
+Miguel Vega,Japón,entidad,2,baja,1,2026-07,2026-07,0.48452576053407753,True,False
 Miguel Vega,Mundial,tema,7,media,1,2026-07,2026-07,0.4266779194332002,True,False
-Rodrigo Muñoz,América Latina,entidad,5,media,2,2026-01,2026-07,0.16595093194120816,False,False
+Miguel Vega,cacao dominicano,tema,2,baja,1,2026-03,2026-03,0.2192485663860149,False,False
+Miguel Vega,Román Ramos Uría,entidad,2,baja,1,2026-08,2026-08,0.0,False,False
+Miguel Vega,Trump,entidad,2,baja,1,2026-08,2026-08,0.7279409731852396,False,False
+Miranda Cross,BAY,entidad,2,baja,1,2026-08,2026-08,0.0,False,False
+Miranda Cross,Montecristi,entidad,2,baja,1,2026-08,2026-08,0.0,False,False
+Rodrigo Muñoz,América Latina,entidad,7,media,3,2026-01,2026-08,0.16595093194120816,False,True
+Rodrigo Muñoz,US,entidad,12,alta,3,2026-01,2026-08,0.8387467958166613,False,True
+Rodrigo Muñoz,Amazon,entidad,2,baja,2,2026-07,2026-08,0.5135061420553033,False,False
+Rodrigo Muñoz,Centroamérica y República Dominicana,entidad,2,baja,2,2026-01,2026-08,0.32671979256073796,False,False
+Rodrigo Muñoz,ChatGPT y Claude,entidad,2,baja,2,2026-07,2026-08,0.0,False,False
+Rodrigo Muñoz,desafía a chatgpt,tema,2,baja,2,2026-07,2026-08,0.0,False,False
 Rodrigo Muñoz,dominicana,entidad,2,baja,2,2026-01,2026-07,0.43847482050342557,False,False
+Rodrigo Muñoz,EE UU,entidad,4,media,2,2026-07,2026-08,0.814887045978482,False,False
 Rodrigo Muñoz,exclusivas del mundo,tema,2,baja,2,2026-01,2026-07,0.09251102721621086,False,False
-Rodrigo Muñoz,inteligencia artificial,tema,2,baja,2,2026-07,2026-08,1.4570241794463707,False,False
-Rodrigo Muñoz,Latinoamérica,entidad,6,media,2,2026-01,2026-07,0.06002097029557329,False,False
-Rodrigo Muñoz,mejores playas,tema,2,baja,2,2026-01,2026-07,0.04912598391638303,False,False
-Rodrigo Muñoz,países más ricos,tema,2,baja,2,2026-01,2026-07,0.06525742304368036,False,False
+Rodrigo Muñoz,IA,entidad,5,media,2,2026-02,2026-08,0.5692418842579268,False,False
+Rodrigo Muñoz,inteligencia artificial,tema,7,media,2,2026-07,2026-08,1.4570241794463707,False,False
+Rodrigo Muñoz,Latinoamérica,entidad,6,media,2,2026-01,2026-07,0.06002097029557328,False,False
+Rodrigo Muñoz,mejores playas,tema,2,baja,2,2026-01,2026-07,0.04912598391638302,False,False
+Rodrigo Muñoz,Meta,entidad,2,baja,2,2026-01,2026-08,0.26268188710831086,False,False
+Rodrigo Muñoz,Nvidia,entidad,2,baja,2,2026-07,2026-08,1.1594964048530618,False,False
+Rodrigo Muñoz,países más ricos,tema,2,baja,2,2026-01,2026-07,0.06525742304368035,False,False
 Rodrigo Muñoz,ranking las ciudades,tema,3,media,2,2026-01,2026-07,0.0064958734184325665,False,False
-Rodrigo Muñoz,ranking las marcas,tema,2,baja,2,2026-01,2026-07,0.008992286109849177,False,False
-Rodrigo Muñoz,ranking los países,tema,3,media,2,2026-01,2026-07,0.008322344669027619,False,False
-Rodrigo Muñoz,ranking países,tema,4,media,2,2026-01,2026-07,0.02448173006241037,False,False
-Rodrigo Muñoz,ricas del mundo,tema,2,baja,2,2026-01,2026-07,0.05040201687155838,False,False
-Rodrigo Muñoz,US,entidad,2,baja,2,2026-01,2026-07,0.8387467958166616,False,False
+Rodrigo Muñoz,ranking las marcas,tema,2,baja,2,2026-01,2026-07,0.008992286109849174,False,False
+Rodrigo Muñoz,ranking los países,tema,3,media,2,2026-01,2026-07,0.008322344669027617,False,False
+Rodrigo Muñoz,ranking países,tema,4,media,2,2026-01,2026-07,0.024481730062410365,False,False
+Rodrigo Muñoz,ricas del mundo,tema,2,baja,2,2026-01,2026-07,0.050402016871558375,False,False
 Rodrigo Muñoz,Washington,entidad,2,baja,2,2026-03,2026-07,0.12700582622373557,False,False
-Rodrigo Muñoz,China,entidad,2,baja,1,2026-07,2026-07,0.05684825584503178,False,False
+Rodrigo Muñoz,China,entidad,2,baja,1,2026-07,2026-07,0.056848255845031774,False,False
 Rodrigo Muñoz,competir con nvidia,tema,2,baja,1,2026-07,2026-07,0.0,False,False
-Rodrigo Muñoz,mejores libros,tema,2,baja,1,2026-07,2026-07,0.008359247991077753,False,False
+Rodrigo Muñoz,mejores libros,tema,2,baja,1,2026-07,2026-07,0.008359247991077751,False,False
+Rodrigo Muñoz,millones para fabricar,tema,2,baja,1,2026-08,2026-08,0.0,False,False
 Rodrigo Muñoz,Mundial,tema,2,baja,1,2026-01,2026-01,0.4266779194332002,True,False
 Rodrigo Muñoz,per cápita,tema,2,baja,1,2026-01,2026-01,0.11120401535065391,False,False
-Rodrigo Muñoz,Starbucks,entidad,2,baja,1,2026-01,2026-01,0.04568418608514164,False,False
+Rodrigo Muñoz,mejores ciudades,tema,2,baja,1,2026-01,2026-01,0.011944339211094272,False,False
+Rodrigo Muñoz,Starbucks,entidad,2,baja,1,2026-01,2026-01,0.04568418608514163,False,False
 Rodrigo Muñoz,valiosas del mundo,tema,2,baja,1,2026-01,2026-01,0.06723650239215336,False,False
+Rodrigo Muñoz,vivir en américa,tema,2,baja,1,2026-01,2026-01,0.5018855302144937,False,False
