@@ -2,6 +2,8 @@
 Entry point: streamlit run app/main.py
 """
 
+import os
+
 import streamlit as st
 
 import alertas as vista_alertas
@@ -89,7 +91,11 @@ with col_periodo:
         st.rerun()
     tipo_periodo = dr.PERIODOS[periodo]["tipo"]
     if tipo_periodo == "parcial":
-        st.caption("🔄 Mes en curso — tráfico y autor real, todavía sin semáforo SEO (se calcula al cerrar el mes)")
+        if os.path.exists(f"{dr.DATA_DIR}/semaforo_muestra_notas_{periodo}.csv"):
+            st.caption("🔄 Mes en curso — tráfico y autor real, SEO sobre muestra proporcional "
+                       "(mínimo 10% de las notas reales de cada periodista)")
+        else:
+            st.caption("🔄 Mes en curso — tráfico y autor real, todavía sin semáforo SEO (se calcula al cerrar el mes)")
     elif tipo_periodo == "historico":
         st.caption("⚠️ Muestra histórica — tráfico real y completo, SEO solo sobre notas muestreadas")
 periodo_label = dr.PERIODOS[periodo]["label"]
