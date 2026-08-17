@@ -1,6 +1,11 @@
 entidad,n_autores,confianza_top,tipo
+Santo Domingo,2,0,entidad
+Trump,2,0,entidad
+Apple,1,0,entidad
 Leidsa,1,0,entidad
-Colombia,1,1,entidad
-eclipse solar,1,1,tema
-impactante terremoto,1,1,tema
-terremoto de que sacudió,1,1,tema
+US,1,0,entidad
+dólar hoy en república,1,0,tema
+horarios y dónde ver,1,0,tema
+monorriel de santo,1,0,tema
+precio del dólar,1,0,tema
+resultados de las loterías,1,0,tema

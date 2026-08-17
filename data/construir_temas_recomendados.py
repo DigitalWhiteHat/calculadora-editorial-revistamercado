@@ -27,7 +27,7 @@ SIN límite de filas en julio y en el histórico ene-jun (verificado: 859 y
 -- se usan los 7 periodos completos (ene-jul) para el PICO histórico de cada
 entidad.
 
-Bug real encontrado 16-ago-2026 (Edwin, sobre Temas del día): "Mundial" salía
+Bug real #1 encontrado 16-ago-2026 (Edwin, sobre Temas del día): "Mundial" salía
 con demanda_reciente_ratio=1.0 -- pero esa cifra se calculaba contra JULIO
 (ULTIMO_MES_COMPARABLE), congelado en el pico del Mundial 2026 (que cerró en
 julio) y nunca actualizado -- "no me puedes sacar un tema de mundial cuando
@@ -39,6 +39,29 @@ escribir esto: no es un mes calendario limpio, pero es la señal más actual
 disponible y ya no queda congelada en un pico de hace semanas). El PICO
 histórico se sigue calculando sobre ene-jul (meses calendario limpios); solo
 el punto de comparación "reciente" cambió de julio a esta ventana.
+
+Bug real #2, mismo día: con el fix de arriba, "precio del dólar" (confirmado
+por Edwin como un tema bueno, evergreen) pasó a demanda_reciente_ratio=0.0 --
+el emparejamiento de demanda era por RUTA EXACTA (rutas_entidad, ya conocidas
+de la extracción histórica), pero contenido de servicio diario como el precio
+del dólar publica una URL NUEVA cada día (ej. ".../precio-del-dolar-hoy-en-
+republica-dominicana-este-lunes-13-de-julio-de-2026") -- ninguna ruta de
+agosto podía coincidir nunca con las rutas ya conocidas de meses anteriores.
+Fix: el emparejamiento ahora es por SLUG (substring del texto de la entidad
+normalizada dentro de la ruta), no por ruta exacta -- así una URL nueva sobre
+el mismo tema evergreen sí cuenta.
+
+Bug real #3, mismo día: Edwin señaló que "Elecciones en Colombia" y "Terremoto
+en Venezuela" -- aunque con demanda reciente real y verificada en Semrush --
+NO sirven como "tema del día": son eventos puntuales que ya ocurrieron (una
+elección con ganador proyectado, un terremoto específico), no temas de fondo
+recurrentes como el dólar. "Tienes que excluir notas coyunturales." Se agrega
+un filtro explícito: si una fracción alta de los títulos reales de una entidad
+contiene vocabulario de evento puntual (desastres, resultados electorales,
+finales deportivas, eventos astronómicos con fecha fija), se excluye sin
+importar cuánta demanda tenga -- la recurrencia de MESES no basta como señal
+por sí sola, porque la cobertura extendida de UN solo evento grande (semanas
+de seguimiento de un terremoto) también genera meses_activos>=3.
 
 Uso: python3 data/construir_temas_recomendados.py
 Escribe: data/temas_recomendados.csv
@@ -58,6 +81,34 @@ DIR = Path(__file__).parent
 EXCLUIR_AUTOR = {"revistamercado", "SIN_AUTOR"}
 SUFIJO_JULIO = "2026-07-01_2026-07-31"
 MES_VENTANA_ACTUAL = "actual"  # clave especial, no un mes calendario -- ver docstring
+
+# Vocabulario de evento PUNTUAL (ya ocurrió o tiene fecha de cierre fija) --
+# no es una lista de "malas palabras" editorial, es específicamente el
+# lenguaje que describe un HECHO YA SUCEDIDO o un evento con fecha de cierre,
+# a diferencia de un tema de fondo (dólar, canasta básica, tecnología...) que
+# sigue generando notas nuevas indefinidamente. Ver bug real #3 arriba.
+_PALABRAS_COYUNTURALES = {
+    "terremoto", "terremotos", "sismo", "sismos", "tsunami", "huracan",
+    "inundacion", "inundaciones", "murio", "murieron", "muerto", "muertos",
+    "fallecio", "fallecieron", "fallecidos", "victimas", "desaparecidos",
+    "tragedia", "catastrofe", "rescate", "sobrevivio", "sobrevivientes",
+    "escombros", "elecciones", "eleccion", "electoral", "electorales",
+    "votos", "candidato", "candidata", "ganador", "gano", "presidente electo",
+    "comicios", "segunda vuelta", "mundial", "final", "campeon", "campeona",
+    "campeonato", "eliminado", "eliminada", "medalla", "juegos centroamericanos",
+    "eclipse",
+}
+_UMBRAL_COYUNTURAL = 0.20  # si >=20% de los títulos de la entidad tocan estas palabras, se excluye
+
+
+def _es_coyuntural(titulos: list[str]) -> bool:
+    if not titulos:
+        return False
+    normalizados = [ep.normalizar(t) for t in titulos]
+    con_palabra_evento = sum(
+        1 for t in normalizados if any(p in t for p in _PALABRAS_COYUNTURALES)
+    )
+    return (con_palabra_evento / len(normalizados)) >= _UMBRAL_COYUNTURAL
 
 # Meses calendario limpios (ene-jul), usados para el PICO histórico de cada entidad.
 MESES_PICO = ["2026-01", "2026-02", "2026-03", "2026-04", "2026-05", "2026-06", "2026-07"]
@@ -121,8 +172,17 @@ def main():
     portal_impresiones_mes = impresiones.groupby("mes")["impresiones"].sum()
     print(f"Meses con impresiones portal-completas comparables: {MESES_IMPRESIONES_COMPARABLES}")
 
-    def _demanda_reciente_ratio(rutas_entidad: set) -> float:
-        sub = impresiones[impresiones["ruta"].isin(rutas_entidad)]
+    rutas_impresiones_norm = impresiones["ruta"].fillna("").str.lower()
+
+    def _demanda_reciente_ratio(entidad_norm: str, rutas_entidad: set) -> float:
+        # Por SLUG (substring), no por ruta exacta -- contenido evergreen
+        # publicado con una URL nueva cada vez (ej. el precio del dólar
+        # con la fecha en el slug) nunca coincidiría por ruta exacta con
+        # las rutas ya conocidas de meses anteriores. Ver bug real #2.
+        slug = entidad_norm.replace(" ", "-")
+        coincide = rutas_impresiones_norm.str.contains(re.escape(slug), na=False) if slug else pd.Series(False, index=impresiones.index)
+        coincide = coincide | impresiones["ruta"].isin(rutas_entidad)
+        sub = impresiones[coincide]
         serie = sub.groupby("mes")["impresiones"].sum()
         if serie.empty:
             return 0.0
@@ -146,14 +206,14 @@ def main():
             if norma in ep.EXCLUIR_ENTIDADES_SITIO:
                 continue
             tipo = "tema" if norma in ep.DEGRADAR_A_TEMA_COYUNTURAL else "entidad"
-            filas.append({"ruta": row.ruta, "autor": row.autor, "mes": row.mes,
+            filas.append({"ruta": row.ruta, "autor": row.autor, "mes": row.mes, "titulo": row.titulo,
                           "entidad_norm": norma, "entidad_display": e, "tipo": tipo})
             normas_ya.add(norma)
         for t in temas:
             norma = ep.normalizar(t)
             if norma in ep.EXCLUIR_ENTIDADES_SITIO or norma in normas_ya:
                 continue
-            filas.append({"ruta": row.ruta, "autor": row.autor, "mes": row.mes,
+            filas.append({"ruta": row.ruta, "autor": row.autor, "mes": row.mes, "titulo": row.titulo,
                           "entidad_norm": norma, "entidad_display": t, "tipo": "tema"})
             normas_ya.add(norma)
 
@@ -192,7 +252,11 @@ def main():
         agg["mes_primero"] = agg["entidad_canon"].map(meses_por_entidad.apply(lambda s: s.dropna().min()))
 
         rutas_por_entidad_canon = grupo.groupby("entidad_canon")["ruta"].apply(set)
-        agg["demanda_reciente_ratio"] = agg["entidad_canon"].map(rutas_por_entidad_canon).apply(_demanda_reciente_ratio)
+        agg["demanda_reciente_ratio"] = agg["entidad_canon"].apply(
+            lambda ec: _demanda_reciente_ratio(ec, rutas_por_entidad_canon.get(ec, set())))
+
+        titulos_por_entidad_canon = grupo.groupby("entidad_canon")["titulo"].apply(list)
+        agg["es_coyuntural"] = agg["entidad_canon"].map(titulos_por_entidad_canon).apply(_es_coyuntural)
         resultado.append(agg)
 
     rollup = pd.concat(resultado, ignore_index=True)
@@ -214,10 +278,15 @@ def main():
         (rollup["meses_activos"] >= 3)
         & (span_meses >= 3)
         & (rollup["demanda_reciente_ratio"] >= _UMBRAL_DEMANDA_RECIENTE)
+        & (~rollup["es_coyuntural"])
     )
+    n_excluidas_coyuntura = int((rollup["es_coyuntural"] & (rollup["meses_activos"] >= 3)
+                                  & (span_meses >= 3)).sum())
+    if n_excluidas_coyuntura:
+        print(f"Excluidas por coyuntura (evento puntual, no tema de fondo): {n_excluidas_coyuntura}")
 
     columnas = ["autor", "entidad", "tipo", "notas", "confianza", "meses_activos",
-                "mes_primero", "mes_reciente", "demanda_reciente_ratio", "es_recurrente"]
+                "mes_primero", "mes_reciente", "demanda_reciente_ratio", "es_coyuntural", "es_recurrente"]
     salida = rollup[columnas].sort_values(["autor", "es_recurrente", "meses_activos"], ascending=[True, False, False])
     salida.to_csv(DIR / "temas_recomendados.csv", index=False)
     print(f"\n-> temas_recomendados.csv ({len(salida)} filas, {int(salida['es_recurrente'].sum())} marcadas recurrentes)")

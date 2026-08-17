@@ -1,3 +1,7 @@
 entidad,keyword_ganadora,volumen,tendencia_delta,trend_ultimo_mes,top1_dominio,top1_url,revistamercado_en_top5,fecha_generado
-Elecciones en Colombia,elecciones en colombia,480,0.98,1.0,es.wikipedia.org,https://es.wikipedia.org/wiki/Elecciones_presidenciales_de_Colombia_de_2026,False,2026-08-16
-Terremoto en Venezuela,terremoto venezuela,720,0.5,1.0,,,False,2026-08-16
+Precio del dólar,precio del dolar,246000,0.48,0.82,caribeexpress.com.do,https://caribeexpress.com.do/,False,2026-08-16
+Inteligencia Artificial,ia,49500,0.43,1.0,gemini.google.com,https://gemini.google.com/?hl=es-419,False,2026-08-16
+Apple,iphone 16,9900,0.63,1.0,www.apple.com,https://www.apple.com/la/iphone-16/specs/,False,2026-08-16
+Trump,trump,8100,0.3,0.67,es.wikipedia.org,https://es.wikipedia.org/wiki/Donald_Trump,False,2026-08-16
+Cuba,noticias de cuba,320,0.29,0.54,www.cibercuba.com,https://www.cibercuba.com/,False,2026-08-16
+Monorriel de Santo Domingo,monorriel santo domingo,70,0.12,0.79,,,False,2026-08-16
