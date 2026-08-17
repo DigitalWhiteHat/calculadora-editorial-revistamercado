@@ -84,6 +84,16 @@ def _tendencia_portal():
         label_proy = f"{label_actual} (proy.)"
         agregar_proyeccion(fig, proyeccion, x_actual=label_actual, x_proyectado=label_proy)
 
+    fila_parcial = por_periodo[por_periodo["periodo"] == dr.MES_PARCIAL] if dr.MES_PARCIAL else pd.DataFrame()
+    if not fila_parcial.empty and pd.notna(fila_parcial["sesiones"].iloc[0]):
+        st.caption(
+            f"📊 {fila_parcial['mes_label'].iloc[0]} hasta hoy: "
+            f"**{calc.formatear_numero(fila_parcial['sesiones'].iloc[0])} visitas (sesiones GA4)** -- "
+            f"esta es la cifra comparable 1:1 contra 'Visitas' en Looker Studio/GA4. "
+            f"El gráfico de arriba usa páginas vistas ({calc.formatear_numero(fila_parcial['trafico'].iloc[0])}), "
+            "que es una métrica distinta (una sesión puede ver varias páginas)."
+        )
+
     fig.update_layout(
         height=380, margin=dict(l=0, r=10, t=50, b=10),
         yaxis_title=None, showlegend=False,

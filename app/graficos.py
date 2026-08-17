@@ -35,13 +35,21 @@ def agregar_proyeccion(fig: go.Figure, proyeccion: dict | None, x_actual, x_proy
 def texto_metodologia_proyeccion(proyeccion: dict) -> str:
     """Explica en una frase cómo sale el número proyectado, para que no se lea como una
     caja negra."""
-    return (
+    base = (
         f" El tramo punteado es una **proyección de cierre**: se toma el acumulado real de "
         f"los primeros {proyeccion['dias_transcurridos']} de {proyeccion['dias_totales']} días "
         f"del mes y se estira al mismo ritmo diario para lo que falta -- una regla de tres "
         f"simple, no un modelo. No es un dato confirmado: se recalcula solo cuando se "
         f"refrescan los datos."
     )
+    if proyeccion.get("es_estimado") and proyeccion.get("ventana_ini") and proyeccion.get("ventana_fin"):
+        base += (
+            f" El export diario de GA4 trae una ventana móvil ({proyeccion['ventana_ini']:%d/%m}-"
+            f"{proyeccion['ventana_fin']:%d/%m}) que arranca antes del día 1 del mes -- el "
+            f"acumulado real ya viene prorrateado para excluir esa parte de fuera del mes, así "
+            f"que no es un corte exacto día 1 -> hoy, es una estimación."
+        )
+    return base
 
 
 def marcar_mes_parcial(fig: go.Figure, x_ultimo, y_ultimo) -> None:

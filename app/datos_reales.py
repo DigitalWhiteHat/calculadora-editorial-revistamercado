@@ -246,6 +246,53 @@ def _cargar_crudo_historico(mes: str):
 
 
 @st.cache_data
+def _ventana_actual_ga4() -> tuple[date, date] | None:
+    """Rango real (ini, fin) que cubre el bloque 'actual' del export GA4 diario de
+    Apps Script -- es una ventana MOVIL de ancho fijo hacia atrás desde hoy (~17
+    días), NO un corte alineado al mes calendario, así que puede (y en la práctica
+    siempre) arranca varios días antes del día 1 del mes en curso."""
+    raw_path = sorted(glob.glob(f"{DATA_DIR}/raw_historico/ga4_pages_screens_periodos_*.csv"))
+    if not raw_path:
+        return None
+    df = pd.read_csv(sorted(raw_path)[-1], usecols=["periodo", "periodo_inicio", "periodo_fin"])
+    fila = df[df["periodo"] == "actual"]
+    if fila.empty:
+        return None
+    ini = pd.to_datetime(fila["periodo_inicio"].iloc[0]).date()
+    fin = pd.to_datetime(fila["periodo_fin"].iloc[0]).date()
+    return ini, fin
+
+
+@st.cache_data
+def ventana_actual_info(mes: str) -> dict | None:
+    """Metadata honesta de la ventana móvil real detrás del tier 'parcial' --
+    BUG encontrado 2026-08-16 (Edwin, cruzando contra su reporte real de Looker
+    Studio): la ventana 'actual' del export es rodante (ej. arrancó 2026-07-30
+    para el corte de agosto, no 2026-08-01), y el código anterior sumaba TODO
+    ese bloque como si fuera "agosto acumulado" y usaba date.today().day como
+    días transcurridos para proyectar -- inflando el acumulado real (mezclaba
+    ~2 días de julio) Y descuadrando por completo la regla de tres de cierre de
+    mes (439,061 tratado como 16 días cuando la ventana real cubre 17, de los
+    cuales solo 15 son de agosto). Con esto: `frac_mes` prorratea el acumulado
+    a la porción que realmente cae en `mes`, y `dias_en_mes` es el denominador
+    correcto para la proyección -- sigue siendo una ESTIMACION (no hay
+    granularidad diaria en el export para cortar exacto), pero ya no finge
+    precisión que no tiene."""
+    ventana = _ventana_actual_ga4()
+    if not ventana:
+        return None
+    ini, fin = ventana
+    anio, mes_num = int(mes[:4]), int(mes[5:7])
+    primer_dia_mes = date(anio, mes_num, 1)
+    dias_ventana = (fin - ini).days + 1
+    dias_en_mes = (fin - max(ini, primer_dia_mes)).days + 1
+    return dict(
+        ini=ini, fin=fin, dias_ventana=dias_ventana, dias_en_mes=dias_en_mes,
+        frac_mes=(dias_en_mes / dias_ventana) if dias_ventana else 1.0,
+        es_estimado=ini < primer_dia_mes,
+    )
+
+
 def _cargar_crudo_parcial(mes: str):
     """Tier 'parcial' — mes en curso, todavía sin cerrar. Autor real vía
     JSON-LD (igual método que julio), pero scrapeado INCREMENTALMENTE por
@@ -285,8 +332,14 @@ def _cargar_crudo_parcial(mes: str):
                               .str.replace("https://www.revistamercado.do", "", regex=False)
                               .str.replace("https://revistamercado.do", "", regex=False)
                               .str.rstrip("/").replace("", "/"))
-        procesado = procesado.groupby("ruta", as_index=False)["screenPageViews"].sum().rename(
-            columns={"screenPageViews": "vistas"})
+        procesado = procesado.groupby("ruta", as_index=False)[["screenPageViews", "sessions"]].sum().rename(
+            columns={"screenPageViews": "vistas", "sessions": "sesiones"})
+        info_ventana = ventana_actual_info(mes)
+        if info_ventana:
+            # Prorrateo por fracción de días reales del mes dentro de la ventana
+            # móvil del export -- ver ventana_actual_info() para el porqué.
+            procesado["vistas"] = procesado["vistas"] * info_ventana["frac_mes"]
+            procesado["sesiones"] = procesado["sesiones"] * info_ventana["frac_mes"]
         procesado["seccion_raw"] = _extraer_seccion(procesado["ruta"])
         procesado = procesado.merge(
             notas[["ruta", "clics_search", "clics_discover", "clics_news"]], on="ruta", how="left")
@@ -331,7 +384,13 @@ def trafico_total_por_periodo() -> pd.DataFrame:
     filas = []
     for periodo in reversed(ORDEN_PERIODOS):  # cronológico: ene -> jul
         _, procesado = _crudo(periodo)
-        filas.append(dict(periodo=periodo, mes_label=MES_LABEL_LARGO[periodo], trafico=float(procesado["vistas"].sum())))
+        fila = dict(periodo=periodo, mes_label=MES_LABEL_LARGO[periodo], trafico=float(procesado["vistas"].sum()))
+        # "sesiones" (visitas GA4 reales, no páginas vistas) solo existe para el
+        # tier parcial -- es la cifra comparable 1:1 contra "Visitas" de Looker
+        # Studio/GA4, que es distinta de "vistas" (screenPageViews) usado en el
+        # resto de la app para métricas editoriales por nota.
+        fila["sesiones"] = float(procesado["sesiones"].sum()) if "sesiones" in procesado.columns else np.nan
+        filas.append(fila)
     return pd.DataFrame(filas)
 
 
@@ -909,14 +968,23 @@ def proyeccion_fin_de_mes(serie: pd.DataFrame, col_valor: str, col_mes: str = "p
         return None
     anio, mes_num = int(mes[:4]), int(mes[5:7])
     dias_totales = calendar.monthrange(anio, mes_num)[1]
-    dias_transcurridos = date.today().day
+    # BUG corregido 2026-08-16: antes se usaba date.today().day a secas, asumiendo
+    # que el acumulado arrancaba el día 1 del mes -- pero el export de GA4 es una
+    # ventana móvil que arranca varios días ANTES (ver ventana_actual_info). Si
+    # hay info real de la ventana, se usan los días que de verdad caen en `mes`.
+    info_ventana = ventana_actual_info(mes)
+    dias_transcurridos = info_ventana["dias_en_mes"] if info_ventana else date.today().day
+    dias_transcurridos = max(dias_transcurridos, 1)
     valor_actual = float(ultimo[col_valor])
     return {
         "mes": mes,
         "dias_transcurridos": dias_transcurridos,
         "dias_totales": dias_totales,
         "valor_actual": valor_actual,
-        "valor_proyectado": valor_actual / dias_transcurridos * dias_totales if dias_transcurridos else valor_actual,
+        "valor_proyectado": valor_actual / dias_transcurridos * dias_totales,
+        "es_estimado": bool(info_ventana and info_ventana["es_estimado"]),
+        "ventana_ini": info_ventana["ini"] if info_ventana else None,
+        "ventana_fin": info_ventana["fin"] if info_ventana else None,
     }
 
 
