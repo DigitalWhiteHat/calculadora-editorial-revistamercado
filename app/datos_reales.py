@@ -897,11 +897,26 @@ def _trafico_por_entidad(autor_original: str) -> pd.DataFrame:
     """Tráfico real por entidad/tema: suma las vistas de las rutas reales que
     matchearon esa entidad (columna `rutas` de entidades_periodista.csv,
     separadas por "|") — no un promedio inventado, es trazable a notas
-    concretas."""
+    concretas.
+
+    BUG real encontrado 2026-08-17 (Edwin, viendo "iphone pro · 0 · 26 notas"
+    en "no le rinde" de Elba cuando esas notas SÍ generaron tráfico real en
+    agosto: "eso es mentira"): entidades_periodista.csv se construye sobre
+    TODO mapa_autor_ruta.csv (incluye rutas de agosto, ya con el backfill
+    completo), pero esta función solo buscaba vistas en
+    _notas_todo_periodo() (ene-jul) -- cualquier entidad cuyas notas fueran
+    de agosto quedaba en 0 sin importar su tráfico real. Se agrega el mes
+    parcial a la fuente de vistas."""
     df = entidades_por_autor(autor_original)
     if df.empty or "rutas" not in df.columns:
         return df
-    vistas = _notas_todo_periodo().drop_duplicates("ruta").set_index("ruta")["vistas"]
+    bloques = [_notas_todo_periodo()[["ruta", "vistas"]]]
+    if MES_PARCIAL:
+        try:
+            bloques.append(pd.read_csv(f"{DATA_DIR}/notas_{MES_PARCIAL}.csv")[["ruta", "vistas"]])
+        except FileNotFoundError:
+            pass
+    vistas = pd.concat(bloques, ignore_index=True).drop_duplicates("ruta").set_index("ruta")["vistas"]
     df = df.copy()
     df["trafico"] = df["rutas"].apply(
         lambda rutas_str: float(vistas.reindex(str(rutas_str).split("|")).fillna(0).sum()))
