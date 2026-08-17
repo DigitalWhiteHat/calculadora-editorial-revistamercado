@@ -15,6 +15,7 @@ import notas as vista_notas
 import reemplazos as vista_reemplazos
 import secciones as vista_secciones
 import temas_del_dia as vista_temas_del_dia
+import youtube as vista_youtube
 from avatares import logo_revistamercado_data_uri
 from estilos import inyectar_css
 from exportar_pdf import generar_pdf_general, generar_pdf_periodista_cacheado
@@ -45,8 +46,10 @@ NAV_ITEMS = [
     ("🔍", "Diagnóstico SEO", "diagnostico_seo"),
     ("🗓️", "Temas del día", "temas_del_dia"),
     ("🔁", "Reemplazos", "reemplazos"),
+    ("📺", "YouTube", "youtube"),
 ]
-VISTAS_PRINCIPALES = {"general", "secciones", "notas", "alertas", "diagnostico_seo", "temas_del_dia", "reemplazos"}
+VISTAS_PRINCIPALES = {"general", "secciones", "notas", "alertas", "diagnostico_seo", "temas_del_dia",
+                       "reemplazos", "youtube"}
 
 with st.sidebar:
     st.markdown(
@@ -138,6 +141,8 @@ elif st.session_state.vista == "temas_del_dia":
     vista_temas_del_dia.render()
 elif st.session_state.vista == "reemplazos":
     vista_reemplazos.render(tabla_periodistas)
+elif st.session_state.vista == "youtube":
+    vista_youtube.render()
 else:
     slug_seleccionado = general.render(tabla_periodistas, periodo)
     if slug_seleccionado:
