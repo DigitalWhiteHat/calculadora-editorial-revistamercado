@@ -181,28 +181,42 @@ GRACIA_POST_EVENTO_DIAS = 21  # cobertura real de cierre/resumen post-evento, no
 # bucket mensual de agosto es UN SOLO agregado de la ventana móvil completa
 # (~10-jul a 13-ago) -- mezcla los días de pico con los días ya caídos y el
 # promedio no lo detecta. Gap real: ninguna de las 3 señales anteriores mira
-# DENTRO del mes en curso.
+# DENTRO del mes en curso. Instrucción explícita de Edwin: "tienes que mirar
+# las impresiones, la evolución de las impresiones en los últimos 30 o 60
+# días... si tengo una entidad que tuvo mucho tráfico antes y ya no tiene ni
+# la cuarta parte de ese tráfico, no me sirve."
 #
-# Arreglo: el export diario de Apps Script (Drive, ga4_pages_screens_periodos_
-# *.csv) ya guarda un archivo NUEVO cada día con el bloque "actual" (~17 días
-# más recientes de la ventana móvil) -- si se conservan varios de esos
-# archivos diarios (no solo el último), se puede armar una serie de pocos
-# puntos pero 100% real de "cuánto tráfico tuvo este grupo en su bloque
-# reciente", un día distinto por archivo. Verificado con datos reales:
-# - "juegos centroamericanos" (31 notas): 22389 -> 20430 -> 19257 -> 18446
-#   vistas (4 archivos, 12/15/16/17-ago) -- estrictamente descendente aunque
-#   la ventana se corre hacia adelante cada día (debería SUBIR si el evento
-#   siguiera generando tráfico nuevo).
-# - "precio del dólar" (126 notas, evergreen real): 1630 -> 1799 -> 1604 ->
-#   1477 -- SUBE en el primer paso, no es monótona. Misma forma para "dólar
-#   hoy en república" (100 notas). Esta es justo la distinción que pidió
-#   Edwin: "si sube y baja, constante, construye. Si cae a pique de forma
-#   sostenida, ya no sirve" -- monotonía estricta (con tolerancia mínima de
-#   ruido) separa los dos casos reales sin usar ninguna lista curada.
-UMBRAL_RATIO_TENDENCIA_RECIENTE = 0.85  # <85% del primer punto disponible tras 3+ caídas seguidas = declive real
-MIN_PICO_PAGEVIEWS_TENDENCIA_RECIENTE = 2000  # piso para no evaluar la señal sobre ruido de un grupo chico
-MIN_SNAPSHOTS_TENDENCIA_RECIENTE = 3  # con menos de 3 puntos no hay forma de distinguir monotonía de ruido
-TOLERANCIA_RUIDO_MONOTONIA = 1.03  # permite +3% entre puntos consecutivos sin romper la racha descendente
+# Primer intento (INSUFICIENTE, se reemplaza abajo): usar vistas de GA4
+# (bloque "actual" del export diario de Apps Script) y comparar el TOTAL de
+# cada snapshot. Funcionó para "juegos centroamericanos" pero se quedó corto
+# con fragmentos más chicos del mismo evento real (ver más abajo) -- y Edwin
+# pidió impresiones de Search Console explícitamente, no vistas de GA4.
+#
+# Arreglo real: data/raw_historico/sc_consolidado_*.csv también se guarda
+# como un archivo NUEVO cada día (Apps Script, Drive) con la ventana móvil de
+# Search Console (Search+Discover+News) -- conservando varios de esos
+# archivos se arma una serie corta pero 100% real de impresiones. PERO el
+# TOTAL de cada ventana casi siempre SIGUE SUBIENDO aunque el tema ya esté
+# muerto (el día que sale de la ventana rara vez es cero, así que sumar no
+# aísla nada) -- lo que hay que mirar es el APORTE MARGINAL del día que
+# entra cada vez, es decir la DIFERENCIA entre snapshots consecutivos.
+# Verificado con los números reales de las capturas de Edwin (6 snapshots,
+# 09 al 14-ago):
+# - "juegos centroamericanos" (31 notas): total 436143->446065 (sigue
+#   subiendo) pero el APORTE DIARIO cae limpio: +3923 -> +2175 -> +1639 ->
+#   +1223 -> +962 -- último/primero = 0.245, exactamente el "menos de una
+#   cuarta parte" que describió Edwin.
+# - "medallas ganó república dominicana" (el fragmento de 3 notas que Edwin
+#   señaló, que NO alcanzaba el piso de la señal anterior): aporte diario
+#   +3005 -> +1757 -> +1277 -> +947 -> +718 -- ratio 0.239, misma forma real.
+# - "precio del dólar" (126 notas, evergreen real): aporte diario oscila
+#   -23421 -> -10961 -> -21395 -> +12696 -> +5814 -- ni todo positivo ni
+#   monótono, no se marca. Misma forma para WhatsApp/Google/Netflix/Apple
+#   (auditado contra los ~200 grupos de Elba antes de integrarlo).
+UMBRAL_RATIO_TENDENCIA_RECIENTE = 0.30  # aporte diario del último snapshot <30% del primero = declive real
+MIN_PICO_IMPRESIONES_TENDENCIA_RECIENTE = 300  # piso del PRIMER aporte diario, para no evaluar sobre ruido
+MIN_SNAPSHOTS_TENDENCIA_RECIENTE = 4  # con menos de 4 puntos (3 diferencias) no hay forma de confiar en la racha
+TOLERANCIA_RUIDO_MONOTONIA = 1.05  # permite +5% entre aportes diarios consecutivos sin romper la racha descendente
 
 MIN_RATIO_PROPIO = 0.70
 MIN_NOTAS_FUSION_OVERLAP = 0.80
@@ -400,58 +414,58 @@ def _ratio_declive_impresiones(rutas, impresiones_por_ruta_mes: dict) -> float |
     return por_mes[ultimo_mes] / pico
 
 
-def cargar_tendencia_reciente_ga4() -> list[tuple[str, dict[str, float]]]:
+def cargar_tendencia_reciente_gsc() -> list[tuple[str, dict[str, float]]]:
     """Serie de pocos puntos (uno por archivo diario conservado) con las
-    vistas del bloque "actual" de cada snapshot de data/raw_historico/
-    ga4_pages_screens_periodos_*.csv -- ver UMBRAL_RATIO_TENDENCIA_RECIENTE
-    arriba para el porqué. Devuelve [(fecha_fin_str, {ruta: vistas}), ...]
-    ordenado cronológicamente. Lista vacía si no hay archivos (la señal
-    simplemente no se evalúa, no rompe nada)."""
-    archivos = sorted(glob.glob("data/raw_historico/ga4_pages_screens_periodos_*.csv"))
-    puntos = []
+    impresiones REALES de Search Console de cada snapshot de
+    data/raw_historico/sc_consolidado_*.csv -- ver UMBRAL_RATIO_TENDENCIA_
+    RECIENTE arriba para el porqué. Devuelve [(fecha_fin_str, {ruta:
+    impresiones}), ...] ordenado cronológicamente. Lista vacía si no hay
+    archivos (la señal simplemente no se evalúa, no rompe nada)."""
+    archivos = sorted(glob.glob("data/raw_historico/sc_consolidado_*.csv"))
+    puntos = {}
     for path in archivos:
         try:
-            df = pd.read_csv(path, usecols=["periodo", "periodo_fin", "pagePath", "screenPageViews"])
+            df = pd.read_csv(path, usecols=["periodo_fin", "pagina", "impresiones"])
         except (FileNotFoundError, ValueError):
             continue
-        df = df[df["periodo"] == "actual"]
         if df.empty:
             continue
         fecha_fin = str(df["periodo_fin"].iloc[0])
         df = df.copy()
-        df["ruta"] = (df["pagePath"]
+        df["ruta"] = (df["pagina"]
                       .str.replace("https://www.revistamercado.do", "", regex=False)
                       .str.replace("https://revistamercado.do", "", regex=False)
                       .str.rstrip("/"))
-        por_ruta = df.groupby("ruta")["screenPageViews"].sum().to_dict()
-        puntos.append((fecha_fin, por_ruta))
-    # de-duplica por fecha_fin (dos archivos de días distintos pueden compartir
-    # el mismo cierre de ventana) y ordena cronológicamente
-    por_fecha = {fecha: pts for fecha, pts in puntos}
-    return [(fecha, por_fecha[fecha]) for fecha in sorted(por_fecha.keys())]
+        # de-duplica por fecha_fin: dos archivos de días de bajada distintos
+        # pueden compartir el mismo cierre de ventana real de GSC
+        puntos[fecha_fin] = df.groupby("ruta")["impresiones"].sum().to_dict()
+    return [(fecha, puntos[fecha]) for fecha in sorted(puntos.keys())]
 
 
 def _tendencia_reciente_declinando(rutas, snapshots: list[tuple[str, dict[str, float]]]) -> tuple[bool, float | None]:
-    """True si el bloque "actual" del grupo cae de forma ESTRICTAMENTE
-    sostenida entre snapshots diarios reales (no una sola ventana promedio) --
-    ver UMBRAL_RATIO_TENDENCIA_RECIENTE arriba. Devuelve (declinando, ratio
-    último/primero) -- ratio None si no hay suficientes snapshots o el pico
-    no supera el piso de ruido."""
+    """True si el APORTE DIARIO real de impresiones del grupo (la diferencia
+    entre snapshots consecutivos de la ventana móvil de GSC, no el total
+    acumulado -- ver el comentario de UMBRAL_RATIO_TENDENCIA_RECIENTE arriba
+    para el porqué del total no sirve) cae de forma sostenida. Devuelve
+    (declinando, ratio último/primer aporte) -- ratio None si no hay
+    suficientes snapshots o el primer aporte no supera el piso de ruido."""
     if len(snapshots) < MIN_SNAPSHOTS_TENDENCIA_RECIENTE:
         return False, None
     rutas_norm = {r.rstrip("/") for r in rutas}
     serie = [sum(por_ruta.get(r, 0.0) for r in rutas_norm) for _, por_ruta in snapshots]
-    if max(serie) < MIN_PICO_PAGEVIEWS_TENDENCIA_RECIENTE:
+    deltas = [serie[i + 1] - serie[i] for i in range(len(serie) - 1)]
+    if deltas[0] < MIN_PICO_IMPRESIONES_TENDENCIA_RECIENTE:
         return False, None
-    monotona = all(serie[i + 1] <= serie[i] * TOLERANCIA_RUIDO_MONOTONIA for i in range(len(serie) - 1))
-    ratio = serie[-1] / serie[0] if serie[0] > 0 else None
-    declinando = bool(monotona and ratio is not None and ratio < UMBRAL_RATIO_TENDENCIA_RECIENTE)
+    todas_positivas = all(d > 0 for d in deltas)
+    monotona = all(deltas[i + 1] <= deltas[i] * TOLERANCIA_RUIDO_MONOTONIA for i in range(len(deltas) - 1))
+    ratio = deltas[-1] / deltas[0]
+    declinando = bool(todas_positivas and monotona and ratio < UMBRAL_RATIO_TENDENCIA_RECIENTE)
     return declinando, ratio
 
 
 def procesar_autor(df_autor: pd.DataFrame, stats_globales: dict[str, float],
                     fecha_corte_reciente=None, impresiones_por_ruta_mes: dict | None = None,
-                    tendencia_reciente_ga4: list | None = None) -> pd.DataFrame:
+                    tendencia_reciente_gsc: list | None = None) -> pd.DataFrame:
     total_notas = len(df_autor)
     candidatos = []  # (forma_original, tipo, ruta)
     normalizadas_por_ruta = {}
@@ -554,7 +568,7 @@ def procesar_autor(df_autor: pd.DataFrame, stats_globales: dict[str, float],
             vencio_gracia and ratio_declive is not None and ratio_declive < UMBRAL_RATIO_DECLIVE_EVENTO_CONOCIDO
         )
         concluido_por_tendencia_reciente, ratio_tendencia_reciente = _tendencia_reciente_declinando(
-            g["rutas"], tendencia_reciente_ga4 or [])
+            g["rutas"], tendencia_reciente_gsc or [])
         es_evento_concluido = (concluido_por_volumen or concluido_por_silencio
                                 or concluido_por_tendencia or concluido_por_evento_conocido
                                 or concluido_por_tendencia_reciente)
@@ -596,15 +610,15 @@ def main():
     print(f"Impresiones mensuales cargadas para {len(impresiones_por_ruta_mes)} rutas "
           f"(correr data/construir_impresiones_mensuales.py si está vacío/desactualizado)")
 
-    tendencia_reciente_ga4 = cargar_tendencia_reciente_ga4()
-    print(f"Tendencia reciente: {len(tendencia_reciente_ga4)} snapshots diarios de "
-          f"data/raw_historico/ga4_pages_screens_periodos_*.csv "
+    tendencia_reciente_gsc = cargar_tendencia_reciente_gsc()
+    print(f"Tendencia reciente: {len(tendencia_reciente_gsc)} snapshots diarios de "
+          f"data/raw_historico/sc_consolidado_*.csv "
           f"(mínimo {MIN_SNAPSHOTS_TENDENCIA_RECIENTE} para evaluar la señal)")
 
     resultados = []
     for autor, df_autor in mapa.groupby("autor"):
         r = procesar_autor(df_autor, stats, fecha_corte_reciente, impresiones_por_ruta_mes,
-                            tendencia_reciente_ga4)
+                            tendencia_reciente_gsc)
         if r.empty:
             continue
         r.insert(0, "autor", autor)
