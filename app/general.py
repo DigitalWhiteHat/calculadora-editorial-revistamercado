@@ -383,16 +383,18 @@ def _top_economia(periodo):
         with col_datos:
             st.markdown(f"### {ganador['autor']}")
             st.markdown(
-                f"**{calc.formatear_numero(ganador['trafico'])}** tráfico total &nbsp;·&nbsp; "
+                f"**{calc.formatear_numero(ganador['trafico'])}** tráfico en economía/finanzas &nbsp;·&nbsp; "
                 f"{ganador['notas']} notas de economía/finanzas &nbsp;·&nbsp; "
                 f"{ganador['trafico_por_nota']:,.0f} tráfico/nota promedio".replace(",", "."))
+            st.caption("⚠️ Tráfico SOLO de sus notas en esta sub-sección — no es su tráfico total del mes "
+                       "(ese está en la tarjeta \"Tráfico total\" de arriba).")
 
         if len(ganador["ranking"]) > 1:
             st.write("")
-            st.markdown("**Contra quién compite (tráfico total, mínimo 3 notas):**")
+            st.markdown("**Contra quién compite (tráfico en economía/finanzas, mínimo 3 notas):**")
             for i, r in enumerate(ganador["ranking"], start=1):
                 marca = "🥇" if i == 1 else f"{i}."
-                st.markdown(f"{marca} {r['autor']} — **{calc.formatear_numero(r['trafico'])}** tráfico total "
+                st.markdown(f"{marca} {r['autor']} — **{calc.formatear_numero(r['trafico'])}** tráfico en economía "
                             f"({int(r['notas'])} notas, {r['trafico_por_nota']:,.0f}/nota)".replace(",", "."))
 
         st.write("")

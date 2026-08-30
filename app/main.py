@@ -60,13 +60,21 @@ with st.sidebar:
     st.caption("Desempeño Editorial")
     st.write("")
 
+    # Bug real encontrado 29-ago-2026 (Edwin: "dañaste el acceso al Dashboard
+    # principal, solo veo el perfil de [periodista]"): el patrón on_click=lambda
+    # dejaba el clic registrado pero el cuerpo principal seguía renderizando el
+    # perfil individual -- reproducido en vivo (botón "Dashboard" del menú no
+    # sacaba del perfil, pero "← Volver al dashboard", que usa if st.button(...):
+    # + st.rerun() explícito, sí funcionaba). Se unifica al patrón que sí
+    # funciona en vez de seguir con on_click.
     vista_activa = st.session_state.vista if st.session_state.vista in VISTAS_PRINCIPALES else "general"
     for icono, etiqueta, vista_key in NAV_ITEMS:
         if vista_key is not None:
             es_actual = vista_activa == vista_key
-            st.button(f"{icono}  {etiqueta}", key=f"nav_{etiqueta}", width="stretch",
-                      type="primary" if es_actual else "secondary",
-                      on_click=lambda v=vista_key: st.session_state.update(vista=v))
+            if st.button(f"{icono}  {etiqueta}", key=f"nav_{etiqueta}", width="stretch",
+                         type="primary" if es_actual else "secondary"):
+                st.session_state.vista = vista_key
+                st.rerun()
         else:
             st.button(f"{icono}  {etiqueta}", key=f"nav_{etiqueta}", width="stretch", disabled=True,
                       help="Pendiente de rediseñar con KPIs propios de Revista Mercado")
