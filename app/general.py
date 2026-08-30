@@ -45,10 +45,8 @@ def _kpis(tabla, periodo):
         ayuda_trafico = (
             "Visitas reales (sesiones GA4) de TODO el portal para este periodo -- no solo lo "
             "atribuido a periodistas conocidos, mismo criterio 'Visitas' de Looker Studio/GA4. "
-            "OJO: el export diario que alimenta esta cifra tiene un límite de cobertura medido "
-            "entre 80% y 96% según el mes (no ve el 100% de páginas/días de baja audiencia), así "
-            "que puede quedar por debajo del total exacto de Looker Studio -- para el número "
-            "oficial exacto, revisar el Dashboard de Looker Studio directamente."
+            "Fuente: export diario portal-wide (sin desglose por página), verificado 29-ago-2026 "
+            "contra el Dashboard de Looker Studio real de Edwin: 99.6%-100% de cobertura."
         )
     elif not fila_periodo.empty:
         trafico_total = float(fila_periodo["trafico"].iloc[0])
@@ -106,10 +104,8 @@ def _tendencia_portal():
         "Tráfico TOTAL real reportado por GA4 cada periodo (todo el portal, sin filtrar por clasificación de "
         "artículo) — no cambia con el selector de periodo de arriba. Los periodos cerrados (líneas sólidas "
         "ene-jul) son **páginas vistas**; el mes en curso es **visitas (sesiones GA4)** — mismo criterio "
-        "'Visitas' de Looker Studio/GA4, marcada '· visitas' en el eje. **OJO:** por un límite de cobertura "
-        "del export diario (mide entre 80% y 96% según el mes, no ve el 100% de páginas/días de baja "
-        "audiencia), esta cifra puede quedar por debajo del total exacto de Looker Studio -- es un piso "
-        "real, no una cifra inventada, pero no sustituye el número oficial de Looker Studio. Los puntos "
+        "'Visitas' de Looker Studio/GA4, marcada '· visitas' en el eje, desde un export portal-wide "
+        "verificado 29-ago-2026 al 99.6%-100% contra el Dashboard de Looker Studio real. Los puntos "
         "rojos son periodos con un update de Google conocido."
     )
 

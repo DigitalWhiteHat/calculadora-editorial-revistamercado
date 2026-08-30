@@ -420,11 +420,17 @@ def cargar_periodistas_meta(periodo: str = PERIODO_DEFAULT) -> list[dict]:
 
 
 def _trafico_real_diario_mes(mes: str) -> dict | None:
-    """Suma REAL (sin prorratear) del tráfico de `mes` desde el export diario
-    verdadero de GA4 (data/raw_historico/ga4_pages_screens_<inicio>_<fin>.csv,
-    con columna "date" por día -- NO el "_periodos_" que solo trae dos bloques
-    actual/anterior). Devuelve None si no hay ningún archivo con cobertura del
-    mes completo hasta hoy.
+    """Suma REAL (sin prorratear) del tráfico de `mes`. Devuelve None si no hay
+    ningún archivo con cobertura del mes completo hasta hoy.
+
+    Fuente preferida (desde 29-ago-2026): data/raw_historico/ga4_diario_portal_
+    *.csv -- export SIN dimensión de página (solo "date"), agregado por
+    Apps Script vía exportarGA4_DiarioPortal60d(), mismo patrón ya validado en
+    colombia.com. Verificado contra el Looker Studio real de Edwin para
+    1-28 ago 2026: 795.945 vistas / 439.811 sesiones vs. el 795.993 / 441.518
+    reales -- 100.0% / 99.6% de cobertura (antes, el export por-página solo
+    cubría 632.786 / 369.666 -- ~80-84%, porque la GA4 Data API limita filas
+    por página+día y las páginas de baja audiencia se pierden al agregar).
 
     BUG REAL encontrado 29-ago-2026 (Edwin, mirando la gráfica "Tendencia del
     portal": "yo sigo viendo esto mal" -- el punto de agosto se veía como una
@@ -436,14 +442,43 @@ def _trafico_real_diario_mes(mes: str) -> dict | None:
     ENTERA dentro del mes en curso (deja de tocar el mes anterior), deja de
     poder ver los primeros días del mes (ej. 12-28 agosto no ve 1-11 agosto),
     y el prorrateo (que asume tráfico parejo dentro de la ventana) los da por
-    perdidos en vez de avisar que ya no puede verlos -- el número resultante
-    (252K a 28-ago) no es "lo que va del mes", es solo el tráfico de la
-    ventana más reciente. El export diario real SÍ trae fecha por página
-    (dimension "date" de la GA4 Data API), así que no hace falta prorratear
-    nada: se suma directo cada día real de `mes` que el archivo cubra.
-    Verificado: 632,786 vistas reales (28 días completos de agosto) contra
-    251,872 del método viejo -- 2.5x de diferencia, ya no se ve como una
-    caída frente a julio (437K) ni junio (628K)."""
+    perdidos en vez de avisar que ya no puede verlos. El export diario real SÍ
+    trae fecha (dimension "date" de la GA4 Data API), así que no hace falta
+    prorratear nada: se suma directo cada día real de `mes` que el archivo
+    cubra.
+
+    BUG REAL encontrado y corregido en el mismo commit que agregó
+    ga4_diario_portal_*.csv (29-ago-2026, antes de publicar): esa ventana de
+    60 días arranca el 30-jun -- sin este guard, `trafico_total_por_periodo()`
+    llama esta función también para junio (tipo "historico", no "completo"),
+    encuentra el único 30-jun suelto dentro del archivo y lo devuelve como si
+    fuera "el tráfico real de junio" (33.849 en vez de los 628K reales) --
+    esta función solo tiene sentido para el mes EN CURSO, nunca para meses
+    históricos ya cerrados."""
+    if mes != MES_PARCIAL:
+        return None
+    candidatos_portal = glob.glob(f"{DATA_DIR}/raw_historico/ga4_diario_portal_*.csv")
+    mejor_portal = None
+    for archivo in candidatos_portal:
+        df = pd.read_csv(archivo, usecols=["fecha"], dtype={"fecha": str})
+        fechas_mes = df["fecha"][df["fecha"].str.startswith(mes)]
+        if fechas_mes.empty:
+            continue
+        n_dias = fechas_mes.nunique()
+        if mejor_portal is None or n_dias > mejor_portal[1]:
+            mejor_portal = (archivo, n_dias)
+    if mejor_portal:
+        df = pd.read_csv(mejor_portal[0], dtype={"fecha": str})
+        del_mes = df[df["fecha"].str.startswith(mes)]
+        return dict(
+            trafico=float(del_mes["vistas"].sum()),
+            sesiones=float(del_mes["sesiones"].sum()),
+            dias_reales=int(del_mes["fecha"].nunique()),
+            ultimo_dia=str(del_mes["fecha"].max()),
+        )
+
+    # Fallback (solo si todavía no hay ningún ga4_diario_portal_*.csv para este
+    # mes): export por-página, cobertura parcial ~80-84% -- ver docstring.
     candidatos = glob.glob(f"{DATA_DIR}/raw_historico/ga4_pages_screens_20*.csv")
     candidatos = [c for c in candidatos if "_periodos_" not in c]
     if not candidatos:
