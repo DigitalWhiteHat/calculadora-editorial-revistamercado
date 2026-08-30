@@ -1710,14 +1710,12 @@ def cargar_temas_del_dia() -> pd.DataFrame:
 
 
 @st.cache_data
-def advertencias_declive_secciones(umbral_pct: float = -15.0, top_n: int = 8) -> pd.DataFrame:
-    """Qué SECCIONES vienen bajando -- mes en curso (MES_PARCIAL) vs. julio
-    (censo completo), tráfico/día para que un mes parcial no se vea peor solo
-    por tener menos días. Pedido de Edwin, 17-ago-2026: "le hace falta el tema
-    de qué está bajando" -- mismo patrón ya construido en calculadora-periodistas
-    (colombia.com). Si no hay mes parcial todavía, no hay nada que comparar."""
+def _secciones_pct_cambio_dia() -> list[dict]:
+    """Tráfico/día por sección, mes en curso (MES_PARCIAL) vs. julio -- base
+    compartida de advertencias_declive_secciones() y advertencias_subida_secciones()
+    (mismo cálculo; cada una solo filtra su propio lado del cambio)."""
     if not MES_PARCIAL:
-        return pd.DataFrame()
+        return []
     trafico_actual = secciones_trafico_real(MES_PARCIAL)
     trafico_anterior = secciones_trafico_real("2026-07")
     dias_actual = (periodo_fechas(MES_PARCIAL)[1] - periodo_fechas(MES_PARCIAL)[0]).days + 1
@@ -1731,11 +1729,30 @@ def advertencias_declive_secciones(umbral_pct: float = -15.0, top_n: int = 8) ->
         if ant <= 0 or act <= 0:
             continue
         pct = 100 * (act - ant) / ant
-        if pct <= umbral_pct:
-            filas.append({"seccion_raw": s, "trafico_dia_actual": act, "trafico_dia_anterior": ant, "pct_cambio": pct})
+        filas.append({"seccion_raw": s, "trafico_dia_actual": act, "trafico_dia_anterior": ant, "pct_cambio": pct})
+    return filas
+
+
+def advertencias_declive_secciones(umbral_pct: float = -15.0, top_n: int = 8) -> pd.DataFrame:
+    """Qué SECCIONES vienen bajando -- mes en curso (MES_PARCIAL) vs. julio
+    (censo completo), tráfico/día para que un mes parcial no se vea peor solo
+    por tener menos días. Pedido de Edwin, 17-ago-2026: "le hace falta el tema
+    de qué está bajando" -- mismo patrón ya construido en calculadora-periodistas
+    (colombia.com). Si no hay mes parcial todavía, no hay nada que comparar."""
+    filas = [f for f in _secciones_pct_cambio_dia() if f["pct_cambio"] <= umbral_pct]
     if not filas:
         return pd.DataFrame()
     return pd.DataFrame(filas).sort_values("pct_cambio").head(top_n).reset_index(drop=True)
+
+
+def advertencias_subida_secciones(umbral_pct: float = 15.0, top_n: int = 8) -> pd.DataFrame:
+    """Qué SECCIONES vienen subiendo -- espejo de advertencias_declive_secciones(),
+    mismo tráfico/día mes en curso vs. julio. Pedido de Edwin, 29-ago-2026: "no
+    deberíamos crear ahí como una pestaña donde muestre qué está subiendo"."""
+    filas = [f for f in _secciones_pct_cambio_dia() if f["pct_cambio"] >= umbral_pct]
+    if not filas:
+        return pd.DataFrame()
+    return pd.DataFrame(filas).sort_values("pct_cambio", ascending=False).head(top_n).reset_index(drop=True)
 
 
 @st.cache_data
@@ -1750,4 +1767,17 @@ def advertencias_declive_entidades(umbral_pct: float = -50.0, top_n: int = 8) ->
     except FileNotFoundError:
         return pd.DataFrame()
     df = df[df["pct_cambio"] <= umbral_pct].sort_values("pct_cambio")
+    return df.head(top_n).reset_index(drop=True)
+
+
+def advertencias_subida_entidades(umbral_pct: float = 50.0, top_n: int = 8) -> pd.DataFrame:
+    """Qué ENTIDADES/TEMAS vienen subiendo -- espejo de advertencias_declive_entidades(),
+    mismo data/entidades_declive_portal.csv (ya trae ambos lados del cambio; ver
+    data/calcular_declive_entidades.py, que hasta hoy solo imprimía el "Top 10 en
+    mayor subida" al log sin llegar a la pantalla)."""
+    try:
+        df = pd.read_csv(f"{DATA_DIR}/entidades_declive_portal.csv")
+    except FileNotFoundError:
+        return pd.DataFrame()
+    df = df[df["pct_cambio"] >= umbral_pct].sort_values("pct_cambio", ascending=False)
     return df.head(top_n).reset_index(drop=True)
