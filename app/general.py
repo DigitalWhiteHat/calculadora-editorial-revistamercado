@@ -53,8 +53,14 @@ def _kpis(tabla, periodo):
 
 
 def _tendencia_portal():
-    st.subheader("Tendencia del portal — 7 periodos (jul-2026 censo + histórico ene-jun)")
     por_periodo = dr.trafico_total_por_periodo()
+    # Título dinámico -- bug real encontrado 29-ago-2026 (Edwin: "el título está
+    # mal"): quedó fijo en "7 periodos (jul-2026 censo...)" desde antes de que
+    # existiera el tier parcial de agosto, y nunca se actualizó al agregarlo --
+    # ahora se arma solo a partir de los periodos que la serie realmente trae.
+    n_periodos = len(por_periodo)
+    ultimo_label = por_periodo["mes_label"].iloc[-1] if n_periodos else ""
+    st.subheader(f"Tendencia del portal — {n_periodos} periodos (hasta {ultimo_label})")
 
     # El mes parcial grafica SESIONES (visitas GA4 reales, la cifra 1:1 contra
     # "Visitas" de Looker Studio/GA4) -- los periodos cerrados solo tienen
@@ -372,51 +378,27 @@ def _explicacion_eficiencia(tabla):
 _DIFICULTAD_ICONO = {"Fácil": "🟢", "Media": "🔵", "Difícil": "🔴"}
 
 
-def _top_economia(periodo):
-    with st.container(border=True, key="card_top_economia"):
-        st.subheader(f"💹 Mejor periodista de economía — {dr.MES_LABEL_LARGO.get(periodo, periodo)}")
-        st.caption(
-            "Enfoque editorial del portal: quién le deja más tráfico real al portal en secciones de economía "
-            "dura (empresas, finanzas, mercados), **en el periodo seleccionado arriba** — no acumulado en "
-            "varios meses, para no inflar a quien concentra pocas notas en estas secciones frente a quien "
-            "publica mucho volumen diario pero solo una fracción cae aquí. Solo cuenta subsecciones donde se "
-            "leyeron los titulares reales uno por uno y son consistentemente contenido económico/financiero "
-            "(quedaron fuera \"empresas\" raíz, brand-content, gestión, sport-business y money-invest/"
-            "daily-news pese al nombre: son noticia general, deporte con marco de dinero o contenido "
-            "patrocinado, no economía) — mínimo 3 notas para entrar al ranking."
-        )
-        ganador = dr.top_periodista_tema(periodo)
-        if not ganador:
-            st.caption("Sin suficiente muestra este periodo en las secciones de economía/finanzas verificadas.")
+def _notas_mas_leidas(periodo, top_n=10):
+    """Reemplaza a la tarjeta "Mejor periodista de economía" -- pedido de
+    Edwin, 29-ago-2026: "elimina eso, no sabes cómo sacarlo" (la tarjeta
+    anterior generó confusión dos veces seguidas sobre qué tráfico medía
+    exactamente). En su lugar, lo más simple y verificable: las notas reales
+    con más tráfico del portal completo en el periodo, sin recortar por
+    sub-sección ni autor -- mismo dato ya usado en cargar_notas()/vista
+    "Notas", ordenado por clics reales."""
+    with st.container(border=True, key="card_notas_mas_leidas"):
+        st.subheader(f"🔥 Notas más leídas — {dr.MES_LABEL_LARGO.get(periodo, periodo)}")
+        st.caption("Tráfico real (GA4+Search Console) de todo el portal en el periodo seleccionado arriba, "
+                   "sin recortar por sección ni autor.")
+        notas = dr.cargar_notas(periodo)
+        if notas.empty:
+            st.caption("Sin notas para este periodo.")
             return
-
-        col_foto, col_datos = st.columns([1, 4], vertical_alignment="center")
-        with col_foto:
-            st.image(avatar_data_uri(ganador["autor"], "#334155", 200), width=90)
-        with col_datos:
-            st.markdown(f"### {ganador['autor']}")
-            st.markdown(
-                f"**{calc.formatear_numero(ganador['trafico'])}** tráfico en economía/finanzas &nbsp;·&nbsp; "
-                f"{ganador['notas']} notas de economía/finanzas &nbsp;·&nbsp; "
-                f"{ganador['trafico_por_nota']:,.0f} tráfico/nota promedio".replace(",", "."))
-            st.caption("⚠️ Tráfico SOLO de sus notas en esta sub-sección — no es su tráfico total del mes "
-                       "(ese está en la tarjeta \"Tráfico total\" de arriba).")
-
-        if len(ganador["ranking"]) > 1:
-            st.write("")
-            st.markdown("**Contra quién compite (tráfico en economía/finanzas, mínimo 3 notas):**")
-            for i, r in enumerate(ganador["ranking"], start=1):
-                marca = "🥇" if i == 1 else f"{i}."
-                st.markdown(f"{marca} {r['autor']} — **{calc.formatear_numero(r['trafico'])}** tráfico en economía "
-                            f"({int(r['notas'])} notas, {r['trafico_por_nota']:,.0f}/nota)".replace(",", "."))
-
-        st.write("")
-        st.markdown("**Con qué notas lo demuestra:**")
-        for n in ganador["top_notas"]:
-            st.markdown(f"- {n['titulo']} — **{calc.formatear_numero(n['vistas'])}** "
-                        f"({dr.seccion_label(n['seccion_raw'])})")
-        st.caption("Muestra chica a propósito (economía/finanzas todavía es una sección pequeña del sitio) — "
-                   "más una señal a vigilar que un veredicto definitivo.")
+        top = notas.sort_values("clics", ascending=False).head(top_n)
+        for i, n in enumerate(top.itertuples(), start=1):
+            marca = "🥇" if i == 1 else "🥈" if i == 2 else "🥉" if i == 3 else f"{i}."
+            st.markdown(f"{marca} **{n.titulo}** — {calc.formatear_numero(n.clics)} "
+                        f"({n.periodista} · {n.seccion})")
 
 
 def _advertencias_declive():
@@ -485,55 +467,6 @@ def _dificultad_canal_seccion():
         )
 
 
-def _titulares_patrones_real():
-    """Qué combinación de rasgos del título rinde más tráfico -- portado de
-    calculadora-periodistas/app/general.py (Colombia.com), pedido de Edwin (16-ago-2026:
-    "en los autores falta la ecuación... necesito que sea igual con los datos de
-    colombia.com"). Las anclas cívicas/institucionales usadas aquí son las de
-    revistamercado.do (cédula, Bono Madre, elecciones...), no las de Colombia.com --
-    ver datos_reales.py."""
-    st.subheader("🧮 Qué combinación de titulares funciona")
-    historico = dr.patrones_titulares_todo_el_historico()
-    if historico.empty:
-        st.caption("Sin títulos reales suficientes todavía.")
-        return
-    ecuacion = dr.sintetizar_ecuacion_titular(historico)
-    if ecuacion:
-        ejemplo = dr.ejemplo_titular_todo_el_historico(historico)
-        st.markdown(
-            ecuacion_titular_box("Ecuación de titular -- todo el histórico", ecuacion, ejemplo),
-            unsafe_allow_html=True,
-        )
-        st.caption(
-            "Minado en automático sobre títulos y tráfico reales de Revista Mercado (7 periodos, "
-            "ene-jul 2026) -- \"con vs. sin\" compara el tráfico promedio de los títulos que "
-            "tienen ese rasgo contra los que no."
-        )
-        st.write("")
-
-    meses = dr.meses_con_titulares_real()
-    if not meses:
-        return
-    mes_sel = st.selectbox("Ver el detalle de un periodo puntual", meses, key="titulares_mes_sel",
-                            format_func=lambda p: dr.PERIODOS.get(p, {}).get("label", p))
-    rasgos = dr.patrones_titulares_real(mes_sel)
-    if rasgos.empty:
-        st.caption("Muestra insuficiente ese periodo para comparar rasgos de forma confiable.")
-        return
-    ecuacion_mes = dr.sintetizar_ecuacion_titular(rasgos)
-    if ecuacion_mes:
-        mes_label = dr.PERIODOS.get(mes_sel, {}).get("label", mes_sel)
-        ejemplo_mes = dr.ejemplo_titular_real(mes_sel, rasgos)
-        st.markdown(
-            ecuacion_titular_box(f"Ecuación de titular -- {mes_label}", ecuacion_mes, ejemplo_mes),
-            unsafe_allow_html=True,
-        )
-        st.caption(
-            "Calculada en automático solo con datos de este periodo -- por eso puede variar de "
-            "la ecuación de arriba, que agrega todo el histórico y por lo tanto tiene más muestra."
-        )
-
-
 def render(tabla, periodo):
     if tabla.empty:
         st.info("No hay datos para el rango de fechas seleccionado.")
@@ -543,7 +476,7 @@ def render(tabla, periodo):
     _explicacion_eficiencia(tabla)
     st.write("")
 
-    _top_economia(periodo)
+    _notas_mas_leidas(periodo)
     st.write("")
 
     with st.container(border=True, key="card_tendencia_portal"):
@@ -572,9 +505,5 @@ def render(tabla, periodo):
 
     st.write("")
     _dificultad_canal_seccion()
-
-    st.write("")
-    with st.container(border=True, key="card_titulares_dashboard"):
-        _titulares_patrones_real()
 
     return seleccion_cuadrante or seleccion_tabla or seleccion_selector
