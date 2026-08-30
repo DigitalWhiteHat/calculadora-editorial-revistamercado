@@ -19,9 +19,19 @@ ESTADO_STYLE = {
 }
 
 
-def _kpis(tabla):
+def _kpis(tabla, periodo):
     notas_total = tabla["notas"].sum()
-    trafico_total = tabla["clics"].sum()
+    # BUG real encontrado 29-ago-2026 (Edwin, comparando contra Looker Studio/GA4
+    # real: "ese número no es real"): tabla["clics"].sum() solo suma el tráfico de
+    # notas con AUTOR IDENTIFICADO -- deja fuera todo lo que el sitio publica sin
+    # que el scraper de autoría lo haya podido atribuir todavía (sindicado, autor
+    # genérico, rutas que no calzan con el patrón de artículo). Para "tráfico
+    # total" del portal (no "tráfico atribuido a periodistas conocidos") hay que
+    # usar la misma fuente real ya validada en _tendencia_portal() -- suma diaria
+    # directa de GA4, sin prorratear -- no la tabla de periodistas.
+    por_periodo_kpi = dr.trafico_total_por_periodo()
+    fila_periodo = por_periodo_kpi[por_periodo_kpi["periodo"] == periodo]
+    trafico_total = float(fila_periodo["trafico"].iloc[0]) if not fila_periodo.empty else tabla["clics"].sum()
     eficiencia_prom = tabla["eficiencia_normalizada"].mean()
     en_alerta = int(tabla["en_alerta"].sum())
 
@@ -33,7 +43,10 @@ def _kpis(tabla):
                   help_text="Índice comparativo, no un porcentaje ni un conteo: 100 = mediana del equipo. "
                   "Tráfico ajustado por dificultad de sección, relativo al resto del equipo."),
         kpi_card("📝", "Notas totales", f"{notas_total:.0f}"),
-        kpi_card("🔎", "Tráfico total", calc.formatear_numero(trafico_total)),
+        kpi_card("🔎", "Tráfico total", calc.formatear_numero(trafico_total),
+                  help_text="Tráfico REAL de todo el portal (GA4), no solo el atribuido a periodistas "
+                  "conocidos -- puede ser mayor que la suma de la tabla de abajo, que sí depende de "
+                  "tener el autor identificado."),
         kpi_card("🚩", "Flags de revisión IA", "—", help_text="Aún no se ha corrido la auditoría de originalidad sobre este periodo"),
     ]
     st.markdown(f'<div class="cp-kpi-row">{"".join(tarjetas)}</div>', unsafe_allow_html=True)
@@ -526,7 +539,7 @@ def render(tabla, periodo):
         st.info("No hay datos para el rango de fechas seleccionado.")
         return None
 
-    _kpis(tabla)
+    _kpis(tabla, periodo)
     _explicacion_eficiencia(tabla)
     st.write("")
 
