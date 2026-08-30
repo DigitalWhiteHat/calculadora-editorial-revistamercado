@@ -31,7 +31,34 @@ def _kpis(tabla, periodo):
     # directa de GA4, sin prorratear -- no la tabla de periodistas.
     por_periodo_kpi = dr.trafico_total_por_periodo()
     fila_periodo = por_periodo_kpi[por_periodo_kpi["periodo"] == periodo]
-    trafico_total = float(fila_periodo["trafico"].iloc[0]) if not fila_periodo.empty else tabla["clics"].sum()
+    # BUG real encontrado 29-ago-2026 (Edwin, contra el mismo Looker Studio: "el
+    # tema del tráfico es Visitas, revisa ese informe"): esta tarjeta seguía
+    # mostrando "trafico" (páginas vistas) mientras que _tendencia_portal(), un
+    # poco más abajo en la MISMA pantalla, ya graficaba "sesiones" (visitas) para
+    # el mes en curso desde el 17-ago -- dos cifras distintas de "tráfico total"
+    # en la misma vista. Se unifica: la tarjeta usa sesiones (Visitas GA4 real)
+    # cuando existen (mes en curso), igual que el gráfico de abajo.
+    tiene_sesiones = not fila_periodo.empty and pd.notna(fila_periodo["sesiones"].iloc[0])
+    if tiene_sesiones:
+        trafico_total = float(fila_periodo["sesiones"].iloc[0])
+        etiqueta_trafico = "Visitas"
+        ayuda_trafico = (
+            "Visitas reales (sesiones GA4) de TODO el portal para este periodo -- no solo lo "
+            "atribuido a periodistas conocidos, mismo criterio 'Visitas' de Looker Studio/GA4. "
+            "OJO: el export diario que alimenta esta cifra tiene un límite de cobertura medido "
+            "entre 80% y 96% según el mes (no ve el 100% de páginas/días de baja audiencia), así "
+            "que puede quedar por debajo del total exacto de Looker Studio -- para el número "
+            "oficial exacto, revisar el Dashboard de Looker Studio directamente."
+        )
+    elif not fila_periodo.empty:
+        trafico_total = float(fila_periodo["trafico"].iloc[0])
+        etiqueta_trafico = "Tráfico total"
+        ayuda_trafico = ("Páginas vistas reales de todo el portal (GA4) para este periodo histórico -- "
+                          "no se conservaron sesiones para meses ya cerrados, solo páginas vistas.")
+    else:
+        trafico_total = tabla["clics"].sum()
+        etiqueta_trafico = "Tráfico total"
+        ayuda_trafico = "Suma de clics atribuidos a periodistas con autor identificado en este periodo."
     eficiencia_prom = tabla["eficiencia_normalizada"].mean()
     en_alerta = int(tabla["en_alerta"].sum())
 
@@ -43,10 +70,7 @@ def _kpis(tabla, periodo):
                   help_text="Índice comparativo, no un porcentaje ni un conteo: 100 = mediana del equipo. "
                   "Tráfico ajustado por dificultad de sección, relativo al resto del equipo."),
         kpi_card("📝", "Notas totales", f"{notas_total:.0f}"),
-        kpi_card("🔎", "Tráfico total", calc.formatear_numero(trafico_total),
-                  help_text="Tráfico REAL de todo el portal (GA4), no solo el atribuido a periodistas "
-                  "conocidos -- puede ser mayor que la suma de la tabla de abajo, que sí depende de "
-                  "tener el autor identificado."),
+        kpi_card("🔎", etiqueta_trafico, calc.formatear_numero(trafico_total), help_text=ayuda_trafico),
         kpi_card("🚩", "Flags de revisión IA", "—", help_text="Aún no se ha corrido la auditoría de originalidad sobre este periodo"),
     ]
     st.markdown(f'<div class="cp-kpi-row">{"".join(tarjetas)}</div>', unsafe_allow_html=True)
@@ -81,8 +105,11 @@ def _tendencia_portal():
     st.caption(
         "Tráfico TOTAL real reportado por GA4 cada periodo (todo el portal, sin filtrar por clasificación de "
         "artículo) — no cambia con el selector de periodo de arriba. Los periodos cerrados (líneas sólidas "
-        "ene-jul) son **páginas vistas**; el mes en curso es **visitas (sesiones GA4)** — la misma cifra "
-        "comparable 1:1 contra 'Visitas' en Looker Studio/GA4, marcada '· visitas' en el eje. Los puntos "
+        "ene-jul) son **páginas vistas**; el mes en curso es **visitas (sesiones GA4)** — mismo criterio "
+        "'Visitas' de Looker Studio/GA4, marcada '· visitas' en el eje. **OJO:** por un límite de cobertura "
+        "del export diario (mide entre 80% y 96% según el mes, no ve el 100% de páginas/días de baja "
+        "audiencia), esta cifra puede quedar por debajo del total exacto de Looker Studio -- es un piso "
+        "real, no una cifra inventada, pero no sustituye el número oficial de Looker Studio. Los puntos "
         "rojos son periodos con un update de Google conocido."
     )
 
