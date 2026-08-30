@@ -216,7 +216,7 @@ GRACIA_POST_EVENTO_DIAS = 21  # cobertura real de cierre/resumen post-evento, no
 UMBRAL_RATIO_TENDENCIA_RECIENTE = 0.30  # aporte diario del último snapshot <30% del primero = declive real
 MIN_PICO_IMPRESIONES_TENDENCIA_RECIENTE = 300  # piso del PRIMER aporte diario, para no evaluar sobre ruido
 MIN_SNAPSHOTS_TENDENCIA_RECIENTE = 4  # con menos de 4 puntos (3 diferencias) no hay forma de confiar en la racha
-TOLERANCIA_RUIDO_MONOTONIA = 1.05  # permite +5% entre aportes diarios consecutivos sin romper la racha descendente
+TOLERANCIA_RUIDO_MONOTONIA = 1.05  # permite +5% de la 1a mitad de aportes a la 2a sin romper la tendencia a la baja
 
 MIN_RATIO_PROPIO = 0.70
 MIN_NOTAS_FUSION_OVERLAP = 0.80
@@ -448,18 +448,44 @@ def _tendencia_reciente_declinando(rutas, snapshots: list[tuple[str, dict[str, f
     acumulado -- ver el comentario de UMBRAL_RATIO_TENDENCIA_RECIENTE arriba
     para el porqué del total no sirve) cae de forma sostenida. Devuelve
     (declinando, ratio último/primer aporte) -- ratio None si no hay
-    suficientes snapshots o el primer aporte no supera el piso de ruido."""
+    suficientes snapshots o el primer aporte no supera el piso de ruido.
+
+    Dos correcciones reales, encontradas 21-ago-2026 sobre "juegos
+    centroamericanos" (Elba) -- ya validado con 6 snapshots, dejó de marcarse
+    concluido al sumar el 7mo y 8vo (09 a 17-ago, con un hueco real el
+    15-ago -- el export de ese día no llegó a Drive):
+    1) El export diario a veces salta un día (huecos reales en Drive, no un
+       bug del pipeline) -- el "aporte diario" de un salto de 2 días es casi
+       el doble de un día normal, y comparado sin ajustar contra el día
+       previo (de 1 día) parecía una SUBIDA (962 -> 1254) cuando en realidad
+       seguía cayendo (962 -> 627/día). Se normaliza cada aporte por los días
+       reales entre snapshots antes de comparar.
+    2) Exigir que CADA paso consecutivo sea descendente (monotonía estricta)
+       es fràgil: un solo repunte de ruido en un aporte ya normalizado tira
+       abajo la racha entera aunque la tendencia de fondo sea clara. En vez
+       de eso, compara el promedio de la primera mitad de aportes contra la
+       segunda mitad (mismo criterio ya usado en colombia.com/
+       detectar_evento_concluido.py) -- mucho menos sensible a un solo punto
+       ruidoso, sigue exigiendo que TODOS los aportes sean positivos (si no,
+       no hay racha real que medir, es puro ruido)."""
     if len(snapshots) < MIN_SNAPSHOTS_TENDENCIA_RECIENTE:
         return False, None
     rutas_norm = {r.rstrip("/") for r in rutas}
+    fechas = [pd.Timestamp(fecha) for fecha, _ in snapshots]
     serie = [sum(por_ruta.get(r, 0.0) for r in rutas_norm) for _, por_ruta in snapshots]
-    deltas = [serie[i + 1] - serie[i] for i in range(len(serie) - 1)]
+    dias_entre = [max(1, (fechas[i + 1] - fechas[i]).days) for i in range(len(fechas) - 1)]
+    deltas = [(serie[i + 1] - serie[i]) / dias_entre[i] for i in range(len(serie) - 1)]
     if deltas[0] < MIN_PICO_IMPRESIONES_TENDENCIA_RECIENTE:
         return False, None
     todas_positivas = all(d > 0 for d in deltas)
-    monotona = all(deltas[i + 1] <= deltas[i] * TOLERANCIA_RUIDO_MONOTONIA for i in range(len(deltas) - 1))
+    mitad = len(deltas) // 2
+    tendencia_baja = True
+    if mitad >= 1:
+        prom_1a = sum(deltas[:mitad]) / mitad
+        prom_2a = sum(deltas[mitad:]) / (len(deltas) - mitad)
+        tendencia_baja = prom_2a <= prom_1a * TOLERANCIA_RUIDO_MONOTONIA
     ratio = deltas[-1] / deltas[0]
-    declinando = bool(todas_positivas and monotona and ratio < UMBRAL_RATIO_TENDENCIA_RECIENTE)
+    declinando = bool(todas_positivas and tendencia_baja and ratio < UMBRAL_RATIO_TENDENCIA_RECIENTE)
     return declinando, ratio
 
 

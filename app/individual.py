@@ -564,6 +564,49 @@ def _eeat_checklist(meta):
         )
 
 
+def _entidades_activas_mes(meta, mes):
+    """Qué entidades/temas del MES EN CURSO están realmente vigentes por impresiones --
+    pedido explícito de Edwin, 19-ago-2026: "no me puedes seguir diciendo [una entidad]
+    cuando ya no hay [esa entidad] en el mes". Distinto de "Le rinde" (tráfico PROMEDIO
+    histórico, sin vigencia) -- ver data/entidades_activas_mes.py. Se muestra ANTES de
+    esa tarjeta para que quede claro cuál es el dato vigente si hay que presentarlo hoy
+    mismo. Portado de calculadora-periodistas (colombia.com), 21-ago-2026."""
+    df = dr.entidades_activas_mes(meta["autor_original"], mes)
+    if df.empty:
+        return
+    with st.container(border=True, key="card_entidades_activas_mes"):
+        st.subheader("📊 Entidades activas este mes (por impresiones)")
+        st.caption(
+            "A diferencia de 'Le rinde' (tráfico promedio histórico), esto arranca SOLO "
+            "de las notas del mes en curso y mide la tendencia real de impresiones de "
+            "Search Console -- una entidad que ya cayó a cero o viene en declive "
+            "sostenido dentro del mes queda marcada para EVITAR, aunque haya generado "
+            "mucho tráfico en su momento."
+        )
+        activas = df[df["estado"] == "ACTIVA"]
+        concluidas = df[df["estado"] == "CONCLUIDA"]
+        sin_datos = df[df["estado"] == "SIN_DATOS"]
+        col_ok, col_evitar = st.columns(2)
+        with col_ok:
+            st.markdown(f"**✅ Vigentes — presentar ({len(activas)})**")
+            if activas.empty:
+                st.caption("Ninguna con señal clara de vigencia todavía.")
+            for r in activas.itertuples():
+                icono = ICONO_TIPO_ENTIDAD.get(r.tipo, "📌")
+                st.markdown(f"{icono} **{r.entidad}** — {r.notas_mes} notas este mes · {r.motivo}")
+        with col_evitar:
+            st.markdown(f"**❌ Evitar — cayeron este mes ({len(concluidas)})**")
+            if concluidas.empty:
+                st.caption("Ninguna detectada este mes.")
+            for r in concluidas.itertuples():
+                icono = ICONO_TIPO_ENTIDAD.get(r.tipo, "📌")
+                st.markdown(f"{icono} **{r.entidad}** — {r.notas_mes} notas · {r.motivo}")
+        if not sin_datos.empty:
+            st.caption(f"⚪ {len(sin_datos)} entidad(es) más sin impresiones suficientes todavía para "
+                       f"tener un veredicto (nota muy reciente o de muy bajo volumen) — no se muestran "
+                       f"como vigentes ni como evitar.")
+
+
 def _entidades_fuertes(meta):
     with st.container(border=True, key="card_entidades_fuertes"):
         st.subheader("En qué secciones le rinde escribir")
@@ -664,6 +707,29 @@ def _temas_fuertes(meta):
 
         st.caption("🟢 alta confianza (≥10 notas) · 🟠 media (3-9) · ⚪ baja (2, solo se muestra en \"le rinde\", "
                    "indicativo). \"No le rinde\" excluye baja confianza para no señalar por un caso aislado.")
+
+
+def _temas_recomendados(meta):
+    """Portado de calculadora-periodistas (colombia.com), 21-ago-2026."""
+    recomendados = dr.temas_recomendados(meta["autor_original"])
+    if recomendados.empty:
+        return
+    with st.container(border=True, key="card_temas_recomendados"):
+        st.subheader("🎯 Temas recomendados — en qué seguir")
+        st.caption(
+            "Entidades/temas en los que este periodista ya demostró un patrón real de cobertura "
+            "(no un pico único) y que siguen generando búsquedas reales ahora — no solo notas "
+            "nuevas. Excluye coyunturas ya cerradas: una elección que ya pasó, un evento que "
+            "caducó, aunque se hayan cubierto mucho en su momento."
+        )
+        for _, r in recomendados.iterrows():
+            icono = ICONO_TIPO_ENTIDAD.get(r["tipo"], "📌")
+            icono_conf = {"alta": "🟢", "media": "🟡", "baja": "⚪"}.get(r["confianza"], "⚪")
+            st.markdown(
+                f"{icono} **{r['entidad']}** {icono_conf} — {int(r['meses_activos'])} meses activos "
+                f"({r['mes_primero']} a {r['mes_reciente']}) · demanda reciente "
+                f"{r['demanda_reciente_ratio']:.0%} del pico histórico"
+            )
 
 
 def _nota_editorial(slug):
@@ -776,11 +842,18 @@ def render(tabla, df_notas, slug, periodo=dr.PERIODO_DEFAULT):
     with col_nota:
         _nota_editorial(slug)
 
+    if not dr.es_periodo_completo(periodo):
+        st.write("")
+        _entidades_activas_mes(meta, periodo)
+
     st.write("")
     _entidades_fuertes(meta)
 
     st.write("")
     _temas_fuertes(meta)
+
+    st.write("")
+    _temas_recomendados(meta)
 
     st.write("")
     col_eeat, col_seo = st.columns(2)
