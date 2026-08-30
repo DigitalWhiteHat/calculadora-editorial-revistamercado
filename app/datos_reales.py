@@ -35,6 +35,7 @@ nunca inventadas): rebote_pct, temas_propios_pct, flags_ia, ctr (bruto).
 
 import calendar
 import glob
+import os
 import re
 import unicodedata
 from datetime import date
@@ -245,16 +246,39 @@ def _cargar_crudo_historico(mes: str):
     return notas, procesado_mes
 
 
+def _ga4_periodos_mas_reciente() -> str | None:
+    """El archivo con el bloque 'actual' más fresco (periodo_fin real, leído del
+    contenido) -- NO ordenar por nombre de archivo: conviven dos convenciones en
+    raw_historico/ (ga4_pages_screens_periodos_2026-08-17.csv de un solo día vs.
+    ga4_pages_screens_periodos_<inicio>_<fin>.csv con rango), y "2026-08-17" ordena
+    alfabéticamente DESPUÉS que "2026-07-17_2026-08-19" aunque el segundo sea más
+    reciente -- bug real encontrado 21-ago-2026 (mismo patrón que picó en
+    construir_impresiones_mensuales.py el mismo día): con el sort por nombre, la
+    ventana 'actual' se quedaba pegada en 17-ago aunque ya hubiera un export
+    descargado con datos hasta el 19-ago."""
+    candidatos = glob.glob(f"{DATA_DIR}/raw_historico/ga4_pages_screens_periodos_*.csv")
+    mejor_archivo, mejor_fecha = None, None
+    for archivo in candidatos:
+        df = pd.read_csv(archivo, usecols=["periodo", "periodo_fin"])
+        fila = df[df["periodo"] == "actual"]
+        if fila.empty:
+            continue
+        fin = pd.to_datetime(fila["periodo_fin"].iloc[0])
+        if mejor_fecha is None or fin > mejor_fecha:
+            mejor_archivo, mejor_fecha = archivo, fin
+    return mejor_archivo
+
+
 @st.cache_data
 def _ventana_actual_ga4() -> tuple[date, date] | None:
     """Rango real (ini, fin) que cubre el bloque 'actual' del export GA4 diario de
     Apps Script -- es una ventana MOVIL de ancho fijo hacia atrás desde hoy (~17
     días), NO un corte alineado al mes calendario, así que puede (y en la práctica
     siempre) arranca varios días antes del día 1 del mes en curso."""
-    raw_path = sorted(glob.glob(f"{DATA_DIR}/raw_historico/ga4_pages_screens_periodos_*.csv"))
-    if not raw_path:
+    archivo = _ga4_periodos_mas_reciente()
+    if not archivo:
         return None
-    df = pd.read_csv(sorted(raw_path)[-1], usecols=["periodo", "periodo_inicio", "periodo_fin"])
+    df = pd.read_csv(archivo, usecols=["periodo", "periodo_inicio", "periodo_fin"])
     fila = df[df["periodo"] == "actual"]
     if fila.empty:
         return None
@@ -335,9 +359,9 @@ def _cargar_crudo_parcial(mes: str):
     except FileNotFoundError:
         pass
 
-    raw_path = sorted(glob.glob(f"{DATA_DIR}/raw_historico/ga4_pages_screens_periodos_*.csv"))
-    if raw_path:
-        crudo_ga4 = pd.read_csv(sorted(raw_path)[-1])
+    archivo_ga4 = _ga4_periodos_mas_reciente()
+    if archivo_ga4:
+        crudo_ga4 = pd.read_csv(archivo_ga4)
         crudo_ga4 = crudo_ga4[crudo_ga4["periodo"] == "actual"].copy()
         crudo_ga4["ruta"] = (crudo_ga4["pagePath"]
                               .str.replace("https://www.revistamercado.do", "", regex=False)
@@ -491,12 +515,67 @@ def cargar_notas(periodo: str = PERIODO_DEFAULT) -> pd.DataFrame:
                "clics", "posicion_promedio", "canal_dominante", "semaforo", "pct_cumplimiento", "fuente"]]
 
 
-def _agregar_periodistas(notas: pd.DataFrame, sec_traf: dict, canib: dict) -> pd.DataFrame:
+@st.cache_data
+def _trafico_evergreen_por_autor(mes: str) -> dict:
+    """BUG REAL, 29-ago-2026 -- mismo patrón encontrado y corregido el mismo día en
+    colombia.com (ver memoria [[feedback-metodologia-auditoria-reportes-editoriales]]
+    sección 4): `notas_{mes}.csv` (ver data/construir_notas_mes_actual.py) solo cruza
+    tráfico de notas PUBLICADAS ese mes -- una nota de julio (o antes) que sigue
+    recibiendo vistas/clics en agosto no aporta nada al total del periodista ese mes,
+    aunque ese tráfico sí ocurrió en agosto. Edwin: "es muy injusto si no se hace así".
+
+    Reusa el mismo mapa_autor_ruta.csv acumulado (TODAS las rutas con autor ya conocido,
+    de cualquier mes) cruzado contra la MISMA ventana 'actual' de GA4 que ya usa
+    `_cargar_crudo_parcial()` -- pero para rutas que NO están en notas_{mes}.csv (para no
+    duplicar lo que ya se sumó ahí). Aplica el mismo prorrateo por `frac_mes` que el resto
+    del tier parcial (ver ventana_actual_info) -- mismo criterio, no dos reglas distintas.
+    Solo GA4 (vistas), no GSC: "clics" en este archivo YA significa únicamente
+    `g["vistas"].sum()" -- ver _agregar_periodistas() -- los clics de Search/Discover/News
+    nunca se suman ahí, solo se usan aparte para canal_dominante/CTR. Mezclar GSC acá
+    inflaría el evergreen con una métrica que "clics" nunca incluyó.
+
+    Por decisión explícita de Edwin (mismo criterio que colombia.com): este evergreen
+    entra SOLO al total de tráfico mostrado ("clics") -- nunca a `eficiencia_normalizada`/
+    `trafico_ajustado` ni al "índice" simple de historial_periodista(), que deben seguir
+    midiendo solo el rendimiento de las notas NUEVAS de este mes (ver `clics_nuevas`)."""
+    notas_path = f"{DATA_DIR}/notas_{mes}.csv"
+    mapa_path = f"{DATA_DIR}/mapa_autor_ruta.csv"
+    archivo_ga4 = _ga4_periodos_mas_reciente()
+    if not (os.path.exists(notas_path) and os.path.exists(mapa_path) and archivo_ga4):
+        return {}
+
+    rutas_del_mes = set(pd.read_csv(notas_path, usecols=["ruta"])["ruta"])
+    mapa = pd.read_csv(mapa_path)
+    mapa = mapa[~mapa["autor"].isin(EXCLUIR_AUTOR) & mapa["autor"].notna()]
+    mapa = mapa[~mapa["ruta"].isin(rutas_del_mes)][["ruta", "autor"]]
+    if mapa.empty:
+        return {}
+
+    info_ventana = ventana_actual_info(mes)
+    frac = info_ventana["frac_mes"] if info_ventana else 1.0
+
+    ga4 = pd.read_csv(archivo_ga4)
+    ga4 = ga4[ga4["periodo"] == "actual"].copy()
+    ga4["ruta"] = (ga4["pagePath"].str.replace("https://www.revistamercado.do", "", regex=False)
+                   .str.replace("https://revistamercado.do", "", regex=False)
+                   .str.rstrip("/").replace("", "/"))
+    vistas = ga4.groupby("ruta", as_index=False)["screenPageViews"].sum().rename(
+        columns={"screenPageViews": "vistas"})
+    vistas["vistas"] = vistas["vistas"] * frac
+
+    cruce = vistas.merge(mapa, on="ruta", how="inner")
+    if cruce.empty:
+        return {}
+    return cruce.groupby("autor")["vistas"].sum().to_dict()
+
+
+def _agregar_periodistas(notas: pd.DataFrame, sec_traf: dict, canib: dict, evergreen: dict | None = None) -> pd.DataFrame:
     """Agregación por autor — COMPARTIDA entre los dos tiers. Lo único que
     cambia entre Tier 1 y Tier 2 es qué tan completas vienen `pct_cumplimiento`
     / `palabras_body` en el `notas` de entrada (censo vs. muestra); la lógica
     de agregación es la misma."""
     df = notas
+    evergreen = evergreen or {}
 
     con_pos_global = df[df["posicion"].notna() & (df["clics_search"] > 0) & (df["impresiones_search"] > 0)].copy()
     con_pos_global["ctr"] = con_pos_global["clics_search"] / con_pos_global["impresiones_search"]
@@ -537,7 +616,8 @@ def _agregar_periodistas(notas: pd.DataFrame, sec_traf: dict, canib: dict) -> pd
         notas_seo_evaluadas = int(g["pct_cumplimiento"].notna().sum())
         pct_cumplimiento_prom = float(g["pct_cumplimiento"].mean()) if notas_seo_evaluadas else np.nan
 
-        trafico_ajustado = float(g["vistas"].sum()) * dif_ajuste
+        clics_nuevas = float(g["vistas"].sum())
+        trafico_ajustado = clics_nuevas * dif_ajuste
 
         filas.append(dict(
             slug=slug, periodista=autor,
@@ -545,7 +625,7 @@ def _agregar_periodistas(notas: pd.DataFrame, sec_traf: dict, canib: dict) -> pd
             beat=", ".join(top_secciones),
             canal_dominante=canal_dominante, tema_principal=top_secciones[0] if top_secciones else "",
             dificultad_categoria=dif_categoria, dificultad_ajuste=dif_ajuste,
-            notas=len(g), clics=float(g["vistas"].sum()),
+            notas=len(g), clics=clics_nuevas + evergreen.get(autor, 0.0), clics_nuevas=clics_nuevas,
             impresiones=float(g[["impresiones_search", "impresiones_discover", "impresiones_news"]].fillna(0).sum().sum()),
             ctr=np.nan, ctr_indice=ctr_indice_val,
             posicion_promedio=posicion_promedio,
@@ -586,7 +666,8 @@ def cargar_periodistas(periodo: str = PERIODO_DEFAULT) -> pd.DataFrame:
     notas, _ = _crudo(periodo)
     sec_traf = secciones_trafico_real(periodo)
     canib = canibalizacion_por_autor()
-    return _agregar_periodistas(notas, sec_traf, canib)
+    evergreen = _trafico_evergreen_por_autor(periodo) if PERIODOS[periodo]["tipo"] == "parcial" else {}
+    return _agregar_periodistas(notas, sec_traf, canib, evergreen)
 
 
 # Alertas de ESTADO ACTUAL (no requieren historial de varios meses — eso sigue
@@ -718,20 +799,28 @@ def historial_periodista(autor_original: str) -> pd.DataFrame:
     tarjeta del periodo (esa sí ajusta por dificultad de sección): aquí es
     tráfico/nota puro contra la mediana de tráfico/nota del equipo ESE mismo
     periodo — se sacrifica el ajuste por dificultad para poder comparar los 7
-    periodos con el mismo criterio simple (igual que Colombia.com)."""
+    periodos con el mismo criterio simple (igual que Colombia.com).
+
+    `trafico` SÍ incluye el evergreen del tier parcial (mismo criterio que
+    colombia.com: el total mostrado cuenta todo lo generado ese mes, notas
+    nuevas o viejas) -- pero `eficiencia`/`indice` usan `clics_nuevas` (solo
+    notas nuevas de ese periodo), nunca `clics`, para que el evergreen no
+    infle el puntaje de rendimiento (decisión explícita de Edwin, 29-ago-2026).
+    Para tiers histórico/completo, clics_nuevas == clics (no hay evergreen ahí
+    todavía), así que no cambia nada para esos periodos."""
     filas = []
     for periodo in reversed(ORDEN_PERIODOS):  # cronológico: ene -> jul
         tabla = cargar_periodistas(periodo)
         if tabla.empty:
             continue
-        eficiencia_equipo = tabla["clics"] / tabla["notas"].clip(lower=1)
+        eficiencia_equipo = tabla["clics_nuevas"] / tabla["notas"].clip(lower=1)
         mediana = eficiencia_equipo.median()
         fila = tabla[tabla["periodista"] == autor_original]
         if fila.empty:
             continue
         f = fila.iloc[0]
         notas = float(f["notas"])
-        eficiencia = float(f["clics"]) / notas if notas else float("nan")
+        eficiencia = float(f["clics_nuevas"]) / notas if notas else float("nan")
         filas.append(dict(
             mes=periodo, mes_label=MES_LABEL_LARGO[periodo],
             trafico=float(f["clics"]), notas=notas,
@@ -979,6 +1068,47 @@ def temas_debiles(autor_original: str, top_n: int = 6, excluir_patron: str | Non
         df = df[~df["forma"].str.contains(excluir_patron, case=False, na=False)]
     sub = df[~df["confianza"].astype(str).str.contains("baja", na=False)]
     return sub.sort_values("trafico_por_nota", ascending=True).head(top_n)
+
+
+@st.cache_data
+def temas_recomendados(autor_original: str, top_n: int = 8) -> pd.DataFrame:
+    """En qué entidad/tema seguir escribiendo -- excluye coyunturas ya cerradas
+    (una elección que ya pasó, un evento que caducó) aunque el periodista las
+    haya cubierto mucho en su momento. Portado de calculadora-periodistas
+    (colombia.com) -- ver data/construir_temas_recomendados.py para la regla
+    completa (meses_activos>=3, span>=3 meses, demanda de impresiones
+    reciente>=10% del pico histórico). Solo entidades/temas es_recurrente=True."""
+    try:
+        df = pd.read_csv(f"{DATA_DIR}/temas_recomendados.csv")
+    except FileNotFoundError:
+        return pd.DataFrame()
+    sub = df[(df["autor"] == autor_original) & (df["es_recurrente"])].copy()
+    orden_confianza = {"alta": 0, "media": 1, "baja": 2}
+    sub["_orden"] = sub["confianza"].map(orden_confianza)
+    return sub.sort_values(["_orden", "meses_activos"], ascending=[True, False]).drop(columns="_orden").head(top_n)
+
+
+@st.cache_data
+def entidades_activas_mes(autor_original: str, mes: str = MES_PARCIAL) -> pd.DataFrame:
+    """Entidades/temas del MES EN CURSO (no histórico) clasificados por su
+    tendencia real de impresiones de Search Console -- pedido explícito de
+    Edwin, 19-ago-2026: "necesito saber qué entidades activas hay en agosto...
+    basado en impresiones... si una entidad no es constante en agosto, que se
+    fue a cero, no es una entidad válida que yo le pueda presentar." A
+    diferencia de entidades_fuertes()/temas_fuertes() (tráfico PROMEDIO de
+    TODO el histórico, sin señal de vigencia), esto arranca solo de las notas
+    del mes en curso y reusa las 4 señales reales ya validadas de
+    entidades_periodista.py -- ver data/entidades_activas_mes.py."""
+    if not mes:
+        return pd.DataFrame()
+    try:
+        df = pd.read_csv(f"{DATA_DIR}/entidades_activas_{mes}.csv")
+    except FileNotFoundError:
+        return pd.DataFrame()
+    orden_estado = {"ACTIVA": 0, "CONCLUIDA": 1, "SIN_DATOS": 2}
+    sub = df[df["autor"] == autor_original].copy()
+    sub["_orden"] = sub["estado"].map(orden_estado)
+    return sub.sort_values(["_orden", "notas_mes"], ascending=[True, False]).drop(columns="_orden")
 
 
 @st.cache_data

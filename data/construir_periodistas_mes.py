@@ -10,13 +10,54 @@ Lee: data/notas_<mes>.csv (ver data/construir_notas_mes_actual.py -- ya trae
 Escribe: data/periodistas_<mes>.csv, data/secciones_<mes>.csv
 """
 
+import glob
 import sys
 from pathlib import Path
 
 import pandas as pd
 
 DIR = Path(__file__).parent
+RAW = DIR / "raw_historico"
 EXCLUIR_AUTOR = {"SIN_AUTOR"}
+
+
+def normalizar(url: str) -> str:
+    return (
+        str(url)
+        .replace("https://www.revistamercado.do", "")
+        .replace("https://revistamercado.do", "")
+        .rstrip("/")
+        or "/"
+    )
+
+
+def _trafico_evergreen(mes: str, rutas_del_mes: set) -> pd.Series:
+    """BUG REAL, 29-ago-2026 -- mismo patrón que colombia.com (ver
+    app/datos_reales.py::_trafico_evergreen_por_autor(), misma lógica duplicada acá
+    porque este script no importa de app/): "trafico" de este archivo solo suma notas
+    PUBLICADAS este mes, perdiendo el tráfico que notas viejas siguen generando ahora.
+    Se suma aparte, nunca a "eficiencia" (que sigue siendo solo sobre notas nuevas)."""
+    cache_path = DIR / "mapa_autor_ruta.csv"
+    archivos_ga4 = sorted(RAW.glob("ga4_pages_screens_periodos_*.csv"))
+    if not (cache_path.exists() and archivos_ga4):
+        return pd.Series(dtype=float)
+
+    mapa = pd.read_csv(cache_path)
+    mapa = mapa[~mapa["autor"].isin(EXCLUIR_AUTOR) & mapa["autor"].notna()]
+    mapa = mapa[~mapa["ruta"].isin(rutas_del_mes)][["ruta", "autor"]]
+    if mapa.empty:
+        return pd.Series(dtype=float)
+
+    ga4 = pd.read_csv(archivos_ga4[-1])
+    ga4 = ga4[ga4["periodo"] == "actual"].copy()
+    ga4["ruta"] = ga4["pagePath"].apply(normalizar)
+    vistas = ga4.groupby("ruta", as_index=False)["screenPageViews"].sum().rename(
+        columns={"screenPageViews": "vistas"})
+
+    cruce = vistas.merge(mapa, on="ruta", how="inner")
+    if cruce.empty:
+        return pd.Series(dtype=float)
+    return cruce.groupby("autor")["vistas"].sum()
 
 
 def main(mes: str):
@@ -53,7 +94,11 @@ def main(mes: str):
         notas=("ruta", "count"), trafico=("trafico_total", "sum")
     ).reset_index()
     por_periodista["mes"] = mes
+    # eficiencia se calcula ANTES de sumar el evergreen -- sigue siendo "tráfico
+    # promedio por nota NUEVA este mes" (ver _trafico_evergreen arriba).
     por_periodista["eficiencia"] = (por_periodista["trafico"] / por_periodista["notas"]).round(0)
+    evergreen = _trafico_evergreen(mes, set(notas["ruta"]))
+    por_periodista["trafico"] = por_periodista["trafico"] + por_periodista["autor"].map(evergreen).fillna(0)
     por_periodista = por_periodista.merge(pos_por_autor, on="autor", how="left")
     columnas = ["mes", "autor", "notas", "trafico", "eficiencia",
                 "posicion_promedio", "notas_top10", "notas_con_posicion"]
