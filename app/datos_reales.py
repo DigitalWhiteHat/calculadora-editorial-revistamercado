@@ -419,6 +419,56 @@ def cargar_periodistas_meta(periodo: str = PERIODO_DEFAULT) -> list[dict]:
     return sorted(metas, key=lambda m: m["nombre"])
 
 
+def _trafico_real_diario_mes(mes: str) -> dict | None:
+    """Suma REAL (sin prorratear) del tráfico de `mes` desde el export diario
+    verdadero de GA4 (data/raw_historico/ga4_pages_screens_<inicio>_<fin>.csv,
+    con columna "date" por día -- NO el "_periodos_" que solo trae dos bloques
+    actual/anterior). Devuelve None si no hay ningún archivo con cobertura del
+    mes completo hasta hoy.
+
+    BUG REAL encontrado 29-ago-2026 (Edwin, mirando la gráfica "Tendencia del
+    portal": "yo sigo viendo esto mal" -- el punto de agosto se veía como una
+    caída abrupta frente a todos los meses anteriores) -- mismo bug ya
+    encontrado y corregido el mismo día en colombia.com (ver
+    calculadora-periodistas/data/trafico_real_por_mes.py): el bloque "actual"
+    de ga4_pages_screens_periodos_*.csv es una ventana móvil de ancho FIJO
+    (~17-34 días) -- una vez que esa ventana avanza lo suficiente para caer
+    ENTERA dentro del mes en curso (deja de tocar el mes anterior), deja de
+    poder ver los primeros días del mes (ej. 12-28 agosto no ve 1-11 agosto),
+    y el prorrateo (que asume tráfico parejo dentro de la ventana) los da por
+    perdidos en vez de avisar que ya no puede verlos -- el número resultante
+    (252K a 28-ago) no es "lo que va del mes", es solo el tráfico de la
+    ventana más reciente. El export diario real SÍ trae fecha por página
+    (dimension "date" de la GA4 Data API), así que no hace falta prorratear
+    nada: se suma directo cada día real de `mes` que el archivo cubra.
+    Verificado: 632,786 vistas reales (28 días completos de agosto) contra
+    251,872 del método viejo -- 2.5x de diferencia, ya no se ve como una
+    caída frente a julio (437K) ni junio (628K)."""
+    candidatos = glob.glob(f"{DATA_DIR}/raw_historico/ga4_pages_screens_20*.csv")
+    candidatos = [c for c in candidatos if "_periodos_" not in c]
+    if not candidatos:
+        return None
+    mejor = None
+    for archivo in candidatos:
+        df = pd.read_csv(archivo, usecols=["date"])
+        fechas_mes = df["date"][df["date"].str.startswith(mes)]
+        if fechas_mes.empty:
+            continue
+        n_dias = fechas_mes.nunique()
+        if mejor is None or n_dias > mejor[1]:
+            mejor = (archivo, n_dias)
+    if mejor is None:
+        return None
+    df = pd.read_csv(mejor[0])
+    del_mes = df[df["date"].str.startswith(mes)]
+    return dict(
+        trafico=float(del_mes["screenPageViews"].sum()),
+        sesiones=float(del_mes["sessions"].sum()) if "sessions" in del_mes.columns else np.nan,
+        dias_reales=int(del_mes["date"].nunique()),
+        ultimo_dia=str(del_mes["date"].max()),
+    )
+
+
 @st.cache_data
 def trafico_total_por_periodo() -> pd.DataFrame:
     """Tráfico TOTAL real reportado por GA4 cada periodo (ene-jul 2026), sin
@@ -426,13 +476,18 @@ def trafico_total_por_periodo() -> pd.DataFrame:
     Analytics para todo el portal, para "Tendencia del portal" del Dashboard."""
     filas = []
     for periodo in reversed(ORDEN_PERIODOS):  # cronológico: ene -> jul
-        _, procesado = _crudo(periodo)
-        fila = dict(periodo=periodo, mes_label=MES_LABEL_LARGO[periodo], trafico=float(procesado["vistas"].sum()))
-        # "sesiones" (visitas GA4 reales, no páginas vistas) solo existe para el
-        # tier parcial -- es la cifra comparable 1:1 contra "Visitas" de Looker
-        # Studio/GA4, que es distinta de "vistas" (screenPageViews) usado en el
-        # resto de la app para métricas editoriales por nota.
-        fila["sesiones"] = float(procesado["sesiones"].sum()) if "sesiones" in procesado.columns else np.nan
+        real_diario = None if es_periodo_completo(periodo) else _trafico_real_diario_mes(periodo)
+        if real_diario:
+            fila = dict(periodo=periodo, mes_label=MES_LABEL_LARGO[periodo],
+                        trafico=real_diario["trafico"], sesiones=real_diario["sesiones"])
+        else:
+            _, procesado = _crudo(periodo)
+            fila = dict(periodo=periodo, mes_label=MES_LABEL_LARGO[periodo], trafico=float(procesado["vistas"].sum()))
+            # "sesiones" (visitas GA4 reales, no páginas vistas) solo existe para el
+            # tier parcial -- es la cifra comparable 1:1 contra "Visitas" de Looker
+            # Studio/GA4, que es distinta de "vistas" (screenPageViews) usado en el
+            # resto de la app para métricas editoriales por nota.
+            fila["sesiones"] = float(procesado["sesiones"].sum()) if "sesiones" in procesado.columns else np.nan
         filas.append(fila)
     return pd.DataFrame(filas)
 
@@ -1187,8 +1242,22 @@ def proyeccion_fin_de_mes(serie: pd.DataFrame, col_valor: str, col_mes: str = "p
     # que el acumulado arrancaba el día 1 del mes -- pero el export de GA4 es una
     # ventana móvil que arranca varios días ANTES (ver ventana_actual_info). Si
     # hay info real de la ventana, se usan los días que de verdad caen en `mes`.
-    info_ventana = ventana_actual_info(mes)
-    dias_transcurridos = info_ventana["dias_en_mes"] if info_ventana else date.today().day
+    #
+    # SEGUNDO BUG corregido 29-ago-2026: "dias_en_mes" de ventana_actual_info()
+    # es el SOLAPE de la ventana móvil con el mes, no los días reales que ya
+    # pasaron -- una vez que la ventana (ancho fijo, ~17-34 días) queda ENTERA
+    # dentro del mes en curso, ese solape es solo el ANCHO de la ventana (ej.
+    # 17), no los días de verdad transcurridos (ej. 28) -- infla la
+    # proyección de menos de lo que debería porque además "valor_actual" en
+    # ese caso ya viene de _trafico_real_diario_mes() (ver arriba), que si
+    # tiene su propio conteo real de días (dias_reales) hay que preferir ese,
+    # no el de la ventana.
+    real_diario = _trafico_real_diario_mes(mes)
+    info_ventana = None if real_diario else ventana_actual_info(mes)
+    if real_diario:
+        dias_transcurridos = real_diario["dias_reales"]
+    else:
+        dias_transcurridos = info_ventana["dias_en_mes"] if info_ventana else date.today().day
     dias_transcurridos = max(dias_transcurridos, 1)
     valor_actual = float(ultimo[col_valor])
     return {
@@ -1197,7 +1266,7 @@ def proyeccion_fin_de_mes(serie: pd.DataFrame, col_valor: str, col_mes: str = "p
         "dias_totales": dias_totales,
         "valor_actual": valor_actual,
         "valor_proyectado": valor_actual / dias_transcurridos * dias_totales,
-        "es_estimado": bool(info_ventana and info_ventana["es_estimado"]),
+        "es_estimado": bool(info_ventana and info_ventana["es_estimado"]) if not real_diario else False,
         "ventana_ini": info_ventana["ini"] if info_ventana else None,
         "ventana_fin": info_ventana["fin"] if info_ventana else None,
     }

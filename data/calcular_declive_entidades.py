@@ -18,9 +18,11 @@ COYUNTURAL ya corregido 16-ago-2026 -- "las entidades no pueden ser elementos
 coyunturales") aplicado a TODO el portal a la vez en vez de por periodista.
 
 Uso: python3 data/calcular_declive_entidades.py
-Lee data/raw_historico/ga4_pages_screens_periodos_2026-08-16.csv
+Lee el archivo con periodo_fin real más reciente de
+data/raw_historico/ga4_pages_screens_periodos_*.csv
 Escribe data/entidades_declive_portal.csv
 """
+import glob
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -39,7 +41,29 @@ from entidades_periodista import (  # noqa: E402
 )
 
 DIR = Path(__file__).parent
-RAW_GA4 = DIR / "raw_historico" / "ga4_pages_screens_periodos_2026-08-16.csv"
+
+
+def _ga4_periodos_mas_reciente() -> Path:
+    """Mismo bug real ya encontrado y corregido 21-ago-2026 en app/datos_reales.py
+    y data/construir_impresiones_mensuales.py: el nombre de archivo NO sirve para
+    saber cuál es más fresco -- conviven dos convenciones en raw_historico/
+    (ga4_pages_screens_periodos_2026-08-16.csv de un solo día vs.
+    ga4_pages_screens_periodos_<inicio>_<fin>.csv con rango), y ordenar por
+    nombre puede quedarse pegado en un archivo viejo. Este script todavía tenía
+    el nombre fijo (encontrado 29-ago-2026, entidades_declive_portal.csv seguía
+    fechado 17-ago pese a exports mucho más nuevos ya bajados) -- se generaliza
+    igual que los otros dos casos: comparar el periodo_fin real del contenido."""
+    candidatos = glob.glob(str(DIR / "raw_historico" / "ga4_pages_screens_periodos_*.csv"))
+    mejor_archivo, mejor_fecha = None, None
+    for archivo in candidatos:
+        df = pd.read_csv(archivo, usecols=["periodo", "periodo_fin"])
+        fila = df[df["periodo"] == "actual"]
+        if fila.empty:
+            continue
+        fin = pd.to_datetime(fila["periodo_fin"].iloc[0])
+        if mejor_fecha is None or fin > mejor_fecha:
+            mejor_archivo, mejor_fecha = archivo, fin
+    return Path(mejor_archivo)
 UMBRAL_VOLUMEN = 300  # piso de tráfico en la ventana "anterior" para no reportar ruido
 MAX_PCT_BOILERPLATE_PORTAL = 0.15  # a nivel portal, no 0.50 (ese umbral es por-periodista)
 MIN_NOTAS_CANDIDATO = 2
@@ -116,7 +140,9 @@ def _extraer_por_periodo(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def main():
-    df = pd.read_csv(RAW_GA4)
+    raw_ga4 = _ga4_periodos_mas_reciente()
+    df = pd.read_csv(raw_ga4)
+    print(f"Archivo usado: {raw_ga4.name}")
     print(f"Filas totales: {len(df)} -- periodos: {df['periodo'].unique().tolist()}")
     for p in df["periodo"].unique():
         sub = df[df["periodo"] == p]
